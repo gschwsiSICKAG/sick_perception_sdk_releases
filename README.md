@@ -1,10 +1,12 @@
 <div align="center">
 
 <img src="doc/SICK-logo.svg" alt="SICK Logo" width="300"/>
+<br/>
+<img src="doc/SICK-SDK-icon.svg" alt="SICK SDK Icon" width="90"/>
 
 # sick_perception_sdk
 
-A modern C++17 SDK for developing applications with various SICK LiDAR sensors and access to device configuration, scan data, and integration examples.
+A modern C++17 SDK for developing applications with various SICK LiDAR sensors and access to sensor configuration, scan data, and integration examples.
 
 ![OS](https://img.shields.io/badge/OS-Linux_|_Windows-005aff)
 ![CPU](https://img.shields.io/badge/CPU-x86_|_x86__64_|_ARM-005aff)
@@ -12,10 +14,9 @@ A modern C++17 SDK for developing applications with various SICK LiDAR sensors a
 [![License](https://img.shields.io/badge/License-Apache_License_2.0-005aff)](LICENSE)
 [![Maintenance](https://img.shields.io/badge/Maintained-yes-005aff)](https://github.com/SICKAG/sick_perception_sdk)
 [![Documentation](https://img.shields.io/badge/Documentation-complete-005aff)](https://github.com/SICKAG/sick_perception_sdk)
+[![Open Issues](https://img.shields.io/github/issues/SICKAG/sick_perception_sdk?label=Open%20Issues&color=005aff)](https://github.com/SICKAG/sick_perception_sdk/issues)
 
-[⚡️Getting started](#️getting-started) • [📖 Code Documentation](https://github.com/SICKAG/sick_perception_sdk/ghpages) • [🔄 Change Log](https://github.com/SICKAG/sick_perception_sdk/CHANGELOG.md)
-
-<!-- FIXME link -->
+[⚡️Getting started](#️getting-started) • [🔄 Change Log](CHANGELOG.md)
 
 </div>
 
@@ -26,28 +27,29 @@ A modern C++17 SDK for developing applications with various SICK LiDAR sensors a
 - [🛠️ Tested Compatibilities](#️-tested-compatibilities)
 - [📦 Code Dependencies](#-code-dependencies)
 - [⚡️Getting Started](#️getting-started)
-  - [Linux Prerequisites](#linux-prerequisites)
-  - [Windows Prerequisites](#windows-prerequisites)
-  - [Clone the Repository](#clone-the-repository)
-  - [Build Instructions (CMake build including all Examples in-tree)](#build-instructions-cmake-build-including-all-examples-in-tree)
-  - [Build Instructions (cmake install including a single Example)](#build-instructions-cmake-install-including-a-single-example)
-  - [Network Setup](#network-setup)
-  - [Sensor Setup](#sensor-setup)
-  - [Learning Examples](#learning-examples)
-- [⚙️ CMake Configurations](#️-cmake-configurations)
-- [🕹️ Usage](#️-usage)
-  - [Data Streaming](#data-streaming)
-  - [Device Configuration](#device-configuration)
-  - [Find Devices in the Network](#find-devices-in-the-network)
-  - [Firmware Update](#firmware-update)
+  - [1) Setup the Ethernet Network and the SICK sensor](#1-setup-the-ethernet-network-and-the-sick-sensor)
+  - [2a) Prepare Linux](#2a-prepare-linux)
+  - [2b) Prepare Windows](#2b-prepare-windows)
+  - [3) Clone the Repository](#3-clone-the-repository)
+  - [4) Explore the Learning Examples](#4-explore-the-learning-examples)
+  - [5) Build the Learning Examples (CMake build including all Examples in-tree)](#5-build-the-learning-examples-cmake-build-including-all-examples-in-tree)
+- [⚙️ Detailed Build Instructions](#️-detailed-build-instructions)
+  - [Configuring the CMake Build](#configuring-the-cmake-build)
+  - [Consuming the CMake Components](#consuming-the-cmake-components)
+  - [Example CMake Workflow](#example-cmake-workflow)
+  - [Conan 2.0](#conan-20)
+  - [Static Builds on Windows](#static-builds-on-windows)
 - [🧠 Technical Background](#-technical-background)
-  - [SDK Architecture](#sdk-architecture)
-  - [Data Structures](#data-structures)
-  - [Time Synchronization](#time-synchronization)
+  - [Overview](#overview)
+  - [Library Structure](#library-structure)
+  - [Sensor Configuration](#sensor-configuration)
+  - [Compact Streaming](#compact-streaming)
+  - [Logging](#logging)
+  - [Version](#version)
 - [🛠️ Troubleshooting and FAQ](#️-troubleshooting-and-faq)
-  - [No Connection to the Device](#no-connection-to-the-device)
+  - [No Connection to the Sensor](#no-connection-to-the-sensor)
   - [No Data Streaming](#no-data-streaming)
-  - [No Device Configuration](#no-device-configuration)
+  - [No Sensor Configuration](#no-sensor-configuration)
 - [🔑 License](#-license)
 - [💬 Feedback and Issues](#-feedback-and-issues)
   - [Requesting New Features](#requesting-new-features)
@@ -58,9 +60,9 @@ A modern C++17 SDK for developing applications with various SICK LiDAR sensors a
 
 ## ✨ Features
 
-- Receive scan data in SICK data format **Compact** over **UDP** or **TCP**
-- Device configuration via **REST API**
-- **Thread-safe** and event-driven data acquisition from multiple devices
+- Receive scan data, IMU data and encoder data in SICK data format **Compact** over **UDP** or **TCP**
+- Sensor configuration via **REST API**
+- **Thread-safe** and event-driven data acquisition from multiple sensors
 - Cross-platform build system using **CMake** for Linux and Windows
 - Dependency management via **Conan 2** possible
 - Compatible with **x64, x86 and ARM** architectures (e.g. Raspberry Pi)
@@ -70,18 +72,33 @@ A modern C++17 SDK for developing applications with various SICK LiDAR sensors a
 
 ## 🛠️ Tested Compatibilities
 
-|                          |                                                                                                                                                                                                                                                                                                       |
-| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **SICK devices**         | ✅ [**multiScan100 Family**](https://www.sick.com/multiscan100) (multiScan136, multiScan165, multiScan165-S, multiScan166)<br>✅ [**multiScan200 Family**](https://www.sick.com/multiscan200) (multiScan270)<br>✅ [**picoScan100 Family**](https://www.sick.com/picoscan100) (picoScan120, picoScan150) |
-| **Target Architectures** | ✅ x64 (64-bit)<br>✅ ARM (64-bit)                                                                                                                                                                                                                                                                      |
-| **Build Tools**          | ✅ GCC 11.5<br>✅ Clang/LLVM 13<br>✅ MSVC 19.29<br>✅ CMake 3.24                                                                                                                                                                                                                                         |
-| **Language Standard**    | ✅ C++17<br>❌ C++14                                                                                                                                                                                                                                                                                    |
-| **Platforms**            | ✅ Ubuntu 22.04 LTS<br> ✅ Ubuntu 24.04 LTS<br>✅ Windows 11<br>❌ macOS                                                                                                                                                                                                                                  |
+<table>
+  <tr>
+    <td><b>SICK Sensors</b></td>
+    <td>✅ <a href="https://www.sick.com/multiscan100"><b>multiScan100 Family</b></a> (multiScan136, multiScan165, multiScan165-S, multiScan166)<br>✅ <a href="https://www.sick.com/picoscan100"><b>picoScan100 Family</b></a> (picoScan120, picoScan150)<br>✅ <a href="https://www.sick.com/LRS4000"><b>LRS4000 Family</b></a> (LRS4581)</td>
+  </tr>
+  <tr>
+    <td><b>Target Architectures</b></td>
+    <td>✅ x64 (64-bit)<br>✅ ARM (64-bit)</td>
+  </tr>
+  <tr>
+    <td><b>Build Tools</b></td>
+    <td>✅ GCC 11.5 <br>✅ Clang/LLVM 13 <br>✅ MSVC 19.29 <br>✅ CMake 3.24</td>
+  </tr>
+  <tr>
+    <td><b>Language Standard</b></td>
+    <td>✅ C++17 <br>❌ C++14</td>
+  </tr>
+  <tr>
+    <td><b>Platforms</b></td>
+    <td>✅ Ubuntu 22.04 LTS <br>✅ Ubuntu 24.04 LTS <br>✅ Windows 11 ❌ macOS</td>
+  </tr>
+</table>
 
-> [!NOTE]  
+> [!NOTE]
 >
-> - Across all supported architectures, operating systems and compilers, the end-of-life (EOL) support for this repository is aligned with the officially communicated standard support timelines of each respective targets.
-> - The code base has been tested against the latest device firmware. Find the latest device firmware on [https://www.sick.com/](https://www.sick.com/).
+> - Across all supported architectures, operating systems and compilers, the end-of-life (EOL) support for this repository is aligned with the officially communicated standard support timelines of each respective target.
+> - The code base has been tested against the latest sensor firmware. Find the latest sensor firmware on [https://www.sick.com/](https://www.sick.com/).
 
 ## 📦 Code Dependencies
 
@@ -95,16 +112,30 @@ A modern C++17 SDK for developing applications with various SICK LiDAR sensors a
 | zlib          | >=1.3.1   | [License](https://zlib.net/zlib_license.html)                               |
 | CppSockets    | -         | [License](/src/compact_receiver/include/compact_receiver/socket/Socket.hpp) |
 
-> [!NOTE]
-> To exclude googletest from the build, set the CMake flag `BUILD_UNIT_TESTS` to `OFF`.
-
-<!-- FIXME: where / in which file to set this?? -->
+Also see [Detailed Build Instructions](#️-detailed-build-instructions).
 
 ## ⚡️Getting Started
 
-### Linux Prerequisites
+### 1) Setup the Ethernet Network and the SICK sensor
 
-Before you can build the SDK, make sure the following tools are installed on your system:
+Ensure your PC and your SICK sensors are all within the same subnet and your Ethernet interface uses a static IP address (e.g. 192.168.0.100).
+
+> [!NOTE] Note for Windows
+>
+> Ensure that the network interface used for sensor communication is set to **Private** in Windows network settings. If the interface is marked as **Public**, incoming UDP packets may be blocked by the firewall. Use a _Windows PowerShell_ to read the profile number with `Get-NetConnectionProfile` and `Set-NetConnectionProfile -InterfaceIndex 3 -NetworkCategory Private` to set this profile to `Private` (if necessary, run as administrator). Adapt your profile number accordingly.
+
+Setup the SICK sensor following these steps:
+
+1. Power on the sensor and wait until the boot sequence is complete. A green status LED indicates operational readiness.
+2. Establish the network connection by attaching the Ethernet cable to the sensor.
+3. The factory default IP address is [http://192.168.0.1/](http://192.168.0.1/).
+4. (Optional) Configure a custom IP address. Changing the default requires authentication. The predefined credentials are: User: `Service` and Password: `servicelevel`
+
+![Change IP address](doc/change-ip.png)
+
+### 2a) Prepare Linux
+
+Before you can build **sick_perception_sdk**, make sure the following tools are installed on your system:
 
 ```bash
 sudo apt update                       # Update package lists
@@ -123,7 +154,7 @@ gcc --version
 openssl version
 ```
 
-### Windows Prerequisites
+### 2b) Prepare Windows
 
 Before you can build **sick_perception_sdk**, make sure the following tools are installed on your system:
 
@@ -161,243 +192,584 @@ C:\Users\usr>openssl version
 OpenSSL 3.5.2 5 Aug 2025 (Library: OpenSSL 3.5.2 5 Aug 2025)
 
 C:\Users\usr>cmake --version
-cmake version 3.31.6-msvc6  
+cmake version 3.31.6-msvc6
 
 C:\Users\usr>cl
-Microsoft (R) C/C++ Optimizing Compiler Version 19.44.35219 for x86
+Microsoft (R) C/C++ Optimizing Compiler Version ...
 ```
 
-### Clone the Repository
+### 3) Clone the Repository
 
 ```bash
 git clone https://github.com/sick-ag/sick_perception_sdk.git
 cd sick_perception_sdk
 ```
 
-### Build Instructions (CMake build including all Examples in-tree)
+### 4) Explore the Learning Examples
 
-This workflow shows how to build the SDK libraries and the examples in one step without installing the libraries.
+To get a smooth start, check out the learning examples for the used SICK sensor.
+
+- [multiScan100 Learning Examples](examples/multiScan100_learning_examples.md)
+- [picoScan100 Learning Examples](examples/picoScan100_learning_examples.md)
+- [LRS4000 Learning Examples](examples/LRS4000_learning_examples.md)
+
+### 5) Build the Learning Examples (CMake build including all Examples in-tree)
+
+This workflow shows how to build the **sick_perception_sdk** libraries and the learning examples in one step without installing the libraries.
 
 ```bash
-# Download and install dependencies (Windows PowerShell)
+# For Windows PowerShell: Download and install dependencies
 ./install_third_party.ps1 Release
-# Download and install dependencies (Linux Bash)
+# For Linux Bash: Download and install dependencies
 ./install_third_party.sh Release
 
 # Configure and build all projects including examples
 cmake -S . -B build -DCMAKE_PREFIX_PATH="$PWD/install" -DCMAKE_BUILD_TYPE=Release -DBUILD_EXAMPLES=ON
 cmake --build build -j --config Release
 
-# Run the built example (Windows PowerShell)
-./build/bin/Release/picoScan100_configuration_and_streaming_example.exe
-# Run the built example (Linux Bash)
-./build/bin/Release/picoScan100_configuration_and_streaming_example
+# For Windows PowerShell: Run one of the built examples
+.\build\bin\Release\picoScan100_data_streaming_example.exe
+# For Linux Bash: Run one of the built examples
+./build/bin/picoScan100_data_streaming_example
 ```
 
-> [!NOTE]
-> To exclude googletest from the build, set the CMake flag `BUILD_UNIT_TESTS` to `OFF`.
+## ⚙️ Detailed Build Instructions
 
-### Build Instructions (cmake install including a single Example)
+### Configuring the CMake Build
 
-This workflow shows how to build the SDK libraries, install them to `/install`, and build an example project that consumes the installed libraries.
+The **sick_perception_sdk** consists of multiple libraries that can be built and consumed separately. This gives users the flexibility to customize their build according to the requirements of their application. This can help to constrain third-party dependencies to the minimum required set. Each library can be enabled or disabled with a CMake option. The cmake configuration contains logic to handle internal library dependencies automatically; enabling a library will also enable the libraries on which it depends. See section [Library Structure](#library-structure) for details on the dependencies between the libraries.
+
+The following CMake options can be set to configure the scope of the build.
+
+| CMake Option                 | Direct Third-Party Dependencies | Description                                                              | Default Value |
+| ---------------------------- | ------------------------------- | ------------------------------------------------------------------------ | :-----------: |
+| `BUILD_DRIVERS`              | plog                            | Build the library `drivers`.                                             |     `ON`      |
+| `BUILD_COMPACT_RECEIVER`     | ZLIB                            | Build the library `compact_receiver`.                                    |     `ON`      |
+| `BUILD_SENSOR_CONFIGURATION` | httplib, nlohmann_json, OpenSSL | Build the library `sensor_configuration`.                                |     `ON`      |
+| `BUILD_UNIT_TESTS`           | gtest                           | Build all unit test projects.                                            |     `OFF`     |
+| `BUILD_EXAMPLES`             |                                 | Build all example projects in-tree.                                      |     `OFF`     |
+| `BUILD_SHARED_LIBS`          |                                 | Build all libraries as shared libraries (.so on Linux, .dll on Windows). |     `OFF`     |
+
+The build can be further customized by setting standard CMake options. The most important common options are listed below.
+
+| CMake Option           | Description                                       |
+| ---------------------- | ------------------------------------------------- |
+| `CMAKE_BUILD_TYPE`     | Build configuration (Release, Debug).             |
+| `CMAKE_INSTALL_PREFIX` | Installation directory for libraries and headers. |
+| `CMAKE_PREFIX_PATH`    | Path to dependencies (third-party libraries).     |
+
+### Consuming the CMake Components
+
+Each library is provided as CMake component. After installing the libraries, the installation directory can be provided to CMake via the `CMAKE_PREFIX_PATH` variable. Each library can then be found and linked using `find_package` with the `COMPONENTS` option and `target_link_libraries`.
+
+```cmake
+find_package(
+  sick_perception_sdk
+  REQUIRED
+  COMPONENTS
+    drivers
+    sensor_configuration
+    compact_receiver
+)
+target_link_libraries(
+  your_target
+  PRIVATE
+    sick_perception_sdk::drivers
+    sick_perception_sdk::sensor_configuration
+    sick_perception_sdk::compact_receiver
+)
+```
+
+### Example CMake Workflow
+
+This workflow shows how to build and install the **sick_perception_sdk** libraries and build an example project that consumes the installed libraries. Third-party dependencies are installed to `/install`, the SDK libraries are installed to `/install_sdk`. This shows that different install directories can be used. If this is not required, both can be set to the same path.
 
 ```bash
-# Download and install dependencies (Windows PowerShell)
+# For Windows PowerShell: Download and install dependencies
 ./install_third_party.ps1 Release
-# Download and install dependencies (Linux Bash)
+# For Linux Bash: Download and install dependencies
 ./install_third_party.sh Release
 
-# Configure and build the main project
-cmake -S . -B build -DCMAKE_PREFIX_PATH="$PWD/install" -DCMAKE_BUILD_TYPE=Release
+# Install the libraries. Configure your own install directory if required.
+cmake -S . -B build -DCMAKE_PREFIX_PATH="$PWD/install" -DCMAKE_INSTALL_PREFIX="$PWD/install_sdk" -DCMAKE_BUILD_TYPE=Release
+cmake --build build --target install -j --config Release
+
+# Build examples for picoScan100 (change to specific device example folder)
+cd examples/picoScan100
+cmake -S . -B build -DCMAKE_PREFIX_PATH="$PWD/../../install;$PWD/../../install_sdk" -DCMAKE_BUILD_TYPE=Release
 cmake --build build -j --config Release
 
-# Install the built libraries. Configure your own install directory if required.
-cmake -S . -B build -DCMAKE_INSTALL_PREFIX="$PWD/install" -DCMAKE_BUILD_TYPE=Release
-cmake --build build --target install
-
-# Build an example
-cd examples/picoScan100/configuration_and_data_streaming
-cmake -S . -B build -DCMAKE_PREFIX_PATH="$PWD/../../../install" -DCMAKE_BUILD_TYPE=Release
-cmake --build build -j --config Release
-
-# Run the built example (Windows PowerShell)
-./build/Release/picoScan100_configuration_and_streaming_example.exe
-# Run the built example (Linux Bash)
-./build/Release/picoScan100_configuration_and_streaming_example
+# For Windows PowerShell: Run the built example
+.\build\Release\picoScan100_data_streaming_example.exe
+# For Linux Bash: Run the built example
+./build/picoScan100_data_streaming_example
 ```
 
-### Network Setup
+Note: the `$CWD` may not work on all systems (e.g. bash on Windows). Use the full path instead.
 
-Ensure your PC and your SICK devices are all within the same subnet and your ethernet interface uses a static IP address (e.g. 192.168.0.100).
+### Conan 2.0
 
-> [!NOTE] Note for Windows  
->
-> Ensure that the network interface used for sensor communication is set to **Private** in Windows network settings. If the interface is marked as **Public**, incoming UDP packets may be blocked by the firewall. Use a _Windows PowerShell_ to read the profile number with `Get-NetConnectionProfile` and `Set-NetConnectionProfile -InterfaceIndex 3 -NetworkCategory Private` to set this profile to `Private` (if necessary, run as administrator). Adapt your profile number accordingly.
+A more convenient way to handle the dependencies is [Conan 2.0](https://conan.io/). The `conanfile.py` in the root folder defines all required dependencies.
 
-### Sensor Setup
+The cmake options defined in the previous section can be set via Conan options in conan (python) syntax (`-o <option>={True|False}`).
 
-1. Power on the device and wait until the boot sequence is complete. A green status LED indicates operational readiness.
-2. Establish the network connection by attaching the Ethernet cable to the device.
-3. Verify IP configuration. The device must reside in the same subnet as the host system. The factory default IP address is [http://192.168.0.1/](http://192.168.0.1/).
-4. (Optional) Configure a custom IP address. Changing the default requires authentication. The predefined credentials are: User: `Service` and Password: `servicelevel`
+| CMake Option                 | conan Option                 |
+| ---------------------------- | ---------------------------- |
+| `BUILD_DRIVERS`              | `build_drivers`              |
+| `BUILD_COMPACT_RECEIVER`     | `build_compact_receiver`     |
+| `BUILD_SENSOR_CONFIGURATION` | `build_sensor_configuration` |
+| `BUILD_UNIT_TESTS`           | `build_unit_tests`           |
+| `BUILD_EXAMPLES`             | `build_examples`             |
+| `BUILD_SHARED_LIBS`          | `shared`                     |
 
-![Change IP address](doc/change-ip.png)
+The following commands are most useful when working with the SICK Perception SDK via Conan.
 
-### Learning Examples
-
-Checkout the learning examples to get started.
-
-- [multiScan100 Learning Examples](examples/multiScan100_learning_examples.md)
-- [multiScan200 Learning Examples](examples/multiScan200_learning_examples.md)
-- [picoScan100 Learning Examples](examples/picoScan100_learning_examples.md)
-
-Depending on the selected example and the operating system, you can start the executable as follows:  
-
-## ⚙️ CMake Configurations
-
-| CMake Option           | Description                                      | Default Value |
-| ---------------------- | ------------------------------------------------ | ------------- |
-| `BUILD_EXAMPLES`       | Build example applications                       | `OFF`         |
-| `BUILD_UNIT_TESTS`     | Build unit tests (requires googletest)           | `ON`          |
-| `CMAKE_BUILD_TYPE`     | Build configuration (Release, Debug)             | `Release`     |
-| `CMAKE_INSTALL_PREFIX` | Installation directory for libraries and headers | `install`     |
-| `CMAKE_PREFIX_PATH`    | Path to dependencies (third-party libraries)     | -             |
-
-## 🕹️ Usage
-
-### Data Streaming
-
-The SDK offers multiple callbacks, depending on the connected device, to process data (e.g. scan data, imu data or ambient light data).
-
-#### Segmented Scan Data Callback
-
-```cpp
-
-```
-<!-- FIXME: link doxygen -->
-
-#### Full Frame Callback
-
-```cpp
-
-```
-<!-- FIXME: link doxygen -->
-
-#### Point Cloud Callback
-
-```cpp
-
-```
-<!-- FIXME: link doxygen -->
-
-The content of the point cloud can be configured individually. For more details, refer to: `/src/compact_receiver/include/compact_receiver/PointCloudConfiguration.hpp`
-
-#### Ambient Light Data Callback
-
-```cpp
-
-```
-<!-- FIXME: link doxygen -->
-
-#### IMU Data Callback
-
-```cpp
-
-```
-<!-- FIXME: link doxygen -->
-
->The IMU is factory calibrated. Recalibration is not possible.
-
-### Device Configuration
-
-The SDK reads device settings via the REST interfaces. For more details see `\src\sensor_configuration`. Example:
-
-```cpp
-
-```
-<!-- FIXME: Convenience function-->
-<!-- FIXME: link doxygen -->
-
->The possible sensor configurations depend on the device variant used and the installed licenses.
-
-The SDK writes devices configurations via the REST interfaces, using a challenge–response authentication method for secure access. For more details see: `\src\sensor_configuration`. Example:
-
-<!-- FIXME: add a example with a Convenience function (scanDataStreaming) and add the doxygen link-->
-
-```cpp
-
+```bash
+conan install . --build=missing  # Install dependencies using the default conan profile
+conan build .                    # Build the sick_perception_sdk libraries
+conan create .                   # Install the sick_perception_sdk libraries to the local conan cache
 ```
 
-<!-- FIXME: add a example with a standard function (set device time) function and add the doxygen link-->
+### Static Builds on Windows
 
-```cpp
-
-```
-
-It is also possible to import and export a full device configuration (.json).
-
-```cpp
-
-```
-<!-- FIXME: add code and link doxygen -->
-
-### Find Devices in the Network
-
-```cpp
-
-```
-<!-- FIXME: add code and link doxygen -->
-
-### Firmware Update
-
-```cpp
-
-```
-<!-- FIXME: add code and link doxygen -->
+The conan project is configured to build static libraries by default. However, for all dependencies to be linked statically, this requires that `compiler.runtime=static` is configured on Windows, e.g. in the conan profile.
 
 ## 🧠 Technical Background
 
-### SDK Architecture
+### Overview
 
-<!-- FIXME: UML / Mermaid like  overview-->
+The following figure shows the typical top-level integration of **sick_perception_sdk**.
 
 ```mermaid
-graph TD;
-    Application --> LiDAR_SDK
-    LiDAR_SDK --> Sensor_Communication
-    LiDAR_SDK --> Data_Processing
-    LiDAR_SDK --> Configuration_Interface
-    Sensor_Communication --> SICK_LiDAR_Device
+stateDiagram-v2
+  state "Customer Application" as CustomerApplication
+  state "sick_perception_sdk" as SDK
+  state "SICK Sensor" as Sensor
+
+  CustomerApplication --> SDK: compiles and links
+  SDK --> Sensor: configuration via REST
+  Sensor --> SDK: status via REST
+  Sensor --> SDK: Compact data streaming via UDP or TCP
 ```
 
-### Data Structures
+### Library Structure
 
-The SDK receives the SICK data format _Compact_ from the devices, which contains radial distances, intensity, angles, and timestamps. For full documentation, refer to the [Data format description](https://www.sick.com/8028132). The format parser is located in `\src\ScanDataParser.cpp`.
+**sick_perception_sdk** comprises a set of libraries for different functionality.
 
-For more convenient handling, the SDK also provides a conversion to point cloud in `src\compact_receiver\src\PointCloudConverter.cpp`.
+```mermaid
+---
+config:
+  class:
+    hideEmptyMembersBox: true
+---
+classDiagram
+  namespace sick_perception_sdk {
+    class common["library common"]
+    class compact_receiver["library compact_receiver"]
+    class drivers["library drivers"]
+    class sensor_configuration["library sensor_configuration"]
+  }
 
-### Time Synchronization
+  namespace examples {
+    class application["customer applications"]
+  }
 
-When using two or more LiDARs in a combined system, accurate time alignment of scan data is important. The recommended approach is to enable **PTP (Precision Time Protocol)** on all devices and the host system. This reduces drift compared to NTP and enables accurate fusion of multi-sensor data.
+  compact_receiver ..> common
+  drivers ..> compact_receiver
+  sensor_configuration ..> common
+  application ..> drivers
+  application ..> sensor_configuration
+```
 
-> [!NOTE]
->
-> - The current system time can be read and set with: <!-- FIXME: add doxygen link to systemTime(*this) -->
-> - The time synchronization method can set with: <!-- FIXME: add doxygen link to timeSynchronization(*this) -->
+- The library **common** provides common functionality used by other sick_perception_sdk libraries.
+- The library **compact_receiver** implements functionality to receive and parse data from Compact formatted data streams SICK sensors.
+- The library **sensor_configuration** provides functionality to configure SICK sensors via their REST APIs.
+- The library **drivers** provides high-level classes to interact with SICK sensors, including configuration and data acquisition.
+
+### Sensor Configuration
+
+**sick_perception_sdk** provides classes to configure SICK devices, read back configuration parameters, and read the sensor status. This functionality is implemented in the `sensor_configuration` library.
+
+All configuration and status interactions with the sensor are based on the devices' REST APIs.
+
+#### SensorConfigurator Class
+
+Sensor configuration is handled by device-specific configurator classes that derive from the `SensorConfigurator` base class.
+
+```mermaid
+---
+config:
+  class:
+    hideEmptyMembersBox: true
+---
+classDiagram
+    class SensorConfigurator {
+        + readVariable~PayloadT~() : PayloadT::Get::Response
+        + writeVariable~PayloadT~(payload: PayloadT::Post::Request)
+        + invokeMethod(...) : ResponsePayloadType
+    }
+    class MultiScan100Configurator
+    class PicoScan100Configurator
+    class OtherConfigurator["..."]
+
+    SensorConfigurator <|-- MultiScan100Configurator
+    SensorConfigurator <|-- PicoScan100Configurator
+    SensorConfigurator <|-- OtherConfigurator
+```
+
+The `SensorConfigurator` class is the base class for all sensor-specific configurator classes. It provides functions for raw access to the sensor's REST API as well as convenience accessors for common configuration and status entities.
+
+#### Raw Variable Access
+
+The `SensorConfigurator` base class provides the functions `readVariable` and `writeVariable` for raw access to sensor REST endpoints that represent SOPAS variables. These functions expect payloads that are generated from the OpenAPI specification of the sensor.
+
+Functions that execute POST requests will perform the challenge response procedure with the configured user level and password. The challenge response procedure is described in the [SICK Scan REST Client](https://github.com/SICKAG/sick_scan_rest_client) documentation.
+
+An example of using the raw variable access is given below.
+
+```cpp
+#include <sick_perception_sdk/sensor_configuration/SensorConfigurator.hpp>
+#include <sick_perception_sdk/sensor_configuration/api/picoScan100.g.hpp> // Include all generated payloads for picoScan100
+
+// Create a generic device configurator.
+sick::SensorConfigurator configurator{"192.168.0.1", 80, sick::UserLevel::Service, "servicelevel"};
+
+// Configure and enable the interval filter.
+sick::srt::picoScan100::LFPintervalFilter::Post::Request const request {true, 2};
+configurator.writeVariable<sick::srt::picoScan100::LFPintervalFilter>(request);
+
+// Read and print the sensor's serial number.
+auto const serialNumber = configurator.readVariable<sick::srt::picoScan100::SerialNumber>()._SerialNumber;
+std::cout << "Serial Number: " << serialNumber << '\n';
+```
+
+#### SOPAS Method Access
+
+Some REST endpoints represent SOPAS functions that are handled differently than SOPAS variables. The `readVariable` and `writeVariable` functions cannot be used in this case. The generated endpoint structures have their `isSopasMethod` field set to `true`. Invoking the SOPAS methods requires more detailed knowledge about the REST API and the structure of the payloads than the variable access. SOPAS methods should be invoked by manually assembling and executing a POST request. The `SensorConfigurator` class provides the function `post` to initiate the request.
+
+An example with a request payload and a response payload is given below (the `sick` namespace has been omitted for clarity).
+
+```cpp
+#include <sick_perception_sdk/sensor_configuration/HttpClient/httplib_client/HttpClient.hpp>
+#include <sick_perception_sdk/sensor_configuration/SensorConfigurator.hpp>
+#include <sick_perception_sdk/sensor_configuration/api/picoScan100.g.hpp> // Include all generated payloads for picoScan100
+
+// Create a generic device configurator.
+auto const httpClient = std::make_shared<httplib_client::HttpClient>(deviceAddress, 80);
+PicoScan100Configurator configurator(httpClient, UserLevel::Service, "servicelevel");
+
+// Read the field evaluation contours. This requires a request payload that indicates which evaluation ID to query.
+// The POST call returns a response payload with the field contours.
+int const evaluationId = 1;
+sick::srt::picoScan100::GetFieldEvaluationContour::Post::Request const request {evaluationId};
+auto const response
+  = m_configurator.post(sick::srt::picoScan100::GetFieldEvaluationContour::methodName)
+                  .withPlainRequestPayload(request)
+                  .execute()
+                  .withPlainResponsePayload<sick::srt::picoScan100::GetFieldEvaluationContour::Post::Response>();
+```
+
+#### Convenience Accessors
+
+While the raw variable access provides full flexibility through the direct REST API representation, the device-specific configurator classes simplify common configuration and status operations with convenient accessors for key endpoints.
+
+The design principle is that each endpoint is represented by an accessor object of the configurator class. The accessor object implements the functions for interacting with the endpoint. The naming convention for each abstracted sensor endpoint is `<endpoint>Access`.
+
+The accessors take a reference to the `SensorConfigurator` instance which allows them to call the necessary `readVariable`, `writeVariable`, or `invokeMethod` functions. For example, an interval filter may be represented by an `IntervalFilterAccess` that implements functions like `enable`, `disable`, or `isEnabled`.
+
+A general example is given below.
+
+```mermaid
+---
+config:
+  class:
+    hideEmptyMembersBox: true
+---
+classDiagram
+    class SensorConfigurator
+
+    class DeviceAConfigurator {
+        + const IntervalFilterAccess intervalFilter
+        + const SerialNumberAccess serialNumber
+    }
+
+    class IntervalFilterAccess {
+        + enable()
+        + disable()
+        + isEnabled() : bool
+        - SensorConfigurator const& m_configurator
+    }
+
+    class SerialNumberAccess {
+        + get() : string
+        - SensorConfigurator const& m_configurator
+    }
+
+    SensorConfigurator <|-- DeviceAConfigurator
+    DeviceAConfigurator *-- IntervalFilterAccess
+    DeviceAConfigurator *-- SerialNumberAccess
+    SensorConfigurator o-- IntervalFilterAccess
+    SensorConfigurator o-- SerialNumberAccess
+```
+
+User code can access these convenience accessors via the device-specific configurator class.
+
+```cpp
+#include <sick_perception_sdk/sensor_configuration/HttpClient/httplib_client/HttpClient.hpp>
+#include <sick_perception_sdk/sensor_configuration/PicoScan100Configurator.hpp>
+
+// Create the convenience device configurator for a picoScan100 sensor.
+auto const httpClient = std::make_shared<httplib_client::HttpClient>(deviceAddress, 80);
+PicoScan100Configurator configurator(httpClient, UserLevel::Service, "servicelevel");
+
+// Configure and enable the interval filter.
+configurator.intervalFilter.enable(2);
+
+// Read and print the sensor's serial number.
+auto serialNumber = configurator.serialNumber.get();
+std::cout << "Serial Number: " << serialNumber << '\n';
+```
+
+#### Code Generation from OpenAPI
+
+To interact with REST API, **sick_perception_sdk** provides payload classes that represent the bodies of the REST requests. The payload classes are generated from the devices' OpenAPI descriptions.
+
+Each REST endpoint is represented by a generated header in `/src/sensor_configuration/include/sensor_configuration/api/<device type>/<endpoint>.g.hpp`. All generated code is in the device-specific namespace `sick::srt::<device type>`.
+
+The structure of a REST request is represented by nested `struct`s.
+
+```mermaid
+---
+config:
+  class:
+    hideEmptyMembersBox: true
+---
+classDiagram
+  class Endpoint["&lt;endpoint&gt;"] {
+    + const char* variableName$
+  }
+
+  class Post
+  class PostRequest["Request"]
+  class PostRequestPayload["&lt;request payload objects&gt;"]
+  class PostResponse["Response"]
+  class PostResponsePayload["&lt;response payload objects&gt;"]
+
+  class Get
+  class GetRequest["Request"]
+  class GetResponse["Response"]
+
+  <<struct>> Endpoint
+  <<struct>> Post
+  <<struct>> PostRequest
+  <<struct>> PostRequestPayload
+  <<struct>> PostResponse
+  <<struct>> PostResponsePayload
+  <<struct>> Get
+  <<struct>> GetRequest
+  <<struct>> GetResponse
+
+  Endpoint <.. Post: declared in
+  Post <.. PostRequest: declared in
+  PostRequest *-- PostRequestPayload
+  PostRequest <.. PostRequestPayload: declared in
+  Post <.. PostResponse: declared in
+  PostResponse *-- PostResponsePayload
+  PostResponse <.. PostResponsePayload: declared in
+
+  Endpoint <.. Get: declared in
+  Get <.. GetRequest: declared in
+  GetRequest *-- GetRequestPayload
+  GetRequest <.. GetRequestPayload: declared in
+  Get <.. GetResponse: declared in
+  GetResponse *-- GetResponsePayload
+  GetResponse <.. GetResponsePayload: declared in
+```
+
+Each supported device is represented by a full set of such generated headers in the corresponding device namespace. This means that there are many headers with the same content but it ensures that all devices are self-contained.
+
+Instructions for the code generator can be found in [CONTRIBUTING.md](CONTRIBUTING.md).
+
+#### HTTP Client Implementation
+
+The sensor configuration classes expect a HTTP client implementation to perform the REST requests. Necessary functions are defined by the `IHttpClient` interface. The sick_perception_sdk provides a default implementation based on the [cpp-httplib](https://github.com/yhirose/cpp-httplib). Users can provide their own HTTP client implementation by implementing the `IHttpClient` interface and injecting it into the `SensorConfigurator` instance.
+
+#### HTTPS Support (HTTP over TLS)
+
+The sick_perception_sdk's default HTTP client implementation supports HTTPS. In the default implementation, HTTPS is implemented in a separate class `HttpsClient` that derives from the `IHttpClient` interface. To use HTTPS, inject an instance of the `HttpsClient` into the `SensorConfigurator` instance.
+
+```mermaid
+---
+config:
+  class:
+    hideEmptyMembersBox: true
+---
+classDiagram
+    class IHttpClient
+
+    class HttpClientBase~ClientT~ {
+      - unique_ptr<ClientT> m_client
+      + client() : ClientT&
+    }
+
+    class HttpClient
+    class HttpsClient
+
+    IHttpClient <|-- HttpClientBase
+    HttpClientBase <|-- HttpClient: ClientT = httplib__Client
+    HttpClientBase <|-- HttpsClient: ClientT = httplib__SSLClient
+```
+
+#### Certificate Configuration for HTTPS
+
+When using HTTPS to communicate with SICK sensors, proper certificate configuration is required.
+
+- The SDK requires a certificate that is treated as trusted root certificate.
+- Client certificate authentication (mutual TLS) is **not supported**.
+
+**Providing the Root Certificate:**
+
+On **Windows**, the default implementation of `IHttpsClient` using `cpp-httplib` can read certificates from the Windows certificate store.
+
+```cpp
+auto const httpsClient = std::make_shared<httplib_client::HttpsClient>(deviceAddress, 443);
+```
+
+Alternatively, the file path to a root certificate can be provided explicitly.
+
+```cpp
+auto const httpsClient = std::make_shared<httplib_client::HttpsClient>(
+    deviceAddress,
+    443,
+    "path/to/ca-cert.pem"  // explicit root certificate
+);
+```
+
+### Compact Streaming
+
+**sick_perception_sdk** provides functionality to receive and parse data from SICK sensors that stream data in the [Compact format](https://www.sick.com/8028132). This functionality is implemented in the `compact_receiver` library.
+
+The library is designed in layers so applications can choose the level of abstraction they want to work with.
+
+<table>
+  <thead>
+    <tr>
+      <th align="left">Layer</th>
+      <th align="left">Description</th>
+      <th align="left">Examples</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td valign="top"><em>Data Structures</em></td>
+      <td valign="top">The structures in this layer represent the data received from the sensor in a convenient format for further processing. The structures are a close but not necessarily exact image of the Compact formats streamed by the sensors.</td>
+      <td valign="top">
+        <a href="src/compact_receiver/include/compact_receiver/AmbientLightData.hpp">AmbientLightData</a>,
+        <a href="src/compact_receiver/include/compact_receiver/EncoderData.hpp">EncoderData</a>,
+        <a href="src/compact_receiver/include/compact_receiver/ImuData.hpp">ImuData</a>,
+        <a href="src/compact_receiver/include/compact_receiver/ScanData.hpp">ScanData</a>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top"><em>Low-Level Data Exchange</em></td>
+      <td valign="top">This layer provides classes for low-level data via UDP or TCP sockets. The primary purpose of these classes to abstract access of the operating system sockets (<code>sys/socket.h</code> on Linux, <code>winsock2.h</code> on Windows).</td>
+      <td valign="top">
+        <a href="src/compact_receiver/include/compact_receiver/TcpClientSocket.hpp">TcpClientSocket</a>,
+        <a href="src/compact_receiver/include/compact_receiver/UdpListeningSocket.hpp">UdpListeningSocket</a>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top"><em>Compact Parsing</em></td>
+      <td valign="top">This layer provides classes to parse Compact formatted data streams. The parsers convert raw byte streams into the data structures defined in the data structures layer. These parsers can be used without reference to the <em>low-level data exchange</em> layer so it is possible to use other socket or data exchange implementations.</td>
+      <td valign="top">
+        <a href="src/compact_receiver/include/compact_receiver/AmbientLightParser.hpp">AmbientLightParser</a>,
+        <a href="src/compact_receiver/include/compact_receiver/EncoderParser.hpp">EncoderParser</a>,
+        <a href="src/compact_receiver/include/compact_receiver/ImuParser.hpp">ImuParser</a>,
+        <a href="src/compact_receiver/include/compact_receiver/ScanDataParser.hpp">ScanDataParser</a>,
+        <a href="src/compact_receiver/include/compact_receiver/StreamExtractor.hpp">StreamExtractor</a>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top"><em>Convenience Compact Handling</em></td>
+      <td valign="top">This layer provides classes that combine low-level data exchange and Compact parsing to provide convenient access to Compact data streams via UDP or TCP. These convenience classes contain their own threads. Interaction with the application is done via callbacks.</td>
+      <td valign="top">
+        <a href="src/compact_receiver/include/compact_receiver/TcpCompactStream.hpp">TcpCompactStream</a>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top"><em>Helpers</em></td>
+      <td valign="top">This layer provides helper classes for common tasks when working with Compact data, e.g., monitoring package loss or converting scan data to point clouds.</td>
+      <td valign="top">
+        <a href="src/compact_receiver/include/compact_receiver/PackageLossMonitor.hpp">PackageLossMonitor</a>,
+        <a href="src/compact_receiver/include/compact_receiver/PointCloudConverter.hpp">PointCloudConverter</a>,
+        <a href="src/compact_receiver/include/compact_receiver/PointCloudToPCDConverter.hpp">PointCloudToPCDConverter</a>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+The layers depend on each other as follows.
+
+```mermaid
+---
+config:
+  class:
+    hideEmptyMembersBox: true
+---
+classDiagram
+class DataStructures["Data Structures"]
+class LowLevelDataExchange ["Low-Level Data Exchange"]
+class CompactParsing ["Compact Parsing"]
+class ConvenienceCompactHandling ["Convenience Compact Handling"]
+class Helpers ["Helpers"]
+
+DataStructures <|-- LowLevelDataExchange
+DataStructures <|-- CompactParsing
+DataStructures <|-- Helpers
+LowLevelDataExchange <|-- ConvenienceCompactHandling
+CompactParsing <|-- ConvenienceCompactHandling
+```
+
+### Logging
+
+**sick_perception_sdk** provides basic logging functionality via the `common` library. The default logging implementation uses [plog](https://github.com/SergiusTheBest/plog) implemented in `logging.plog.cpp`.
+
+If desired, a different logging implementation can be integrated by implementing the `Log` and `LogMessage` and compiling it into the project. Custom implementations should make sure that logging is possible without explicit initialization, e.g., via static initialization of the logging backend. A call to `Log::init()` should be optional for application code.
+
+The minimum log level can be configured by calling the static function `Log::setMinLogLevel(LogLevel level)` in the application's main function before any other SDK code is called.
+
+For example, to set the minimum log level to `Warning`, use the following code snippet:
+
+```cpp
+sick::Log::init(sick::LogLevel::Warning);
+```
+
+With this configuration, only log messages with the level `Warning` or `Error` will be logged.
+
+### Version
+
+The version of the **sick_perception_sdk** can be obtained via the `sick::version()` function:
+
+```cpp
+#include <sick_perception_sdk/common/version.hpp>
+auto const ver = sick::version();
+```
+
+Its contents are defined by the `PROJECT_VERSION` and `PRE_RELEASE_VERSION` variables in the top-level `CMakeLists.txt`.
 
 ## 🛠️ Troubleshooting and FAQ
 
-### No Connection to the Device
+### No Connection to the Sensor
 
-First, check if the device is powered on. A green LED on the device indicates that it is running. If the LED is off, verify that the power supply is connected and working. If the device is powered but still not reachable, check your network settings. Make sure your PC is in the same subnet as the device.  Try to ping the device to confirm connectivity. If the connection still fails, verify that you are using the correct IP address. The default IP address of the device is `192.168.0.1`.
+First, check if the sensor is powered on. A green LED on the sensor indicates that it is running. If the LED is off, verify that the power supply is connected and working. If the sensor is powered but still not reachable, check your network settings. Make sure your PC is in the same subnet as the sensor. Try to ping the sensor to confirm connectivity. If the connection still fails, verify that you are using the correct IP address. The default IP address of the sensor is `192.168.0.1`.
 
 ### No Data Streaming
 
 If no data is being received, ensure that UDP traffic is not blocked by a firewall. On Windows systems, make sure the network interface is set to `Private` using the `Get-NetConnectionProfile` / `Set-NetConnectionProfile` command.
 
-### No Device Configuration
+### No Sensor Configuration
 
-If you cannot access the device configuration, confirm that you are using the correct password. If the password has been changed, update your login credentials accordingly.
+If you cannot access the sensor configuration, confirm that you are using the correct password. If the password has been changed, update your login credentials accordingly.
 
 Use the diagnosis examples (e.g. [examples\picoScan100\diagnosis\main.cpp](examples\picoScan100\diagnosis\main.cpp)) to get some basic diagnosis information.
 
@@ -407,7 +779,7 @@ This project is licensed under the [Apache License 2.0](LICENSE).
 
 ## 💬 Feedback and Issues
 
-For SDK- or code-related issues, use the GitHub Issues section of this repository. This keeps discussion transparent and enables community-driven fixes.
+For **sick_perception_sdk**-related issues, use the GitHub Issues section of this repository. This keeps discussions transparent and enables community-driven fixes.
 For sensor-specific issues (hardware defects or replacement), contact your local SICK sales and service representative. Local contacts are listed on the [SICK Website](https://support.sick.com).
 
 ### Requesting New Features
@@ -433,6 +805,7 @@ For both, please check existing issues before submitting to avoid duplicates.
 For guidelines on how to contribute, please see our [contributing guide](CONTRIBUTING.md).
 
 ---
+
 ---
 
-Keywords: multiScan, multiScan100, multiScan136, multiScan165, multiScan165-S, multiScan166, multiScan200, multiScan270, picoScan, picoScan100, picoScan120, picoScan150, LRS4000, LRS4581, LiDAR, C++, SDK, SICK Sensor, Point Cloud, 3D Scanning, Sensor Integration, Real-time Processing, SLAM, AMR, Autonomous Systems, Object Detection, Sensor Fusion, Industrial Automation, PCL, Data Parser, REST, API, C++ Driver
+Keywords: multiScan, multiScan100, multiScan136, multiScan165, multiScan165-S, multiScan166, picoScan, picoScan100, picoScan120, picoScan150, LRS4000, LRS4581, LiDAR, C++, SDK, SICK Sensor, Point Cloud, 3D Scanning, Sensor Integration, Real-time Processing, SLAM, AMR, Autonomous Systems, Object Detection, Sensor Fusion, Industrial Automation, PCL, Data Parser, REST, API, C++ Driver

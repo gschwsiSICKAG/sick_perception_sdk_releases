@@ -1,0 +1,110 @@
+/*
+Copyright (c) 2026 SICK AG
+SPDX-License-Identifier: MIT
+*/
+
+/**
+ * @file PortState.g.hpp Sensor REST API payload definitions.
+ * @warning This file was generated for device 'picoScan100' version '2.2.0'.
+ * Do not edit manually!
+ */
+#pragma once
+
+#include <sick_perception_sdk/common/export.hpp>
+#include <sick_perception_sdk/sensor_configuration/api/NumericRange.hpp>
+
+namespace sick::srt::picoScan100 {
+
+/**
+ * @brief Payloads for endpoint /PortState.
+*/
+struct SDK_EXPORT PortState
+{
+
+  constexpr static const char* variableName = "PortState";
+  constexpr static const bool isSopasMethod = false;
+
+/**
+ * @brief Returns the state of the ports. "PortState" is preferred over "OutputState".
+*/
+struct SDK_EXPORT Get
+{
+struct SDK_EXPORT Response
+{
+  struct SDK_EXPORT aInternalPortsItem
+  {
+    enum class ePortState
+    {
+      OutputNotActive = 0,
+      OutputActive = 1,
+      Tristate = 2,
+      InputActive = 3,
+      InputNotActive = 4,
+    };
+
+    aInternalPortsItem() = default;
+
+    explicit aInternalPortsItem(ePortState ePortState, int PortCounter)
+      : _ePortState(ePortState), _PortCounter(PortCounter)
+    {}
+
+    ePortState _ePortState;
+    int _PortCounter;
+  };
+
+  struct SDK_EXPORT aExternalPortsItem
+  {
+    enum class ePortState
+    {
+      OutputNotActive = 0,
+      OutputActive = 1,
+      Tristate = 2,
+      InputActive = 3,
+      InputNotActive = 4,
+    };
+
+    aExternalPortsItem() = default;
+
+    explicit aExternalPortsItem(ePortState ePortState, int PortCounter)
+      : _ePortState(ePortState), _PortCounter(PortCounter)
+    {}
+
+    ePortState _ePortState;
+    int _PortCounter;
+  };
+
+  struct SDK_EXPORT aTimeBlockItem
+  {
+    aTimeBlockItem() = default;
+
+    explicit aTimeBlockItem(NumericRange<0, 2105, 0> uiYear, NumericRange<0, 12, 1> usiMonth, NumericRange<0, 31, 1> usiDay, NumericRange<0, 23, 0> usiHour, NumericRange<0, 59, 0> usiMinute, NumericRange<0, 59, 0> usiSec, NumericRange<0, 999999, 0> udiUSec)
+      : _uiYear(std::move(uiYear)), _usiMonth(std::move(usiMonth)), _usiDay(std::move(usiDay)), _usiHour(std::move(usiHour)), _usiMinute(std::move(usiMinute)), _usiSec(std::move(usiSec)), _udiUSec(std::move(udiUSec))
+    {}
+
+    NumericRange<0, 2105, 0> _uiYear;
+    NumericRange<0, 12, 1> _usiMonth;
+    NumericRange<0, 31, 1> _usiDay;
+    NumericRange<0, 23, 0> _usiHour;
+    NumericRange<0, 59, 0> _usiMinute;
+    NumericRange<0, 59, 0> _usiSec;
+    NumericRange<0, 999999, 0> _udiUSec;
+  };
+
+  Response() = default;
+
+  explicit Response(int uiVersionNumber, int udiSystCount, std::vector<aInternalPortsItem> aInternalPorts, std::vector<aExternalPortsItem> aExternalPorts, std::vector<aTimeBlockItem> aTimeBlock)
+    : _uiVersionNumber(uiVersionNumber), _udiSystCount(udiSystCount), _aInternalPorts(aInternalPorts), _aExternalPorts(aExternalPorts), _aTimeBlock(aTimeBlock)
+  {}
+
+  int _uiVersionNumber;
+  int _udiSystCount;
+  std::vector<aInternalPortsItem> _aInternalPorts;
+  std::vector<aExternalPortsItem> _aExternalPorts;
+  std::vector<aTimeBlockItem> _aTimeBlock;
+};
+
+}; // struct Get
+
+}; // struct PortState
+
+} // namespace sick::srt::picoScan100

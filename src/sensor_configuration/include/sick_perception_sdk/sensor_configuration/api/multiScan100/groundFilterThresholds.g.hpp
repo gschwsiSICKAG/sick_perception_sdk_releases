@@ -1,0 +1,69 @@
+/*
+Copyright (c) 2026 SICK AG
+SPDX-License-Identifier: MIT
+*/
+
+/**
+ * @file groundFilterThresholds.g.hpp Sensor REST API payload definitions.
+ * @warning This file was generated for device 'multiScan100' version '2.4.1'.
+ * Do not edit manually!
+ */
+#pragma once
+
+#include <sick_perception_sdk/common/export.hpp>
+#include <sick_perception_sdk/sensor_configuration/api/NumericRange.hpp>
+
+namespace sick::srt::multiScan100 {
+
+/**
+ * @brief Payloads for endpoint /groundFilterThresholds.
+*/
+struct SDK_EXPORT groundFilterThresholds
+{
+
+  constexpr static const char* variableName = "groundFilterThresholds";
+  constexpr static const bool isSopasMethod = false;
+
+/**
+ * @brief Returns/set the ground filter thresholds.
+*/
+struct SDK_EXPORT Get
+{
+struct SDK_EXPORT Response
+{
+  Response() = default;
+
+  explicit Response(NumericRange<-10000, 0, -100> minimumDistance, NumericRange<0, 10000, 100> maximumDistance)
+    : _minimumDistance(std::move(minimumDistance)), _maximumDistance(std::move(maximumDistance))
+  {}
+
+  NumericRange<-10000, 0, -100> _minimumDistance;
+  NumericRange<0, 10000, 100> _maximumDistance;
+};
+
+}; // struct Get
+
+/**
+ * @brief Returns/set the ground filter thresholds.
+
+ This function requires at least user level: Authorized Client.
+*/
+struct SDK_EXPORT Post
+{
+struct SDK_EXPORT Request
+{
+  Request() = default;
+
+  explicit Request(NumericRange<-10000, 0, -100> minimumDistance, NumericRange<0, 10000, 100> maximumDistance)
+    : _minimumDistance(std::move(minimumDistance)), _maximumDistance(std::move(maximumDistance))
+  {}
+
+  NumericRange<-10000, 0, -100> _minimumDistance;
+  NumericRange<0, 10000, 100> _maximumDistance;
+};
+
+}; // struct Post
+
+}; // struct groundFilterThresholds
+
+} // namespace sick::srt::multiScan100

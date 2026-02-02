@@ -1,0 +1,68 @@
+/*
+Copyright (c) 2026 SICK AG
+SPDX-License-Identifier: MIT
+*/
+
+/**
+ * @file temperatureAlarmConfiguration.g.hpp Sensor REST API payload definitions.
+ * @warning This file was generated for device 'multiScan100' version '2.4.1'.
+ * Do not edit manually!
+ */
+#pragma once
+
+#include <sick_perception_sdk/common/export.hpp>
+
+namespace sick::srt::multiScan100 {
+
+/**
+ * @brief Payloads for endpoint /temperatureAlarmConfiguration.
+*/
+struct SDK_EXPORT temperatureAlarmConfiguration
+{
+
+  constexpr static const char* variableName = "temperatureAlarmConfiguration";
+  constexpr static const bool isSopasMethod = false;
+
+/**
+ * @brief Returns/set the thresholds for the device temperature alarm status.
+*/
+struct SDK_EXPORT Get
+{
+struct SDK_EXPORT Response
+{
+  Response() = default;
+
+  explicit Response(int upperThreshold, int lowerThreshold)
+    : _upperThreshold(upperThreshold), _lowerThreshold(lowerThreshold)
+  {}
+
+  int _upperThreshold;
+  int _lowerThreshold;
+};
+
+}; // struct Get
+
+/**
+ * @brief Returns/set the thresholds for the device temperature alarm status.
+
+ This function requires at least user level: Authorized Client.
+*/
+struct SDK_EXPORT Post
+{
+struct SDK_EXPORT Request
+{
+  Request() = default;
+
+  explicit Request(int upperThreshold, int lowerThreshold)
+    : _upperThreshold(upperThreshold), _lowerThreshold(lowerThreshold)
+  {}
+
+  int _upperThreshold;
+  int _lowerThreshold;
+};
+
+}; // struct Post
+
+}; // struct temperatureAlarmConfiguration
+
+} // namespace sick::srt::multiScan100

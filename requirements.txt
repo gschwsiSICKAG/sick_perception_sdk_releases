@@ -1,0 +1,7 @@
+clang-format
+clang-tidy
+cmake
+conan
+openapi-spec-validator
+prance
+tabulate

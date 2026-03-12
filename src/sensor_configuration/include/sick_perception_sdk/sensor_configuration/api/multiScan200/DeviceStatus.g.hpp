@@ -5,7 +5,7 @@ SPDX-License-Identifier: MIT
 
 /**
  * @file DeviceStatus.g.hpp Sensor REST API payload definitions.
- * @warning This file was generated for device 'multiScan200' version '0.6.0'.
+ * @warning This file was generated for device 'multiScan200' version '0.9.0-c.1+2407.172e2'.
  * Do not edit manually!
  */
 #pragma once
@@ -24,7 +24,7 @@ struct SDK_EXPORT DeviceStatus
   constexpr static const bool isSopasMethod = false;
 
 /**
- * @brief Returns the device state (9 possible states).
+ * @brief Current state of the device.
 */
 struct SDK_EXPORT Get
 {

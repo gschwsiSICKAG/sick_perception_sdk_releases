@@ -7,6 +7,7 @@ SPDX-License-Identifier: MIT
 
 #include <sick_perception_sdk/common/export.hpp>
 
+#include <limits>
 #include <ostream>
 #include <string>
 
@@ -25,7 +26,7 @@ public:
   using value_type = float;
 
   constexpr Distance()
-    : m_meters(0.0f)
+    : m_meters(std::numeric_limits<Distance::value_type>::quiet_NaN())
   { }
 
   constexpr static auto fromMillimeters(value_type millimeters) -> Distance

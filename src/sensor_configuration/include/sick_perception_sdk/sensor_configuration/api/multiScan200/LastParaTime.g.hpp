@@ -5,7 +5,7 @@ SPDX-License-Identifier: MIT
 
 /**
  * @file LastParaTime.g.hpp Sensor REST API payload definitions.
- * @warning This file was generated for device 'multiScan200' version '0.6.0'.
+ * @warning This file was generated for device 'multiScan200' version '0.9.0-c.1+2407.172e2'.
  * Do not edit manually!
  */
 #pragma once
@@ -25,7 +25,7 @@ struct SDK_EXPORT LastParaTime
   constexpr static const bool isSopasMethod = false;
 
 /**
- * @brief Returns the last time (e.g. 13:24) when a permanent parameter save was executed.
+ * @brief Last date when store permanent was executed.
 */
 struct SDK_EXPORT Get
 {
@@ -41,6 +41,26 @@ struct SDK_EXPORT Response
 };
 
 }; // struct Get
+
+/**
+ * @brief Last date when store permanent was executed.
+
+ This function requires at least user level: SICK Service.
+*/
+struct SDK_EXPORT Post
+{
+struct SDK_EXPORT Request
+{
+  Request() = default;
+
+  explicit Request(std::string LastParaTime)
+    : _LastParaTime(std::move(LastParaTime))
+  {}
+
+  std::string _LastParaTime;
+};
+
+}; // struct Post
 
 }; // struct LastParaTime
 

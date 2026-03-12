@@ -57,9 +57,9 @@ IpV4Address::IpV4Address(std::string const& str)
       throw std::out_of_range("Input string is too short");
     }
   }
-  catch (std::exception const& ex)
+  catch (std::exception const& exception)
   {
-    throw std::invalid_argument("Invalid IP address format: " + std::string(ex.what()));
+    throw std::invalid_argument("Invalid IP address format: " + std::string(exception.what()));
   }
 }
 

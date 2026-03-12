@@ -5,7 +5,7 @@ SPDX-License-Identifier: MIT
 
 /**
  * @file DailyOpHours.g.hpp Sensor REST API payload definitions.
- * @warning This file was generated for device 'multiScan200' version '0.6.0'.
+ * @warning This file was generated for device 'multiScan200' version '0.9.0-c.1+2407.172e2'.
  * Do not edit manually!
  */
 #pragma once
@@ -24,7 +24,7 @@ struct SDK_EXPORT DailyOpHours
   constexpr static const bool isSopasMethod = false;
 
 /**
- * @brief Returns the runtime duration since the last power on (non-persistent).
+ * @brief The runtime duration since last power on. Non persistant !.
 */
 struct SDK_EXPORT Get
 {
@@ -40,6 +40,26 @@ struct SDK_EXPORT Response
 };
 
 }; // struct Get
+
+/**
+ * @brief The runtime duration since last power on. Non persistant !.
+
+ This function requires at least user level: Production.
+*/
+struct SDK_EXPORT Post
+{
+struct SDK_EXPORT Request
+{
+  Request() = default;
+
+  explicit Request(float DailyOpHours)
+    : _DailyOpHours(DailyOpHours)
+  {}
+
+  float _DailyOpHours;
+};
+
+}; // struct Post
 
 }; // struct DailyOpHours
 

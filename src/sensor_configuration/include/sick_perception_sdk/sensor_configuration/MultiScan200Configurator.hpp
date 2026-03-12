@@ -21,6 +21,9 @@ SPDX-License-Identifier: MIT
 #include <memory>
 #include <string>
 
+// NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers, readability-magic-numbers): magic numbers result from generated code
+// NOLINTBEGIN(cppcoreguidelines-avoid-const-or-ref-data-members): The *Access structs are owned by the configurator thus lifetime is guaranteed by design
+
 namespace sick {
 
 /**
@@ -60,10 +63,22 @@ public:
     BloomingFilterStrength strength;
   };
 
+  struct ContaminationConfiguration
+  {
+    uint8_t strategy  = 0;
+    int responseTime  = 3;
+    uint8_t threshold = 0;
+    uint8_t cover     = 0;
+    std::vector<bool> customSectors {};
+    bool bEnableWarning = true;
+    bool bEnableError   = true;
+  };
+
   enum class EchoFilterSetting
   {
     FirstEcho               = 0,
     AllEchoes               = 1,
+    LastEcho                = 2,
     StrongestEcho           = 3,
     AllEchoesStrongestFirst = 4
   };
@@ -108,7 +123,6 @@ public:
     NumericRange<1, 50, 1> innerIndexIncrement;
   };
 
-public:
   struct BloomingFilterAccess
     : public GetAccess<BloomingFilterSettings>
     , public EnableAccess<BloomingFilterStrength>
@@ -121,6 +135,46 @@ public:
       , DisableAccess<BloomingFilterStrength>(configurator)
       , IsEnabledAccess<BloomingFilterSettings>(configurator)
     { }
+  };
+
+  class SDK_EXPORT ContaminationConfigAccess
+  {
+  public:
+    explicit ContaminationConfigAccess(SensorConfigurator const& configurator)
+      : m_configurator(configurator)
+    { }
+
+    auto get() const -> ContaminationConfiguration;
+    auto set(ContaminationConfiguration const& configuration) const;
+
+  private:
+    SensorConfigurator const& m_configurator;
+  };
+
+  class SDK_EXPORT ContaminationDataAccess
+  {
+  public:
+    explicit ContaminationDataAccess(SensorConfigurator const& configurator)
+      : m_configurator(configurator)
+    { }
+
+    auto get() const -> std::vector<int>;
+
+  private:
+    SensorConfigurator const& m_configurator;
+  };
+
+  class SDK_EXPORT ContaminationResultAccess
+  {
+  public:
+    explicit ContaminationResultAccess(SensorConfigurator const& configurator)
+      : m_configurator(configurator)
+    { }
+
+    auto get() const -> std::array<bool, 2>;
+
+  private:
+    SensorConfigurator const& m_configurator;
   };
 
   class SDK_EXPORT DeviceTemperatureAccess
@@ -256,6 +310,7 @@ public:
     { }
 
     auto get() const -> std::string;
+    void set(std::string const& value) const;
 
   private:
     SensorConfigurator const& m_configurator;
@@ -363,13 +418,26 @@ public:
     SensorConfigurator const& m_configurator;
   };
 
-public:
   explicit MultiScan200Configurator(std::shared_ptr<IHttpClient> httpClient, UserLevel userLevel, std::string password);
   ~MultiScan200Configurator() = default;
 
+  MultiScan200Configurator(MultiScan200Configurator const&)                    = delete;
+  auto operator=(MultiScan200Configurator const&) -> MultiScan200Configurator& = delete;
+  MultiScan200Configurator(MultiScan200Configurator&&)                         = delete;
+  auto operator=(MultiScan200Configurator&&) -> MultiScan200Configurator&      = delete;
+
+  // Public const members provide a fluent API (e.g., configurator.sensorTemperature.get()).
+  // Since they are const, external mutation is not possible, making this safe.
+  // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
   GetSetAccess<AmbientLightPixelCountVertical> const ambientLightPixelCountVertical;
 
   BloomingFilterAccess const bloomingFilter;
+
+  ContaminationConfigAccess const contaminationConfig;
+
+  ContaminationDataAccess const contaminationData;
+
+  ContaminationResultAccess const contaminationResult;
 
   DeviceTemperatureAccess const sensorTemperature;
 
@@ -421,7 +489,9 @@ public:
 
   VerticalAngleRangeFilterAccess const verticalAngleRangeFilter;
 
-  // Device methods
+  // NOLINTEND(misc-non-private-member-variables-in-classes)
+
+  // Sensor methods
   void factoryReset() const;
   void findMe(Duration const& activateFor) const;
   void reboot() const;
@@ -430,4 +500,6 @@ public:
   void persistParametersOnDevice() const;
 };
 
+// NOLINTEND(cppcoreguidelines-avoid-const-or-ref-data-members)
+// NOLINTEND(cppcoreguidelines-avoid-magic-numbers, readability-magic-numbers)
 } // namespace sick

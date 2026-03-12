@@ -3,6 +3,9 @@
 # will be an OBJECT library. Thus, correct sources, include directories and
 # libraries to link against have to be passed.
 #
+# All header files (*.hpp) found in the INCLUDE_DIRS and source file
+# directories are automatically included
+#
 # Usage:
 #   target_enable_clang_tidy(
 #     TARGET <target>
@@ -37,8 +40,21 @@ function(target_enable_clang_tidy)
 
   # Only create the target if clang-tidy is available.
   if(CLANG_TIDY_EXE)
-    set(CLANG_TIDY_COMMAND "${CLANG_TIDY_EXE};-p;${CMAKE_BINARY_DIR};--extra-arg=-Wno-unknown-warning-option;--header-filter=src/.*(?<!\\.g)\\.hpp$") # Uses .clang-tidy file implicitly.
-    add_library(${targetName} OBJECT ${CLANG_TIDY_ARGS_SOURCES})
+    # Collect all headers from include directories and source file directories.
+    set(ALL_HEADERS "")
+    foreach(includeDir IN LISTS CLANG_TIDY_ARGS_INCLUDE_DIRS)
+      file(GLOB_RECURSE DIR_HEADERS "${includeDir}/*.hpp")
+      list(APPEND ALL_HEADERS ${DIR_HEADERS})
+    endforeach()
+    foreach(sourceFile IN LISTS CLANG_TIDY_ARGS_SOURCES)
+      get_filename_component(sourceDir "${sourceFile}" DIRECTORY)
+      file(GLOB DIR_HEADERS "${sourceDir}/*.hpp")
+      list(APPEND ALL_HEADERS ${DIR_HEADERS})
+    endforeach()
+    list(REMOVE_DUPLICATES ALL_HEADERS)
+
+    set(CLANG_TIDY_COMMAND "${CLANG_TIDY_EXE};-p;${CMAKE_BINARY_DIR};--extra-arg=-Wno-unknown-warning-option") # Uses .clang-tidy file for header filter and checks.
+    add_library(${targetName} OBJECT ${CLANG_TIDY_ARGS_SOURCES} ${ALL_HEADERS})
     target_include_directories(${targetName} PUBLIC ${CLANG_TIDY_ARGS_INCLUDE_DIRS})
     target_link_libraries(${targetName} ${CLANG_TIDY_ARGS_LIBS})
     target_compile_definitions(${targetName} PUBLIC CLANG_TIDY)

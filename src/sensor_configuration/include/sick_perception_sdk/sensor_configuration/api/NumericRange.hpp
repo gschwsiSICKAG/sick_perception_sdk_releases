@@ -44,8 +44,8 @@ private:
 template <int min, int max, int defaultValue>
 inline void from_json(nlohmann::json const& j, NumericRange<min, max, defaultValue>& r)
 {
-  int value = j.get<int>();
-  r         = NumericRange<min, max, defaultValue>(value);
+  int const value = j.get<int>();
+  r               = NumericRange<min, max, defaultValue>(value);
 }
 
 } // namespace sick

@@ -22,12 +22,12 @@ SPDX-License-Identifier: MIT
 // =============================================================================
 
 // Detect if we're building any of the SDK libraries
-#if defined(common_EXPORTS) || defined(compact_receiver_EXPORTS) || defined(sensor_configuration_EXPORTS) || defined(drivers_EXPORTS)
+#if defined(common_EXPORTS) || defined(compact_format_EXPORTS) || defined(sensor_configuration_EXPORTS) || defined(drivers_EXPORTS)
 #  define SICK_PERCEPTION_SDK_BUILDING
 #endif
 
 // Define export macros based on platform and build mode
-#if defined(SICK_PERCEPTION_SDK_BUILDING)
+#ifdef SICK_PERCEPTION_SDK_BUILDING
 // We are building the SDK libraries - export symbols
 #  ifdef _WIN32
 #    define SDK_EXPORT __declspec(dllexport)

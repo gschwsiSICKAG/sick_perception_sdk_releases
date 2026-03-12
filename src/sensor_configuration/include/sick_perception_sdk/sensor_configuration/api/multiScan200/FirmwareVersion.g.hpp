@@ -5,7 +5,7 @@ SPDX-License-Identifier: MIT
 
 /**
  * @file FirmwareVersion.g.hpp Sensor REST API payload definitions.
- * @warning This file was generated for device 'multiScan200' version '0.6.0'.
+ * @warning This file was generated for device 'multiScan200' version '0.9.0-c.1+2407.172e2'.
  * Do not edit manually!
  */
 #pragma once
@@ -25,7 +25,7 @@ struct SDK_EXPORT FirmwareVersion
   constexpr static const bool isSopasMethod = false;
 
 /**
- * @brief Returns the current firmware version.
+ * @brief Version of the application software.
 */
 struct SDK_EXPORT Get
 {

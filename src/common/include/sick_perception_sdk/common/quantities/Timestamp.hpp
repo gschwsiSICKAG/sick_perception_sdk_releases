@@ -35,19 +35,9 @@ public:
     return Timestamp(microseconds);
   }
 
-  constexpr static auto fromNanoseconds(value_type nanoseconds) -> Timestamp
-  {
-    return Timestamp(nanoseconds / 1'000);
-  }
-
   constexpr auto microsecondsSinceEpoch() const -> value_type
   {
     return m_microsecondsSinceEpoch;
-  }
-
-  constexpr auto nanosecondsSinceEpoch() const -> value_type
-  {
-    return m_microsecondsSinceEpoch * 1'000;
   }
 
   /*
@@ -81,33 +71,45 @@ constexpr auto operator<(Timestamp const& lhs, Timestamp const& rhs) -> bool
   return lhs.microsecondsSinceEpoch() < rhs.microsecondsSinceEpoch();
 }
 
+constexpr auto operator==(Timestamp const& lhs, Timestamp const& rhs) -> bool
+{
+  return lhs.microsecondsSinceEpoch() == rhs.microsecondsSinceEpoch();
+}
+
+constexpr auto operator!=(Timestamp const& lhs, Timestamp const& rhs) -> bool
+{
+  return !(lhs == rhs);
+}
+
 // Arithmetic operators
 constexpr auto operator+(Timestamp const& lhs, Duration const& rhs) -> Timestamp
 {
-  return Timestamp::fromMicrosecondsSinceEpoch(lhs.microsecondsSinceEpoch() + rhs.microseconds());
+  return Timestamp::fromMicrosecondsSinceEpoch(lhs.microsecondsSinceEpoch() + static_cast<Timestamp::value_type>(rhs.microseconds()));
 }
 
 constexpr auto operator-(Timestamp const& lhs, Timestamp const& rhs) -> Duration
 {
-  return Duration::fromMicroseconds(lhs.microsecondsSinceEpoch() - rhs.microsecondsSinceEpoch());
+  return Duration::fromMicroseconds(
+    static_cast<Duration::value_type>(lhs.microsecondsSinceEpoch()) - static_cast<Duration::value_type>(rhs.microsecondsSinceEpoch())
+  );
 }
 
 // Stream operators
 auto SDK_EXPORT operator<<(std::ostream& stream, Timestamp const& timestamp) -> std::ostream&;
 
-} // namespace sick
-
-namespace std {
-
-constexpr auto max(sick::Timestamp const& lhs, sick::Timestamp const& rhs) -> sick::Timestamp
+constexpr auto max(Timestamp const& lhs, Timestamp const& rhs) -> Timestamp
 {
   return lhs.microsecondsSinceEpoch() > rhs.microsecondsSinceEpoch() ? lhs : rhs;
 }
 
-constexpr auto min(sick::Timestamp const& lhs, sick::Timestamp const& rhs) -> sick::Timestamp
+constexpr auto min(Timestamp const& lhs, Timestamp const& rhs) -> Timestamp
 {
   return lhs.microsecondsSinceEpoch() < rhs.microsecondsSinceEpoch() ? lhs : rhs;
 }
+
+} // namespace sick
+
+namespace std {
 
 // NOLINTNEXTLINE(readability-identifier-naming): to_string is standard library style
 auto SDK_EXPORT to_string(sick::Timestamp const& timestamp) -> std::string;

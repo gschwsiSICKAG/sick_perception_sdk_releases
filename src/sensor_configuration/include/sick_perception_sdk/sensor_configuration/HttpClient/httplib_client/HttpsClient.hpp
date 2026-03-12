@@ -17,7 +17,7 @@ namespace sick::httplib_client {
 /**
  * @brief HTTPS client implementation using [httplib](https://github.com/yhirose/cpp-httplib).
  */
-class SDK_EXPORT HttpsClient : public HttpClientBase<httplib::SSLClient>
+class SDK_EXPORT HttpsClient final : public HttpClientBase<httplib::SSLClient>
 {
 public:
   /**
@@ -31,7 +31,12 @@ public:
  * @brief Construct an HTTPS client with an explicit CA certificate for server certificate verification.
  */
   explicit HttpsClient(IpV4Address address, std::uint16_t port, std::string const& caCertificatePath);
-  virtual ~HttpsClient() = default;
+  ~HttpsClient() override = default;
+
+  HttpsClient(HttpsClient const&)                        = delete;
+  auto operator=(HttpsClient const&) -> HttpsClient&     = delete;
+  HttpsClient(HttpsClient&&) noexcept                    = delete;
+  auto operator=(HttpsClient&&) noexcept -> HttpsClient& = delete;
 
   /**
    * @brief Disable server certificate and hostname verification.

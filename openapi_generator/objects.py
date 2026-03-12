@@ -45,3 +45,4 @@ class EndpointDescription:
         self.get: Optional[EndpointMethodDescription] = None
         self.post: Optional[EndpointMethodDescription] = None
         self.is_sopas_method = False
+        self.tags: List[str] = []  # Tags from OpenAPI spec for grouping

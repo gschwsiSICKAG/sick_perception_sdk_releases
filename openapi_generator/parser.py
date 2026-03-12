@@ -7,6 +7,8 @@ def parse_path(path_name: str, path, endpoints: List[EndpointDescription]) -> No
     """
 
     endpoint_description = EndpointDescription(path_name)
+    all_tags = []
+    
     for method, operation in path.items():
         if method not in ["get", "post"]:
             print(f"⚠️  Method '{method}' of path '{path_name}' not supported. Skipping it.")
@@ -18,11 +20,17 @@ def parse_path(path_name: str, path, endpoints: List[EndpointDescription]) -> No
         response = _parse_response(operation, path_name, method)
         endpoint_method_description = EndpointMethodDescription(method_class_name, description, request, response)
 
+        # Extract tags from operation
+        if "tags" in operation and isinstance(operation["tags"], list):
+            all_tags.extend(operation["tags"])
+
         if method == "get":
             endpoint_description.get = endpoint_method_description
         else:
             endpoint_description.post = endpoint_method_description
 
+    # Store unique tags for this endpoint
+    endpoint_description.tags = list(dict.fromkeys(all_tags))  # Preserve order, remove duplicates
     endpoint_description.is_sopas_method = _is_sopas_method(endpoint_description)
     endpoints.append(endpoint_description)
 

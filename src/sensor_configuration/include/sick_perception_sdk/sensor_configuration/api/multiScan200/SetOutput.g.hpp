@@ -5,7 +5,7 @@ SPDX-License-Identifier: MIT
 
 /**
  * @file SetOutput.g.hpp Sensor REST API payload definitions.
- * @warning This file was generated for device 'multiScan200' version '0.6.0'.
+ * @warning This file was generated for device 'multiScan200' version '0.9.0-c.1+2407.172e2'.
  * Do not edit manually!
  *
  * @note This class represents the payload of a SOPAS method. Do not use in `write_variable()`!
@@ -26,7 +26,7 @@ struct SDK_EXPORT SetOutput
   constexpr static const bool isSopasMethod = true;
 
 /**
- * @brief Sets the output state for an individual output. Precondition is to set the output source to "SOPAS command".
+ * @brief sets the specified output.
 */
 struct SDK_EXPORT Post
 {

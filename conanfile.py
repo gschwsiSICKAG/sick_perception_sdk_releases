@@ -7,7 +7,6 @@ required_conan_version = ">=2.13"
 class SickPerceptionSDK(ConanFile):
     name = "sick_perception_sdk"
     version = "0.0.0"
-    url = "https://gitlab.sickcn.net/GBC08/development/tools/digitalaccessories/lidar-sdk/sick-sensor-sdk.git"
     description = "This packages contains SDK components for interacting with SICK sensors."
     license = "Copyright SICK AG"
     settings = "os", "compiler", "build_type", "arch"
@@ -15,20 +14,28 @@ class SickPerceptionSDK(ConanFile):
 
     options = {
         "shared": [True, False],
+        "fPIC": [True, False],
         "build_drivers": [True, False],
-        "build_compact_receiver": [True, False],
+        "build_benchmarks": [True, False],
+        "build_compact_format": [True, False],
+        "build_examples": [True, False],
+        "build_drivers": [True, False],
         "build_sensor_configuration": [True, False],
         "build_unit_tests": [True, False],
-        "build_examples": [True, False],
+        "build_examples_device_type": [None, "all", "picoScan100", "multiScan100", "multiScan200", "LRS4000"],
     }
 
     default_options = {
         "shared": False,
+        "fPIC": True,
         "build_drivers": True,
-        "build_compact_receiver": True,
+        "build_benchmarks": False,
+        "build_compact_format": True,
+        "build_drivers": True,
+        "build_examples": False,
         "build_sensor_configuration": True,
         "build_unit_tests": False,
-        "build_examples": False,
+        "build_examples_device_type": None,
     }
 
     def configure(self):
@@ -50,17 +57,28 @@ class SickPerceptionSDK(ConanFile):
         if self.options.build_unit_tests:
             if self.settings.compiler == "msvc" and self.settings.compiler.runtime == "dynamic":
                 self.options["gtest"].shared = True
+            else:
+                self.options["gtest"].shared = False
+
+        # Match gtest runtime to compiler settings when building benchmarks
+        if self.options.build_benchmarks:
+            if self.settings.compiler == "msvc" and self.settings.compiler.runtime == "dynamic":
+                self.options["benchmark"].shared = True
+            else:
+                self.options["benchmark"].shared = False
 
     def requirements(self):
-        self.requires("plog/1.1.10")
-        if self.options.get_safe("build_sensor_configuration") or self.options.get_safe("build_drivers") or self.options.get_safe("build_examples"):
-            self.requires("cpp-httplib/0.27.0", transitive_headers=True)
-            self.requires("nlohmann_json/3.11.3", transitive_headers=True)
-            self.requires("openssl/3.4.1", transitive_headers=True)
-        if self.options.get_safe("build_compact_receiver") or self.options.get_safe("build_drivers") or self.options.get_safe("build_examples"):
-            self.requires("zlib/1.3.1")
+        self.requires("plog/[^1.1.10]")
+        if self.options.get_safe("build_sensor_configuration") or self.options.get_safe("build_drivers") or self.options.get_safe("build_examples_device_type") != None:
+            self.requires("cpp-httplib/[^0.29.0]", transitive_headers=True)
+            self.requires("nlohmann_json/[^3.11.3]", transitive_headers=True)
+            self.requires("openssl/[^3.4]", transitive_headers=True)
+        if self.options.get_safe("build_compact_format") or self.options.get_safe("build_drivers") or self.options.get_safe("build_examples_device_type") != None:
+            self.requires("zlib/[^1.3.1]")
         if self.options.get_safe("build_unit_tests"):
-            self.requires("gtest/1.14.0")
+            self.requires("gtest/[^1.16.0]")
+        if self.options.build_benchmarks:
+            self.test_requires("benchmark/[^1.8.3]")
 
     def layout(self):
         cmake_layout(self)
@@ -69,10 +87,13 @@ class SickPerceptionSDK(ConanFile):
         tc = CMakeToolchain(self)
         tc.variables["BUILD_SHARED_LIBS"] = self.options.shared
         tc.variables["BUILD_DRIVERS"] = self.options.build_drivers
-        tc.variables["BUILD_COMPACT_RECEIVER"] = self.options.build_compact_receiver
+        tc.variables["BUILD_BENCHMARKS"] = self.options.build_benchmarks
+        tc.variables["BUILD_COMPACT_FORMAT"] = self.options.build_compact_format
+        tc.variables["BUILD_DRIVERS"] = self.options.build_drivers
+        tc.variables["BUILD_EXAMPLES"] = self.options.build_examples
         tc.variables["BUILD_SENSOR_CONFIGURATION"] = self.options.build_sensor_configuration
         tc.variables["BUILD_UNIT_TESTS"] = self.options.build_unit_tests
-        tc.variables["BUILD_EXAMPLES"] = self.options.build_examples
+        tc.variables["BUILD_EXAMPLES_DEVICE_TYPE"] = "" if self.options.build_examples_device_type == None else str(self.options.build_examples_device_type)
         tc.generate()
         deps = CMakeDeps(self)
         deps.generate()
@@ -83,10 +104,13 @@ class SickPerceptionSDK(ConanFile):
             variables={
                 "BUILD_SHARED_LIBS": self.options.shared,
                 "BUILD_DRIVERS": self.options.build_drivers,
-                "BUILD_COMPACT_RECEIVER": self.options.build_compact_receiver,
+                "BUILD_BENCHMARKS": self.options.build_benchmarks,
+                "BUILD_COMPACT_FORMAT": self.options.build_compact_format,
+                "BUILD_DRIVERS": self.options.build_drivers,
+                "BUILD_EXAMPLES": self.options.build_examples,
                 "BUILD_SENSOR_CONFIGURATION": self.options.build_sensor_configuration,
                 "BUILD_UNIT_TESTS": self.options.build_unit_tests,
-                "BUILD_EXAMPLES": self.options.build_examples,
+                "BUILD_EXAMPLES_DEVICE_TYPE": "" if self.options.build_examples_device_type == None else str(self.options.build_examples_device_type),
             }
         )
         cmake.build()
@@ -108,13 +132,13 @@ class SickPerceptionSDK(ConanFile):
         if self.options.get_safe("build_drivers"):
             self.cpp_info.components["drivers"].libs = ["drivers"]
             self.cpp_info.components["drivers"].set_property("cmake_target_name", "sick_perception_sdk::drivers")
-            self.cpp_info.components["drivers"].requires = ["common", "compact_receiver", "sensor_configuration", "cpp-httplib::cpp-httplib", "nlohmann_json::nlohmann_json", "openssl::openssl"]
+            self.cpp_info.components["drivers"].requires = ["common", "compact_format", "sensor_configuration", "cpp-httplib::cpp-httplib", "nlohmann_json::nlohmann_json", "openssl::openssl"]
             self.cpp_info.components["drivers"].requires.append("zlib::zlib")
 
-        if self.options.get_safe("build_compact_receiver"):
-            self.cpp_info.components["compact_receiver"].libs = ["compact_receiver"]
-            self.cpp_info.components["compact_receiver"].set_property("cmake_target_name", "sick_perception_sdk::compact_receiver")
-            self.cpp_info.components["compact_receiver"].requires = ["common", "zlib::zlib"]
+        if self.options.get_safe("build_compact_format"):
+            self.cpp_info.components["compact_format"].libs = ["compact_format"]
+            self.cpp_info.components["compact_format"].set_property("cmake_target_name", "sick_perception_sdk::compact_format")
+            self.cpp_info.components["compact_format"].requires = ["common", "zlib::zlib"]
 
         if self.options.get_safe("build_sensor_configuration"):
             self.cpp_info.components["sensor_configuration"].libs = ["sensor_configuration"]

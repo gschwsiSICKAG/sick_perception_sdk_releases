@@ -135,9 +135,9 @@ TEST_F(PostRequestTest, execute_error_message_includes_status_code_and_message)
     request.withoutAuthentication().withoutRequestPayload().execute();
     FAIL() << "Expected std::runtime_error to be thrown";
   }
-  catch (std::runtime_error const& e)
+  catch (std::runtime_error const& exception)
   {
-    auto const message = std::string(e.what());
+    auto const message = std::string(exception.what());
     EXPECT_NE(message.find("500"s), std::string::npos);
     EXPECT_NE(message.find("Internal Server Error"s), std::string::npos);
   }

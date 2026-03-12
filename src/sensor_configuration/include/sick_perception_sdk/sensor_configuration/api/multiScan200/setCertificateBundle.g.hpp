@@ -5,7 +5,7 @@ SPDX-License-Identifier: MIT
 
 /**
  * @file setCertificateBundle.g.hpp Sensor REST API payload definitions.
- * @warning This file was generated for device 'multiScan200' version '0.6.0'.
+ * @warning This file was generated for device 'multiScan200' version '0.9.0-c.1+2407.172e2'.
  * Do not edit manually!
  *
  * @note This class represents the payload of a SOPAS method. Do not use in `write_variable()`!
@@ -27,7 +27,7 @@ struct SDK_EXPORT setCertificateBundle
   constexpr static const bool isSopasMethod = true;
 
 /**
- * @brief Uploads a certificate bundle in the PEM format via JSON.
+ * @brief Set and activate a new certificate bundle. The only supported format is PEM. The bundle must start with the device certificate, followed by the intermediate certificates. Each certificate of the chain must validate the preceding certificate. The self-signed root certificate will be discarded.
 
  This function requires at least user level: Service.
 */

@@ -206,7 +206,7 @@ public:
   template <class PayloadT>
   void setSensorPosition(SensorPosition const& position) const
   {
-    typename PayloadT::Post::Request request {
+    typename PayloadT::Post::Request const request {
       static_cast<int>(position.x.millimeters()), //
       static_cast<int>(position.y.millimeters()), //
       static_cast<int>(position.z.millimeters()), //
@@ -287,7 +287,7 @@ public:
     sickDateTime._usiSec    = timeStruct.tm_sec;
     sickDateTime._udiUSec   = static_cast<int>(microseconds.count());
 
-    typename PayloadT::Post::Request request {sickDateTime};
+    typename PayloadT::Post::Request const request {sickDateTime};
     auto const ret =
       post(PayloadT::methodName) //
         .withRequestPayload("DateTime", sickDateTime)

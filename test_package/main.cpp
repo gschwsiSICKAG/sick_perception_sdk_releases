@@ -4,7 +4,7 @@ SPDX-License-Identifier: MIT
 */
 
 #include <sick_perception_sdk/common/version.hpp>
-#include <sick_perception_sdk/compact_receiver/ScanDataParser.hpp>
+#include <sick_perception_sdk/compact_format/telegram_type_1_scan_data/ScanDataParser.hpp>
 #include <sick_perception_sdk/drivers/PicoScan100.hpp>
 #include <sick_perception_sdk/sensor_configuration/HttpClient/httplib_client/HttpClient.hpp>
 #include <sick_perception_sdk/sensor_configuration/PicoScan100Configurator.hpp>
@@ -15,7 +15,7 @@ int main(int argc, char* argv[])
 {
   std::cout << "SICK Perception SDK Version: " << sick::version() << std::endl;
 
-  // Test compilation of library compact_receiver
+  // Test compilation of library compact_format
   sick::compact::scan_data::Parser parser;
 
   // Test compilation of library drivers

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.24)
+cmake_minimum_required(VERSION 3.22)
 
 include(${CMAKE_SOURCE_DIR}/cmake/install-library.cmake)
 include(${CMAKE_SOURCE_DIR}/cmake/compiler-defines.cmake)
@@ -11,9 +11,14 @@ add_library(${PROJECT_NAME}::${LIB_NAME} ALIAS ${LIB_NAME})
 
 set(LIB_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/src/LRS4000.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/MultiScan200.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/MultiScan100.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/MultiScan200.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/PicoScan100.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/socket/ConnectionError.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/socket/ReceiveError.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/socket/SocketError.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/socket/TcpClientSocket.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/socket/UdpListeningSocket.cpp
 )
 
 target_sources(${LIB_NAME} PRIVATE ${LIB_SOURCES})
@@ -27,7 +32,7 @@ find_package(plog REQUIRED)
 
 target_link_libraries(${LIB_NAME}
   PUBLIC
-  ${PROJECT_NAME}::compact_receiver
+  ${PROJECT_NAME}::compact_format
   plog::plog
 )
 
@@ -39,7 +44,7 @@ target_enable_clang_tidy(
   INCLUDE_DIRS 
     ${CMAKE_CURRENT_SOURCE_DIR}/include
   LIBS
-    ${PROJECT_NAME}::compact_receiver
+    ${PROJECT_NAME}::compact_format
 )
 
 #===============================================================================

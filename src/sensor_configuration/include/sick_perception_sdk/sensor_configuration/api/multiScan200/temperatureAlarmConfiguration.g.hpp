@@ -5,7 +5,7 @@ SPDX-License-Identifier: MIT
 
 /**
  * @file temperatureAlarmConfiguration.g.hpp Sensor REST API payload definitions.
- * @warning This file was generated for device 'multiScan200' version '0.6.0'.
+ * @warning This file was generated for device 'multiScan200' version '0.9.0-c.1+2407.172e2'.
  * Do not edit manually!
  */
 #pragma once
@@ -24,7 +24,7 @@ struct SDK_EXPORT temperatureAlarmConfiguration
   constexpr static const bool isSopasMethod = false;
 
 /**
- * @brief Returns/sets temperature alarm thresholds.
+ * @brief Get temperatureAlarmConfiguration.
 */
 struct SDK_EXPORT Get
 {
@@ -41,6 +41,27 @@ struct SDK_EXPORT Response
 };
 
 }; // struct Get
+
+/**
+ * @brief Post temperatureAlarmConfiguration.
+
+ This function requires at least user level: Authorized Client.
+*/
+struct SDK_EXPORT Post
+{
+struct SDK_EXPORT Request
+{
+  Request() = default;
+
+  explicit Request(int upperThreshold, int lowerThreshold)
+    : _upperThreshold(upperThreshold), _lowerThreshold(lowerThreshold)
+  {}
+
+  int _upperThreshold;
+  int _lowerThreshold;
+};
+
+}; // struct Post
 
 }; // struct temperatureAlarmConfiguration
 

@@ -535,6 +535,12 @@ auto C::LocationNameAccess::get() const -> std::string
   return m_configurator.readVariable<srt::picoScan100::LocationName>()._LocationName;
 }
 
+void C::LocationNameAccess::set(std::string const& value) const
+{
+  srt::picoScan100::LocationName::Post::Request const request {value};
+  m_configurator.writeVariable<srt::picoScan100::LocationName>(request);
+}
+
 // MovingAverageFilter
 auto C::MovingAverageFilterAccess::get() const -> NumericRange<2, 4, 3>
 {

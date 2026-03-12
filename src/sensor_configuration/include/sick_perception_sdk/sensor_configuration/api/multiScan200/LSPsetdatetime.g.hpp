@@ -5,7 +5,7 @@ SPDX-License-Identifier: MIT
 
 /**
  * @file LSPsetdatetime.g.hpp Sensor REST API payload definitions.
- * @warning This file was generated for device 'multiScan200' version '0.6.0'.
+ * @warning This file was generated for device 'multiScan200' version '0.9.0-c.1+2407.172e2'.
  * Do not edit manually!
  *
  * @note This class represents the payload of a SOPAS method. Do not use in `write_variable()`!
@@ -27,7 +27,7 @@ struct SDK_EXPORT LSPsetdatetime
   constexpr static const bool isSopasMethod = true;
 
 /**
- * @brief Sets the time of the device (years, months, days, hours, minutes, seconds, microseconds).
+ * @brief Sets datetime of device. Does only work if NTP-Client is not active.
 
  This function requires at least user level: Authorized Client.
 */

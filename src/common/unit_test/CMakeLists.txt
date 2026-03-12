@@ -1,8 +1,21 @@
-cmake_minimum_required(VERSION 3.24)
+cmake_minimum_required(VERSION 3.22)
 
-set(TEST_NAME common_unit_test)
+set(TEST_NAME "${LIB_NAME}_unit_test")
+
 set(TEST_SOURCES
+  ${CMAKE_CURRENT_SOURCE_DIR}/Acceleration.test.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/Angle.test.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/Angularvelocity.test.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/BitmapEncoder.test.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/ByteView.test.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/Distance.test.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/Duration.test.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/IpV4Address.test.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/Speed.test.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/SubByteArrayConverter.test.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/Temperature.test.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/Timestamp.test.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/version.test.cpp
 )
 
@@ -36,7 +49,7 @@ target_sources(${TEST_NAME_ASAN}
 target_link_libraries(${TEST_NAME_ASAN}
   PRIVATE
     GTest::gtest
-    ${PROJECT_NAME}::common
+    ${PROJECT_NAME}::${LIB_NAME}
 )
 
 target_compile_options(${TEST_NAME_ASAN} PRIVATE -fsanitize=address -fno-omit-frame-pointer)

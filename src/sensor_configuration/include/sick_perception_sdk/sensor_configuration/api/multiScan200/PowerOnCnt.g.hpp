@@ -5,7 +5,7 @@ SPDX-License-Identifier: MIT
 
 /**
  * @file PowerOnCnt.g.hpp Sensor REST API payload definitions.
- * @warning This file was generated for device 'multiScan200' version '0.6.0'.
+ * @warning This file was generated for device 'multiScan200' version '0.9.0-c.1+2407.172e2'.
  * Do not edit manually!
  */
 #pragma once
@@ -24,7 +24,7 @@ struct SDK_EXPORT PowerOnCnt
   constexpr static const bool isSopasMethod = false;
 
 /**
- * @brief Returns the number of power on cycles.
+ * @brief The number of power on cycles.
 */
 struct SDK_EXPORT Get
 {
@@ -40,6 +40,26 @@ struct SDK_EXPORT Response
 };
 
 }; // struct Get
+
+/**
+ * @brief The number of power on cycles.
+
+ This function requires at least user level: Production.
+*/
+struct SDK_EXPORT Post
+{
+struct SDK_EXPORT Request
+{
+  Request() = default;
+
+  explicit Request(int PowerOnCnt)
+    : _PowerOnCnt(PowerOnCnt)
+  {}
+
+  int _PowerOnCnt;
+};
+
+}; // struct Post
 
 }; // struct PowerOnCnt
 

@@ -5,7 +5,7 @@ SPDX-License-Identifier: MIT
 
 /**
  * @file verticalAngleRangeFilter.g.hpp Sensor REST API payload definitions.
- * @warning This file was generated for device 'multiScan200' version '0.6.0'.
+ * @warning This file was generated for device 'multiScan200' version '0.9.0-c.1+2407.172e2'.
  * Do not edit manually!
  */
 #pragma once
@@ -25,7 +25,7 @@ struct SDK_EXPORT verticalAngleRangeFilter
   constexpr static const bool isSopasMethod = false;
 
 /**
- * @brief Returns/sets the vertical angle range filter settings.
+ * @brief Restrict the streaming data output to a vertical field of view. The parameters allow for two different regions of interest (ROI) with an outer and an inner ROI. Each ROI has its own subsampling factor. The outer ROI is specified by the angle range [outerRoiStartAngle, outerRoiStopAngle]. The inner ROI is specified by the angle range [innerRoiStartAngle, innerRoiStopAngle]. The inner ROI is supposed to be contained completely inside the outer ROI; if the ROI does not lay completely in the outer ROI the device will raise a parameterization error.
 */
 struct SDK_EXPORT Get
 {
@@ -49,7 +49,7 @@ struct SDK_EXPORT Response
 }; // struct Get
 
 /**
- * @brief Returns/sets the vertical angle range filter settings.
+ * @brief Restrict the streaming data output to a vertical field of view. The parameters allow for two different regions of interest (ROI) with an outer and an inner ROI. Each ROI has its own subsampling factor. The outer ROI is specified by the angle range [outerRoiStartAngle, outerRoiStopAngle]. The inner ROI is specified by the angle range [innerRoiStartAngle, innerRoiStopAngle]. The inner ROI is supposed to be contained completely inside the outer ROI; if the ROI does not lay completely in the outer ROI the device will raise a parameterization error.
 
  This function requires at least user level: Authorized Client.
 */

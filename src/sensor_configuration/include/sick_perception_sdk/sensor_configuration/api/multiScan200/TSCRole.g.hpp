@@ -5,7 +5,7 @@ SPDX-License-Identifier: MIT
 
 /**
  * @file TSCRole.g.hpp Sensor REST API payload definitions.
- * @warning This file was generated for device 'multiScan200' version '0.6.0'.
+ * @warning This file was generated for device 'multiScan200' version '0.9.0-c.1+2407.172e2'.
  * Do not edit manually!
  */
 #pragma once
@@ -24,7 +24,7 @@ struct SDK_EXPORT TSCRole
   constexpr static const bool isSopasMethod = false;
 
 /**
- * @brief Returns/sets the time synchronization role (none, NTP or PTP).
+ * @brief Select the role (none or client).
 */
 struct SDK_EXPORT Get
 {
@@ -49,7 +49,7 @@ struct SDK_EXPORT Response
 }; // struct Get
 
 /**
- * @brief Returns/sets the time synchronization role (none, NTP or PTP).
+ * @brief Select the role (none or client).
 
  This function requires at least user level: Authorized Client.
 */

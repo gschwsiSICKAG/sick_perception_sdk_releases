@@ -5,7 +5,7 @@ SPDX-License-Identifier: MIT
 
 /**
  * @file LSPdatetime.g.hpp Sensor REST API payload definitions.
- * @warning This file was generated for device 'multiScan200' version '0.6.0'.
+ * @warning This file was generated for device 'multiScan200' version '0.9.0-c.1+2407.172e2'.
  * Do not edit manually!
  */
 #pragma once
@@ -25,7 +25,7 @@ struct SDK_EXPORT LSPdatetime
   constexpr static const bool isSopasMethod = false;
 
 /**
- * @brief Returns the current time of the device (years, months, days, hours, minutes, seconds, microseconds).
+ * @brief The device time.
 */
 struct SDK_EXPORT Get
 {

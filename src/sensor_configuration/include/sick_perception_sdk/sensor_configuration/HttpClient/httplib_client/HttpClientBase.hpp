@@ -9,7 +9,7 @@ SPDX-License-Identifier: MIT
 #include <sick_perception_sdk/common/logging/logging.hpp>
 #include <sick_perception_sdk/sensor_configuration/HttpClient/IHttpClient.hpp>
 
-#define CPPHTTPLIB_OPENSSL_SUPPORT 1
+#define CPPHTTPLIB_OPENSSL_SUPPORT 1 // NOLINT(cppcoreguidelines-macro-usage)
 #include <httplib.h>
 
 #include <cstdint>
@@ -18,36 +18,6 @@ SPDX-License-Identifier: MIT
 #include <string>
 
 namespace sick::httplib_client {
-
-namespace {
-
-void throwIfNotSuccessful(httplib::Result const& result, std::string const& method, std::string const& endpoint)
-{
-  if (!result)
-  {
-    switch (result.error())
-    {
-    case httplib::Error::SSLConnection:
-      throw std::runtime_error("HTTP " + method + " " + endpoint + " failed due to SSL connection error: " + std::to_string(result.ssl_error()));
-      break;
-    case httplib::Error::SSLLoadingCerts:
-      throw std::runtime_error("HTTP " + method + " " + endpoint + " failed due to SSL cert loading error: " + std::to_string(result.ssl_openssl_error()));
-      break;
-    case httplib::Error::SSLServerVerification:
-      throw std::runtime_error("HTTP " + method + " " + endpoint + " failed due to SSL verification error: " + std::to_string(result.ssl_openssl_error()));
-      break;
-    case httplib::Error::SSLServerHostnameVerification:
-      throw std::runtime_error(
-        "HTTP " + method + " " + endpoint + " failed due to SSL hostname verification, X509 error: " + std::to_string(result.ssl_openssl_error())
-      );
-      break;
-    default:
-      throw std::runtime_error("HTTP " + method + " " + endpoint + " failed: " + httplib::to_string(result.error()));
-    }
-  }
-}
-
-} // namespace
 
 /**
  * @brief Base class for HTTP clients using [httplib](https://github.com/yhirose/cpp-httplib).
@@ -61,7 +31,7 @@ public:
     : m_client(std::make_unique<ClientT>(std::forward<Args>(args)...))
   {
     auto const startTime = std::chrono::steady_clock::now();
-    m_client->set_logger([startTime](httplib::Request const& req, httplib::Response const& res) {
+    m_client->set_logger([startTime](httplib::Request const& req, httplib::Response const& res) -> void {
       auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - startTime).count();
       LOG_FAST_LOOP_INFO("HttpClient") << "OK: " << req.method << " " << req.path << " -> " << res.status << " (" << res.body.size() << " bytes, " << duration
                                        << "ms)";
@@ -78,16 +48,21 @@ public:
     });
   }
 
-  virtual ~HttpClientBase() = default;
+  ~HttpClientBase() override = default;
 
-  auto get(std::string const& endpoint) const -> std::string
+  HttpClientBase(HttpClientBase const&)                        = delete;
+  auto operator=(HttpClientBase const&) -> HttpClientBase&     = delete;
+  HttpClientBase(HttpClientBase&&) noexcept                    = delete;
+  auto operator=(HttpClientBase&&) noexcept -> HttpClientBase& = delete;
+
+  auto get(std::string const& endpoint) const -> std::string override
   {
     auto const result = m_client->Get(endpoint);
     throwIfNotSuccessful(result, "GET", endpoint);
     return result->body;
   }
 
-  auto post(std::string const& endpoint, std::string const& payload) const -> std::string
+  auto post(std::string const& endpoint, std::string const& payload) const -> std::string override
   {
     auto const result = m_client->Post(endpoint, payload, "application/json");
     throwIfNotSuccessful(result, "POST", endpoint);
@@ -106,7 +81,34 @@ public:
   }
 
 protected:
-  std::unique_ptr<ClientT> m_client;
+  std::unique_ptr<ClientT> m_client; // NOLINT(misc-non-private-member-variables-in-classes, cppcoreguidelines-non-private-member-variables-in-classes)
+
+private:
+  static void throwIfNotSuccessful(httplib::Result const& result, std::string const& method, std::string const& endpoint)
+  {
+    if (!result)
+    {
+      switch (result.error())
+      {
+      case httplib::Error::SSLConnection:
+        throw std::runtime_error("HTTP " + method + " " + endpoint + " failed due to SSL connection error: " + std::to_string(result.ssl_error()));
+        break;
+      case httplib::Error::SSLLoadingCerts:
+        throw std::runtime_error("HTTP " + method + " " + endpoint + " failed due to SSL cert loading error: " + std::to_string(result.ssl_openssl_error()));
+        break;
+      case httplib::Error::SSLServerVerification:
+        throw std::runtime_error("HTTP " + method + " " + endpoint + " failed due to SSL verification error: " + std::to_string(result.ssl_openssl_error()));
+        break;
+      case httplib::Error::SSLServerHostnameVerification:
+        throw std::runtime_error(
+          "HTTP " + method + " " + endpoint + " failed due to SSL hostname verification, X509 error: " + std::to_string(result.ssl_openssl_error())
+        );
+        break;
+      default:
+        throw std::runtime_error("HTTP " + method + " " + endpoint + " failed: " + httplib::to_string(result.error()));
+      }
+    }
+  }
 };
 
 } // namespace sick::httplib_client

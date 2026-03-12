@@ -19,9 +19,13 @@ SPDX-License-Identifier: MIT
 #include <sick_perception_sdk/sensor_configuration/api/multiScan100.g.hpp>
 
 #include <chrono>
+#include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <string>
+
+// NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers, readability-magic-numbers): magic numbers result from generated code
+// NOLINTBEGIN(cppcoreguidelines-avoid-const-or-ref-data-members): The *Access structs are owned by the configurator thus lifetime is guaranteed by design
 
 namespace sick {
 
@@ -45,13 +49,13 @@ public:
 
   struct ContaminationConfiguration
   {
-    uint8_t strategy;
-    int responseTime;
-    uint8_t threshold;
-    uint8_t cover;
-    std::vector<bool> customSectors;
-    bool bEnableWarning;
-    bool bEnableError;
+    uint8_t strategy  = 0;
+    int responseTime  = 3;
+    uint8_t threshold = 0;
+    uint8_t cover     = 0;
+    std::vector<bool> customSectors {};
+    bool bEnableWarning = true;
+    bool bEnableError   = true;
   };
 
   struct CuboidFilterSettings
@@ -87,7 +91,6 @@ public:
     NativeROS2  = 4,
   };
 
-public:
   class AngleRangeFilterAccess
     : public GetAccess<AngleRangeFilterSettings>
     , public EnableAccess<AngleRangeFilterSettings>
@@ -361,6 +364,7 @@ public:
     { }
 
     auto get() const -> std::string;
+    void set(std::string const& value) const;
 
   private:
     SensorConfigurator const& m_configurator;
@@ -508,10 +512,16 @@ public:
     SensorConfigurator const& m_configurator;
   };
 
-public:
   explicit MultiScan100Configurator(std::shared_ptr<IHttpClient> httpClient, UserLevel userLevel, std::string password);
-  ~MultiScan100Configurator() = default;
+  ~MultiScan100Configurator()                                                  = default;
+  MultiScan100Configurator(MultiScan100Configurator const&)                    = delete;
+  auto operator=(MultiScan100Configurator const&) -> MultiScan100Configurator& = delete;
+  MultiScan100Configurator(MultiScan100Configurator&&)                         = delete;
+  auto operator=(MultiScan100Configurator&&) -> MultiScan100Configurator&      = delete;
 
+  // Public const members provide a fluent API (e.g., configurator.sensorTemperature.get()).
+  // Since they are const, external mutation is not possible, making this safe.
+  // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
   AngleRangeFilterAccess const angleRangeFilter;
 
   ContaminationConfigAccess const contaminationConfig;
@@ -579,6 +589,7 @@ public:
   SystemTimeAccess const systemTime;
 
   TimeSynchronizationAccess const timeSynchronization;
+  // NOLINTEND(misc-non-private-member-variables-in-classes)
 
   void enableImuStreaming(IpV4Address const& destinationAddress, std::uint16_t destinationPort) const;
   void enableScanDataStreaming(IpV4Address const& destinationAddress, std::uint16_t destinationPort) const;
@@ -591,5 +602,8 @@ public:
   void stopMeasurement() const;
   void persistParametersOnDevice() const;
 };
+
+// NOLINTEND(cppcoreguidelines-avoid-const-or-ref-data-members)
+// NOLINTEND(cppcoreguidelines-avoid-magic-numbers, readability-magic-numbers)
 
 } // namespace sick

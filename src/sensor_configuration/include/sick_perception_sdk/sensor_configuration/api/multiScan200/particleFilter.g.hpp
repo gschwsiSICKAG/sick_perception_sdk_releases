@@ -5,7 +5,7 @@ SPDX-License-Identifier: MIT
 
 /**
  * @file particleFilter.g.hpp Sensor REST API payload definitions.
- * @warning This file was generated for device 'multiScan200' version '0.6.0'.
+ * @warning This file was generated for device 'multiScan200' version '0.9.0-c.1+2407.172e2'.
  * Do not edit manually!
  */
 #pragma once
@@ -25,7 +25,7 @@ struct SDK_EXPORT particleFilter
   constexpr static const bool isSopasMethod = false;
 
 /**
- * @brief Returns/sets the particle filter settings. Filters out disturbances in the measurement data caused by particles such as dust, snow, or similar.
+ * @brief Particle filter.
 */
 struct SDK_EXPORT Get
 {
@@ -45,7 +45,7 @@ struct SDK_EXPORT Response
 }; // struct Get
 
 /**
- * @brief Returns/sets the particle filter settings. Filters out disturbances in the measurement data caused by particles such as dust, snow, or similar.
+ * @brief Particle filter.
 
  This function requires at least user level: Authorized Client.
 */

@@ -1,6 +1,6 @@
 clang-format
-clang-tidy
-cmake
+clang-tidy>=18
+cmake>=3.22
 conan
 openapi-spec-validator
 prance

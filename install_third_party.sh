@@ -74,15 +74,21 @@ cmake -S 3rd_party/nlohmann_json -B 3rd_party/nlohmann_json/build -DJSON_BuildTe
 cmake --install 3rd_party/nlohmann_json/build --prefix "$PWD/install"
 
 # Download, build and install cpp-httplib
-download_and_unpack "3rd_party/cpp-httplib" "cpp-httplib-v0.25.0.zip" "https://github.com/yhirose/cpp-httplib/archive/refs/tags/v0.25.0.zip" "3rd_party/cpp-httplib-0.25.0"
+download_and_unpack "3rd_party/cpp-httplib" "cpp-httplib-v0.29.0.zip" "https://github.com/yhirose/cpp-httplib/archive/refs/tags/v0.29.0.zip" "3rd_party/cpp-httplib-0.29.0"
 cmake -S 3rd_party/cpp-httplib -B 3rd_party/cpp-httplib/build
 cmake --install 3rd_party/cpp-httplib/build --prefix "$PWD/install"
 
 # Download, build and install Google Test
-download_and_unpack "3rd_party/googletest" "googletest-1.14.0.zip" "https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip" "3rd_party/googletest-1.14.0"
+download_and_unpack "3rd_party/googletest" "googletest-1.16.0.zip" "https://github.com/google/googletest/archive/refs/tags/v1.16.0.zip" "3rd_party/googletest-1.16.0"
 cmake -S 3rd_party/googletest -B 3rd_party/googletest/build -DCMAKE_BUILD_TYPE="$BUILD_TYPE"
 cmake --build 3rd_party/googletest/build --config "$BUILD_TYPE"
 cmake --install 3rd_party/googletest/build --config "$BUILD_TYPE" --prefix "$PWD/install"
+
+# Download, build and install Google Benchmark
+download_and_unpack "3rd_party/benchmark" "benchmark-1.9.4.zip" "https://github.com/google/benchmark/archive/refs/tags/v1.9.4.zip" "3rd_party/benchmark-1.9.4"
+cmake -S 3rd_party/benchmark -B 3rd_party/benchmark/build -DCMAKE_BUILD_TYPE="$BUILD_TYPE" -DBENCHMARK_ENABLE_GTEST_TESTS=OFF
+cmake --build 3rd_party/benchmark/build --config "$BUILD_TYPE"
+cmake --install 3rd_party/benchmark/build --config "$BUILD_TYPE" --prefix "$PWD/install"
 
 # Download, build and install zlib
 download_and_unpack "3rd_party/zlib" "zlib-1.3.1.zip" "https://github.com/madler/zlib/archive/refs/tags/v1.3.1.zip" "3rd_party/zlib-1.3.1"

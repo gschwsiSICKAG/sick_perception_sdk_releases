@@ -4,7 +4,7 @@
 include("${CMAKE_CURRENT_LIST_DIR}/sick_perception_sdk-config-targets.cmake")
 
 # Include dependencies for each SDK component
-set(SICK_SENSOR_SDK_SUPPORTED_COMPONENTS common compact_receiver drivers sensor_configuration)
+set(SICK_SENSOR_SDK_SUPPORTED_COMPONENTS common compact_format drivers sensor_configuration)
 foreach(component ${SICK_SENSOR_SDK_SUPPORTED_COMPONENTS})
   if(EXISTS "${CMAKE_CURRENT_LIST_DIR}/${component}-dependencies.cmake")
     include("${CMAKE_CURRENT_LIST_DIR}/${component}-dependencies.cmake")

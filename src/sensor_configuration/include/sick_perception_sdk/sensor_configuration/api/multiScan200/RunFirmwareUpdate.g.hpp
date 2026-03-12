@@ -5,7 +5,7 @@ SPDX-License-Identifier: MIT
 
 /**
  * @file RunFirmwareUpdate.g.hpp Sensor REST API payload definitions.
- * @warning This file was generated for device 'multiScan200' version '0.6.0'.
+ * @warning This file was generated for device 'multiScan200' version '0.9.0-c.1+2407.172e2'.
  * Do not edit manually!
  *
  * @note This class represents the payload of a SOPAS method. Do not use in `write_variable()`!
@@ -26,7 +26,7 @@ struct SDK_EXPORT RunFirmwareUpdate
   constexpr static const bool isSopasMethod = true;
 
 /**
- * @brief Starts the firmware update process.
+ * @brief Finishs an update package transfer process and setups the trigger or starts the deployment directly.
 
  This function requires at least user level: Service.
 */

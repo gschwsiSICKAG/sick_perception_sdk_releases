@@ -5,7 +5,7 @@ SPDX-License-Identifier: MIT
 
 /**
  * @file mResetOutputCounter.g.hpp Sensor REST API payload definitions.
- * @warning This file was generated for device 'multiScan200' version '0.6.0'.
+ * @warning This file was generated for device 'multiScan200' version '0.9.0-c.1+2407.172e2'.
  * Do not edit manually!
  *
  * @note This class represents the payload of a SOPAS method. Do not use in `write_variable()`!
@@ -26,7 +26,7 @@ struct SDK_EXPORT mResetOutputCounter
   constexpr static const bool isSopasMethod = true;
 
 /**
- * @brief Resets the counter for the outputs.
+ * @brief Post mResetOutputCounter.
 
  This function requires at least user level: Authorized Client.
 */

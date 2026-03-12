@@ -170,6 +170,9 @@ constexpr auto operator"" _rad(unsigned long long value) -> Angle
 
 } // namespace literals
 
+auto SDK_EXPORT sin(Angle const& angle) -> float;
+auto SDK_EXPORT cos(Angle const& angle) -> float;
+
 } // namespace sick
 
 namespace std {

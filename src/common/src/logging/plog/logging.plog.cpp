@@ -7,6 +7,7 @@ SPDX-License-Identifier: MIT
 
 #include "CustomFormatter.hpp"
 #include <sick_perception_sdk/common/logging/LogLevel.hpp>
+#include <sick_perception_sdk/common/version.hpp>
 
 #include <memory>
 #include <plog/Appenders/ConsoleAppender.h>
@@ -70,6 +71,7 @@ auto Log::init(LogLevel minimumLogLevel) -> void
     return;
   }
   g_impl = std::make_unique<Impl>(minimumLogLevel);
+  LOG_INFO("") << "SDK Version: " << sick::version();
 }
 
 auto Log::fastLoopInfo(std::string const& prefix, std::string fileName, int lineNumber) -> LogMessage

@@ -5,7 +5,7 @@ SPDX-License-Identifier: MIT
 
 /**
  * @file getChallenge.g.hpp Sensor REST API payload definitions.
- * @warning This file was generated for device 'multiScan200' version '0.6.0'.
+ * @warning This file was generated for device 'multiScan200' version '0.9.0-c.1+2407.172e2'.
  * Do not edit manually!
  *
  * @note This class represents the payload of a SOPAS method. Do not use in `write_variable()`!
@@ -27,7 +27,7 @@ struct SDK_EXPORT getChallenge
   constexpr static const bool isSopasMethod = true;
 
 /**
- * @brief Returns a challenge for the challenge and response authentication method. For more details see https://github.com/SICKAG/sick_scan_rest_client.
+ * @brief Post getChallenge.
 */
 struct SDK_EXPORT Post
 {

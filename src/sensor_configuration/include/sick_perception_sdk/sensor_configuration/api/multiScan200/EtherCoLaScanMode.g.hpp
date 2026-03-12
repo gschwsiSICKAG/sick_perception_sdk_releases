@@ -5,7 +5,7 @@ SPDX-License-Identifier: MIT
 
 /**
  * @file EtherCoLaScanMode.g.hpp Sensor REST API payload definitions.
- * @warning This file was generated for device 'multiScan200' version '0.6.0'.
+ * @warning This file was generated for device 'multiScan200' version '0.9.0-c.1+2407.172e2'.
  * Do not edit manually!
  */
 #pragma once
@@ -24,7 +24,7 @@ struct SDK_EXPORT EtherCoLaScanMode
   constexpr static const bool isSopasMethod = false;
 
 /**
- * @brief Configures the device search by SICK tools. If disabled, finding the device via device search and changing the IP address via SICK tools is not possible.
+ * @brief Selects if CoLa Scan (UDP port 37018) is enabled and if IP address configuration via CoLa Scan is allowed for this Ethernet interface.
 */
 struct SDK_EXPORT Get
 {
@@ -50,7 +50,7 @@ struct SDK_EXPORT Response
 }; // struct Get
 
 /**
- * @brief Configures the device search by SICK tools. If disabled, finding the device via device search and changing the IP address via SICK tools is not possible.
+ * @brief Selects if CoLa Scan (UDP port 37018) is enabled and if IP address configuration via CoLa Scan is allowed for this Ethernet interface.
 
  This function requires at least user level: Authorized Client.
 */

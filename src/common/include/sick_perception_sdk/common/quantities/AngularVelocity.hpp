@@ -7,6 +7,7 @@ SPDX-License-Identifier: MIT
 
 #include <sick_perception_sdk/common/export.hpp>
 
+#include <limits>
 #include <ostream>
 #include <string>
 
@@ -23,7 +24,7 @@ public:
   using value_type = float;
 
   constexpr AngularVelocity()
-    : m_radiansPerSecond(0.0f)
+    : m_radiansPerSecond(std::numeric_limits<AngularVelocity::value_type>::quiet_NaN())
   { }
 
   constexpr static auto fromRadiansPerSecond(value_type radiansPerSecond) -> AngularVelocity

@@ -85,9 +85,9 @@ TEST_F(RestClientTest, get_error_message_is_included_in_exception)
     m_restClient.get<std::string>("DeviceType");
     FAIL() << "Expected std::runtime_error to be thrown";
   }
-  catch (std::runtime_error const& e)
+  catch (std::runtime_error const& exception)
   {
-    EXPECT_NE(std::string(e.what()).find("Internal Server Error"), std::string::npos);
+    EXPECT_NE(std::string(exception.what()).find("Internal Server Error"), std::string::npos);
   }
   catch (...)
   {

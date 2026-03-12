@@ -16,7 +16,7 @@ SPDX-License-Identifier: MIT
 
 namespace sick {
 
-inline constexpr auto version() noexcept
+constexpr auto version() noexcept
 {
   return "0.0.0-invalid";
 }

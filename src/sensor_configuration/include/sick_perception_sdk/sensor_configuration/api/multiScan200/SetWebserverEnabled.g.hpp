@@ -5,7 +5,7 @@ SPDX-License-Identifier: MIT
 
 /**
  * @file SetWebserverEnabled.g.hpp Sensor REST API payload definitions.
- * @warning This file was generated for device 'multiScan200' version '0.6.0'.
+ * @warning This file was generated for device 'multiScan200' version '0.9.0-c.1+2407.172e2'.
  * Do not edit manually!
  *
  * @note This class represents the payload of a SOPAS method. Do not use in `write_variable()`!
@@ -26,7 +26,7 @@ struct SDK_EXPORT SetWebserverEnabled
   constexpr static const bool isSopasMethod = true;
 
 /**
- * @brief Sets the availability of the web server (reboot required). If disabled, the web server-based GUI and the REST interface cannot be used anymore.
+ * @brief Disables Webserver if set to false. Port 80 will not be opened after reboot.
 
  This function requires at least user level: Authorized Client.
 */

@@ -19,9 +19,13 @@ SPDX-License-Identifier: MIT
 #include <sick_perception_sdk/sensor_configuration/api/picoScan100.g.hpp>
 
 #include <chrono>
+#include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <string>
+
+// NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers, readability-magic-numbers): magic numbers result from generated code
+// NOLINTBEGIN(cppcoreguidelines-avoid-const-or-ref-data-members): The *Access structs are owned by the configurator thus lifetime is guaranteed by design
 
 namespace sick {
 
@@ -45,13 +49,13 @@ public:
 
   struct ContaminationConfiguration
   {
-    uint8_t strategy;
-    int responseTime;
-    uint8_t threshold;
-    uint8_t cover;
-    std::vector<bool> customSectors;
-    bool bEnableWarning;
-    bool bEnableError;
+    uint8_t strategy  = 0;
+    int responseTime  = 3;
+    uint8_t threshold = 0;
+    uint8_t cover     = 0;
+    std::vector<bool> customSectors {};
+    bool bEnableWarning = true;
+    bool bEnableError   = true;
   };
 
   struct CuboidFilterSettings
@@ -80,6 +84,7 @@ public:
     DHCP     = 1,
   };
 
+  // NOLINTBEGIN(readability-identifier-naming)
   enum class PerformanceProfile
   {
     Profile_01_15Hz_0d500Deg = 1,
@@ -94,6 +99,7 @@ public:
     Profile_10_40Hz_0d125Deg = 10,
     Profile_11_15Hz_1d000Deg = 11
   };
+  // NOLINTEND(readability-identifier-naming)
 
   enum class Sensitivity
   {
@@ -110,7 +116,6 @@ public:
     NativeROS2  = 4,
   };
 
-public:
   class AngleRangeFilterAccess
     : public GetAccess<AngleRangeFilterSettings>
     , public EnableAccess<AngleRangeFilterSettings>
@@ -375,6 +380,7 @@ public:
     { }
 
     auto get() const -> std::string;
+    void set(std::string const& value) const;
 
   private:
     SensorConfigurator const& m_configurator;
@@ -544,10 +550,16 @@ public:
     SensorConfigurator const& m_configurator;
   };
 
-public:
   explicit PicoScan100Configurator(std::shared_ptr<IHttpClient> httpClient, UserLevel userLevel, std::string password);
-  ~PicoScan100Configurator() = default;
+  ~PicoScan100Configurator()                                                 = default;
+  PicoScan100Configurator(PicoScan100Configurator const&)                    = delete;
+  auto operator=(PicoScan100Configurator const&) -> PicoScan100Configurator& = delete;
+  PicoScan100Configurator(PicoScan100Configurator&&)                         = delete;
+  auto operator=(PicoScan100Configurator&&) -> PicoScan100Configurator&      = delete;
 
+  // Public const members provide a fluent API (e.g., configurator.sensorTemperature.get()).
+  // Since they are const, external mutation is not possible, making this safe.
+  // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
   AngleRangeFilterAccess const angleRangeFilter;
 
   ContaminationConfigAccess const contaminationConfig;
@@ -623,6 +635,7 @@ public:
   SystemTimeAccess const systemTime;
 
   TimeSynchronizationAccess const timeSynchronization;
+  // NOLINTEND(misc-non-private-member-variables-in-classes)
 
   void enableEncoderStreaming(IpV4Address const& destinationAddress, std::uint16_t destinationPort) const;
   void enableImuStreaming(IpV4Address const& destinationAddress, std::uint16_t destinationPort) const;
@@ -637,4 +650,6 @@ public:
   void persistParametersOnDevice() const;
 };
 
+// NOLINTEND(cppcoreguidelines-avoid-const-or-ref-data-members)
+// NOLINTEND(cppcoreguidelines-avoid-magic-numbers, readability-magic-numbers)
 } // namespace sick

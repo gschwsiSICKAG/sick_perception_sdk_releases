@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.24)
+cmake_minimum_required(VERSION 3.22)
 
 include(${CMAKE_SOURCE_DIR}/cmake/install-library.cmake)
 include(${CMAKE_SOURCE_DIR}/cmake/compiler-defines.cmake)
@@ -17,6 +17,7 @@ set(LIB_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/src/quantities/Angle.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/quantities/AngularVelocity.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/quantities/Distance.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/quantities/Duration.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/quantities/Temperature.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/quantities/Speed.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/quantities/Timestamp.cpp
@@ -60,6 +61,10 @@ configure_file(${COMMON_VERSION_IN} ${COMMON_VERSION_OUT} @ONLY)
 
 # Expose the generated include root so consumers find
 # <sick_perception_sdk/common/version.hpp> in the generated tree first
+
+if(BUILD_BENCHMARKS)
+  add_subdirectory(benchmark)
+endif()
 
 if(BUILD_UNIT_TESTS)
   add_subdirectory(unit_test)

@@ -6,25 +6,26 @@ SPDX-License-Identifier: MIT
 #include <sick_perception_sdk/drivers/MultiScan100.hpp>
 
 #include <sick_perception_sdk/common/logging/logging.hpp>
-#include <sick_perception_sdk/compact_receiver/EncoderData.hpp>
-#include <sick_perception_sdk/compact_receiver/ImuData.hpp>
-#include <sick_perception_sdk/compact_receiver/PointCloud.hpp>
-#include <sick_perception_sdk/compact_receiver/PointCloudConfiguration.hpp>
-#include <sick_perception_sdk/compact_receiver/ScanData.hpp>
+#include <sick_perception_sdk/compact_format/PointCloud/PointCloudConfiguration.hpp>
+#include <sick_perception_sdk/compact_format/telegram_type_1_scan_data/DataLossMonitor.hpp>
+#include <sick_perception_sdk/compact_format/telegram_type_1_scan_data/PointCloudCollector.hpp>
+#include <sick_perception_sdk/compact_format/telegram_type_1_scan_data/ScanData.hpp>
+#include <sick_perception_sdk/compact_format/telegram_type_2_imu/ImuData.hpp>
 
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
 #include <exception>
 #include <functional>
+#include <optional>
 #include <string>
 #include <utility>
 
 namespace sick {
 
-MultiScan100::MultiScan100(std::function<void(std::exception)> onError)
-  : m_lastFrameSequenceNumber(0)
-  , m_onError(std::move(onError))
+MultiScan100::MultiScan100(std::function<void(std::exception_ptr)> const& onError)
+  : m_imuReceiver(onError)
+  , m_scanDataReceiver(onError)
 { }
 
 MultiScan100::~MultiScan100()
@@ -32,21 +33,111 @@ MultiScan100::~MultiScan100()
   stop();
 }
 
-void MultiScan100::multiplexScanData(compact::scan_data::ScanData const& scanData)
+void MultiScan100::run()
 {
-  if (m_onNewScanData)
+  if (m_imuReceiver.m_stream.has_value())
   {
-    if (m_packageLossMonitor)
+    m_imuReceiver.m_stream->start();
+  }
+  if (m_scanDataReceiver.m_stream.has_value())
+  {
+    m_scanDataReceiver.m_stream->start();
+  }
+}
+
+void MultiScan100::stop()
+{
+  if (m_imuReceiver.m_stream.has_value())
+  {
+    m_imuReceiver.m_stream->stop();
+  }
+  if (m_scanDataReceiver.m_stream.has_value())
+  {
+    m_scanDataReceiver.m_stream->stop();
+  }
+}
+
+// --------------------------------------------------------------
+// ImuReceiver
+// --------------------------------------------------------------
+MultiScan100::ImuReceiver::ImuReceiver(std::function<void(std::exception_ptr)> const& onError)
+  : m_onError(onError)
+  , m_stream(std::nullopt)
+  , m_onNewData(std::nullopt)
+{ }
+
+void MultiScan100::ImuReceiver::setup(std::uint16_t receiverPort, std::chrono::milliseconds firstDataTimeout, std::chrono::milliseconds newDataTimeout)
+{
+  if (m_stream)
+  {
+    return;
+  }
+  constexpr std::size_t kReceiveBufferSize = 65'507;
+  m_stream.emplace(
+    receiverPort,
+    kReceiveBufferSize,
+    [&](compact::imu::ImuData const& imuData) -> void {
+      if (m_onNewData)
+      {
+        (*m_onNewData)(imuData);
+      }
+    },
+    m_onError,
+    firstDataTimeout,
+    newDataTimeout,
+    "multiScan100 IMU on port " + std::to_string(receiverPort)
+  );
+}
+
+void MultiScan100::ImuReceiver::teardown()
+{
+  m_stream = std::nullopt;
+}
+
+void MultiScan100::ImuReceiver::setOnNewDataCallback(MultiScan100::ImuReceiver::DataCallback callback)
+{
+  m_onNewData = std::move(callback);
+}
+
+// --------------------------------------------------------------
+// ScanDataReceiver
+// --------------------------------------------------------------
+MultiScan100::ScanDataReceiver::ScanDataReceiver(std::function<void(std::exception_ptr)> const& onError)
+  : m_onError(onError)
+  , m_stream(std::nullopt)
+  , m_dataLoss(std::nullopt)
+  , m_onNewSegmentScanData(std::nullopt)
+  , m_framePointCloud(std::nullopt)
+  , m_segmentPointCloud(std::nullopt)
+{ }
+
+void MultiScan100::ScanDataReceiver::multiplexScanData(compact::scan_data::ScanData const& scanData)
+{
+  if (m_dataLoss)
+  {
+    try
     {
-      m_packageLossMonitor->check(scanData);
+      auto& [monitor, callback] = *m_dataLoss;
+      auto const lossCounts     = monitor.check(scanData);
+      if ((lossCounts.numberOfLostFrames != 0) || (lossCounts.numberOfLostTelegrams != 0) || (lossCounts.numberOfLostSegments != 0))
+      {
+        callback(lossCounts);
+      }
     }
-    (*m_onNewScanData)(scanData);
+    catch (std::exception_ptr exception)
+    {
+      m_onError(exception);
+    }
   }
-  if (m_onNewPointCloud)
+  if (m_onNewSegmentScanData)
   {
-    (*m_onNewPointCloud)(m_pointCloudConverter.convert(scanData));
+    (*m_onNewSegmentScanData)(scanData);
   }
-  if (m_onNewFullFrame)
+  if (m_segmentPointCloud)
+  {
+    m_segmentPointCloud->second(m_segmentPointCloud->first.convert(scanData));
+  }
+  if (m_framePointCloud)
   {
     if (scanData.modules.empty())
     {
@@ -60,10 +151,13 @@ void MultiScan100::multiplexScanData(compact::scan_data::ScanData const& scanDat
       return;
     }
 
+    auto& collector = m_framePointCloud->first;  // No structured bindings because captured in lambda below.
+    auto& callback  = m_framePointCloud->second; // No structured bindings because captured in lambda below.
+
     auto collectScanData = [&]() -> void {
       LOG_FAST_LOOP_INFO("multiScan100") << "Collecting segment with number " << scanData.modules.front().metaData.segmentIndex << " from frame "
                                          << scanData.modules.front().metaData.frameSequenceNumber << ".";
-      m_pointCloudCollector.collect(scanData);
+      collector.collect(scanData);
     };
 
     bool const frameChanged   = (*m_lastFrameSequenceNumber != scanData.modules.front().metaData.frameSequenceNumber);
@@ -79,24 +173,24 @@ void MultiScan100::multiplexScanData(compact::scan_data::ScanData const& scanDat
 
     if (frameChanged)
     {
-      LOG_FAST_LOOP_INFO("multiScan100") << "Frame changed. Calling the m_onNewFullFrame callback with the full frame point cloud.";
-      (*m_onNewFullFrame)(m_pointCloudCollector.getPointCloud());
-      m_pointCloudCollector.reset();
+      LOG_FAST_LOOP_INFO("multiScan100") << "Frame changed. Calling the frame callback with the frame point cloud.";
+      callback(collector.getPointCloud());
+      collector.reset();
     }
 
     collectScanData();
   }
 }
 
-void MultiScan100::enableScanDataStream(std::uint16_t receiverPort, std::chrono::milliseconds firstDataTimeout, std::chrono::milliseconds newDataTimeout)
+void MultiScan100::ScanDataReceiver::setup(std::uint16_t receiverPort, std::chrono::milliseconds firstDataTimeout, std::chrono::milliseconds newDataTimeout)
 {
-  if (m_scanDataStream)
+  if (m_stream)
   {
     return;
   }
 
   constexpr std::size_t kReceiveBufferSize = 65'507;
-  m_scanDataStream.emplace(
+  m_stream.emplace(
     receiverPort,
     kReceiveBufferSize,
     [&](compact::scan_data::ScanData const& scanData) -> void {
@@ -109,116 +203,29 @@ void MultiScan100::enableScanDataStream(std::uint16_t receiverPort, std::chrono:
   );
 }
 
-void MultiScan100::setOnNewScanData(
-  std::function<void(compact::scan_data::ScanData)> onNewScanData,
-  std::uint16_t receiverPort,
-  std::chrono::milliseconds firstDataTimeout,
-  std::chrono::milliseconds newDataTimeout
-)
+void MultiScan100::ScanDataReceiver::teardown()
 {
-  m_onNewScanData = std::move(onNewScanData);
-  enableScanDataStream(receiverPort, firstDataTimeout, newDataTimeout);
+  m_stream = std::nullopt;
 }
 
-void MultiScan100::setOnNewPointCloud(
-  PointCloudConfiguration pointCloudConfiguration,
-  std::function<void(PointCloud)> onNewPointCloud,
-  std::uint16_t receiverPort,
-  std::chrono::milliseconds firstDataTimeout,
-  std::chrono::milliseconds newDataTimeout
-)
+void MultiScan100::ScanDataReceiver::setDataLossMonitor(compact::scan_data::DataLossMonitor monitor, DataLossCallback callback)
 {
-  m_pointCloudConverter = compact::PointCloudConverter(std::move(pointCloudConfiguration));
-  m_onNewPointCloud     = std::move(onNewPointCloud);
-  enableScanDataStream(receiverPort, firstDataTimeout, newDataTimeout);
+  m_dataLoss = std::make_pair(std::move(monitor), std::move(callback));
 }
 
-void MultiScan100::setOnNewFullFrame(
-  PointCloudConfiguration pointCloudConfiguration,
-  std::function<void(PointCloud)> onNewFullFrame,
-  std::uint16_t receiverPort,
-  std::chrono::milliseconds firstDataTimeout,
-  std::chrono::milliseconds newDataTimeout
-)
+void MultiScan100::ScanDataReceiver::setOnNewFrameCallback(PointCloudCallback callback, PointCloudConfiguration const& pointCloudConfiguration)
 {
-  m_pointCloudCollector = compact::PointCloudCollector(std::move(pointCloudConfiguration));
-  m_onNewFullFrame      = std::move(onNewFullFrame);
-  enableScanDataStream(receiverPort, firstDataTimeout, newDataTimeout);
+  m_framePointCloud = std::make_pair(compact::scan_data::PointCloudCollector(pointCloudConfiguration), std::move(callback));
 }
 
-void MultiScan100::setOnNewImuData(
-  std::function<void(compact::imu::ImuData)> onNewImu,
-  std::uint16_t receiverPort,
-  std::chrono::milliseconds firstDataTimeout,
-  std::chrono::milliseconds newDataTimeout
-)
+void MultiScan100::ScanDataReceiver::setOnNewSegmentCallback(ScanDataCallback callback)
 {
-  constexpr std::size_t kReceiveBufferSize = 65'507;
-  m_imuStream.emplace(
-    receiverPort,
-    kReceiveBufferSize,
-    std::move(onNewImu),
-    m_onError,
-    firstDataTimeout,
-    newDataTimeout,
-    "multiScan100 IMU on port " + std::to_string(receiverPort)
-  );
+  m_onNewSegmentScanData = std::move(callback);
 }
 
-void MultiScan100::setOnNewEncoderData(
-  std::function<void(compact::encoder::EncoderData)> onNewEncoder,
-  std::uint16_t receiverPort,
-  std::chrono::milliseconds firstDataTimeout,
-  std::chrono::milliseconds newDataTimeout
-)
+void MultiScan100::ScanDataReceiver::setOnNewSegmentCallback(PointCloudCallback callback, PointCloudConfiguration const& pointCloudConfiguration)
 {
-  constexpr std::size_t receiveBufferSize = 65'507;
-  m_encoderStream.emplace(
-    receiverPort,
-    receiveBufferSize,
-    std::move(onNewEncoder),
-    m_onError,
-    firstDataTimeout,
-    newDataTimeout,
-    "multiScan100 encoder on port " + std::to_string(receiverPort)
-  );
-}
-
-void MultiScan100::run()
-{
-  if (m_scanDataStream)
-  {
-    m_scanDataStream->start();
-  }
-  if (m_imuStream)
-  {
-    m_imuStream->start();
-  }
-  if (m_encoderStream)
-  {
-    m_encoderStream->start();
-  }
-}
-
-void MultiScan100::stop()
-{
-  if (m_scanDataStream)
-  {
-    m_scanDataStream->stop();
-  }
-  if (m_imuStream)
-  {
-    m_imuStream->stop();
-  }
-  if (m_encoderStream)
-  {
-    m_encoderStream->stop();
-  }
-}
-
-void MultiScan100::setPackageLossMonitor(compact::scan_data::PackageLossMonitor packageLossMonitor)
-{
-  m_packageLossMonitor = std::move(packageLossMonitor);
+  m_segmentPointCloud = std::make_pair(compact::scan_data::PointCloudConverter(pointCloudConfiguration), std::move(callback));
 }
 
 } // namespace sick

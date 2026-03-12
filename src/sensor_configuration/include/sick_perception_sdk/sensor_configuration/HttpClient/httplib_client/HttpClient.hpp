@@ -17,12 +17,17 @@ namespace sick::httplib_client {
 /**
  * @brief HTTP client implementation using [httplib](https://github.com/yhirose/cpp-httplib).
  */
-class SDK_EXPORT HttpClient : public HttpClientBase<httplib::Client>
+class SDK_EXPORT HttpClient final : public HttpClientBase<httplib::Client>
 {
 public:
   explicit HttpClient(IpV4Address address, std::uint16_t port);
 
-  virtual ~HttpClient() = default;
+  ~HttpClient() override = default;
+
+  HttpClient(HttpClient const&)                        = delete;
+  auto operator=(HttpClient const&) -> HttpClient&     = delete;
+  HttpClient(HttpClient&&) noexcept                    = delete;
+  auto operator=(HttpClient&&) noexcept -> HttpClient& = delete;
 };
 
 } // namespace sick::httplib_client

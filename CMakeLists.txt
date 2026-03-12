@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.24)
+cmake_minimum_required(VERSION 3.22)
 project(sick_perception_sdk VERSION 0.0.0 LANGUAGES CXX)
 set(PRE_RELEASE_VERSION "-dev")
 
@@ -6,10 +6,17 @@ set(PRE_RELEASE_VERSION "-dev")
 # User configuration for the SDK package.
 #===============================================================================
 option(BUILD_DRIVERS "Add the library `drivers` to the cmake build." ON)
-option(BUILD_COMPACT_RECEIVER "Add the library `compact_receiver` to the cmake build." ON)
+option(BUILD_COMPACT_FORMAT "Add the library `compact_format` to the cmake build." ON)
 option(BUILD_SENSOR_CONFIGURATION "Add the library `sensor_configuration` to the cmake build." ON)
+option(BUILD_BENCHMARKS "Build benchmarks for the libraries" OFF)
 option(BUILD_UNIT_TESTS "Build unit tests for the libraries" OFF)
-option(BUILD_EXAMPLES "Build examples" OFF)
+set(BUILD_EXAMPLES_DEVICE_TYPE "" CACHE STRING "Set the device type for examples")
+set_property(CACHE BUILD_EXAMPLES_DEVICE_TYPE PROPERTY STRINGS "" "all" "LRS4000" "multiScan100" "multiScan200" "picoScan100")
+set(valid_device_types "" "all" "LRS4000" "multiScan100" "multiScan200" "picoScan100")
+list(FIND valid_device_types "${BUILD_EXAMPLES_DEVICE_TYPE}" idx)
+if(idx EQUAL -1)
+    message(FATAL_ERROR "Invalid BUILD_EXAMPLES_DEVICE_TYPE: ${BUILD_EXAMPLES_DEVICE_TYPE}")
+endif()
 option(BUILD_SHARED_LIBS "Build shared libraries (dll on Windows, so on Linux)" OFF)
 
 # ------------------------------------------------------------------------------
@@ -32,24 +39,24 @@ endif()
 #===============================================================================
 # Internal dependency logic
 #===============================================================================
-if (BUILD_EXAMPLES)
+if(NOT BUILD_EXAMPLES_DEVICE_TYPE STREQUAL "")
   set(BUILD_DRIVERS ON)
   set(BUILD_SENSOR_CONFIGURATION ON)
-  set(BUILD_COMPACT_RECEIVER ON)
+  set(BUILD_COMPACT_FORMAT ON)
 endif()
 
 if (BUILD_UNIT_TESTS)
-  set(BUILD_COMPACT_RECEIVER ON)
+  set(BUILD_COMPACT_FORMAT ON)
   set(BUILD_SENSOR_CONFIGURATION ON)
 endif()
 
 if (BUILD_DRIVERS)
   set(BUILD_COMMON ON)
   set(BUILD_SENSOR_CONFIGURATION ON)
-  set(BUILD_COMPACT_RECEIVER ON)
+  set(BUILD_COMPACT_FORMAT ON)
 endif()
 
-if (BUILD_SENSOR_CONFIGURATION OR BUILD_COMPACT_RECEIVER)
+if (BUILD_SENSOR_CONFIGURATION OR BUILD_COMPACT_FORMAT)
   set(BUILD_COMMON ON)
 endif()
 
@@ -67,8 +74,8 @@ if (BUILD_COMMON)
   add_subdirectory(src/common)
 endif()
 
-if (BUILD_COMPACT_RECEIVER)
-  add_subdirectory(src/compact_receiver)
+if (BUILD_COMPACT_FORMAT)
+  add_subdirectory(src/compact_format)
 endif()
 
 if (BUILD_SENSOR_CONFIGURATION)
@@ -79,7 +86,7 @@ if (BUILD_DRIVERS)
   add_subdirectory(src/drivers)
 endif()
 
-if (BUILD_EXAMPLES)
+if (NOT BUILD_EXAMPLES_DEVICE_TYPE STREQUAL "")
   add_subdirectory(examples)
 endif()
 

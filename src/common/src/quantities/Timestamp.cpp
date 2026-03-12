@@ -12,7 +12,7 @@ namespace sick {
 
 auto operator<<(std::ostream& stream, sick::Timestamp const& timestamp) -> std::ostream&
 {
-  return stream << timestamp.microsecondsSinceEpoch() << " us since epoch";
+  return stream << timestamp.microsecondsSinceEpoch() << " microseconds since epoch";
 }
 
 } // namespace sick
@@ -22,7 +22,7 @@ namespace std {
 // NOLINTNEXTLINE(readability-identifier-naming): to_string is standard library style
 auto to_string(sick::Timestamp const& timestamp) -> std::string
 {
-  return std::to_string(timestamp.microsecondsSinceEpoch()) + " us since epoch";
+  return std::to_string(timestamp.microsecondsSinceEpoch()) + " microseconds since epoch";
 }
 
 } // namespace std

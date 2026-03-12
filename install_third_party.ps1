@@ -31,7 +31,7 @@ function Download-And-Unpack {
 				}
 				
 				Invoke-WebRequest -Uri $Url -OutFile $ZipName
-				Expand-Archive -Path $ZipName -DestinationPath "3rd_party"
+				Expand-Archive -Path $ZipName -DestinationPath "3rd_party" -Force
 				Move-Item -Path $ExtractedDir -Destination $TargetDir
 				Remove-Item $ZipName
 				break  # Success, exit the retry loop
@@ -62,17 +62,25 @@ cmake -S 3rd_party/nlohmann_json -B 3rd_party/nlohmann_json/build -DJSON_BuildTe
 cmake --install 3rd_party/nlohmann_json/build --prefix "$PWD/install"
 
 # Download, build and install cpp-httplib
-Download-And-Unpack -TargetDir "3rd_party/cpp-httplib" -ZipName "cpp-httplib-v0.25.0.zip" -Url "https://github.com/yhirose/cpp-httplib/archive/refs/tags/v0.25.0.zip" -ExtractedDir "3rd_party/cpp-httplib-0.25.0"
+Download-And-Unpack -TargetDir "3rd_party/cpp-httplib" -ZipName "cpp-httplib-v0.29.0.zip" -Url "https://github.com/yhirose/cpp-httplib/archive/refs/tags/v0.29.0.zip" -ExtractedDir "3rd_party/cpp-httplib-0.29.0"
 cmake -S 3rd_party/cpp-httplib -B 3rd_party/cpp-httplib/build
 cmake --install 3rd_party/cpp-httplib/build --prefix "$PWD/install"
 
 # Download, build and install Google Test
-Download-And-Unpack -TargetDir "3rd_party/googletest" -ZipName "googletest-1.14.0.zip" -Url "https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip" -ExtractedDir "3rd_party/googletest-1.14.0"
+Download-And-Unpack -TargetDir "3rd_party/googletest" -ZipName "googletest-1.16.0.zip" -Url "https://github.com/google/googletest/archive/refs/tags/v1.16.0.zip" -ExtractedDir "3rd_party/googletest-1.16.0"
 # Use static runtime (MT/MTd) to match OpenSSL from slproweb.com
 $RuntimeLibrary = if ($BuildType -eq "Debug") { "MultiThreadedDebug" } else { "MultiThreaded" }
 cmake -S 3rd_party/googletest -B 3rd_party/googletest/build -Dgtest_force_shared_crt=OFF -DCMAKE_MSVC_RUNTIME_LIBRARY="$RuntimeLibrary"
 cmake --build 3rd_party/googletest/build --config $BuildType
 cmake --install 3rd_party/googletest/build --prefix "$PWD/install" --config $BuildType
+
+# Download, build and install Google Benchmark
+Download-And-Unpack -TargetDir "3rd_party/benchmark" -ZipName "benchmark-1.9.4.zip" -Url "https://github.com/google/benchmark/archive/refs/tags/v1.9.4.zip" -ExtractedDir "3rd_party/benchmark-1.9.4"
+# Use static runtime (MT/MTd) to match OpenSSL from slproweb.com
+$RuntimeLibrary = if ($BuildType -eq "Debug") { "MultiThreadedDebug" } else { "MultiThreaded" }
+cmake -S 3rd_party/benchmark -B 3rd_party/benchmark/build -Dgtest_force_shared_crt=OFF -DCMAKE_MSVC_RUNTIME_LIBRARY="$RuntimeLibrary" -DBENCHMARK_ENABLE_GTEST_TESTS=OFF
+cmake --build 3rd_party/benchmark/build --config $BuildType
+cmake --install 3rd_party/benchmark/build --prefix "$PWD/install" --config $BuildType
 
 # Download, build and install zlib
 Download-And-Unpack -TargetDir "3rd_party/zlib" -ZipName "zlib-1.3.1.zip" -Url "https://github.com/madler/zlib/archive/refs/tags/v1.3.1.zip" -ExtractedDir "3rd_party/zlib-1.3.1"

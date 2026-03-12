@@ -5,7 +5,7 @@ SPDX-License-Identifier: MIT
 
 /**
  * @file EnableLegacyUserLevel.g.hpp Sensor REST API payload definitions.
- * @warning This file was generated for device 'multiScan200' version '0.6.0'.
+ * @warning This file was generated for device 'multiScan200' version '0.9.0-c.1+2407.172e2'.
  * Do not edit manually!
  *
  * @note This class represents the payload of a SOPAS method. Do not use in `write_variable()`!
@@ -27,7 +27,7 @@ struct SDK_EXPORT EnableLegacyUserLevel
   constexpr static const bool isSopasMethod = true;
 
 /**
- * @brief Activates/deactivates a specific user level for the CoLa A/B interface.
+ * @brief Enables or disables the given legacy userlevel.
 
  This function requires at least user level: Service.
 */

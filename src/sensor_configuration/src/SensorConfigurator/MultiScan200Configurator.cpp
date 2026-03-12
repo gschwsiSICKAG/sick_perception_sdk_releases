@@ -36,6 +36,9 @@ MultiScan200Configurator::MultiScan200Configurator(std::shared_ptr<IHttpClient> 
   : SensorConfigurator(std::move(httpClient), userLevel, std::move(password))
   , ambientLightPixelCountVertical(*this)
   , bloomingFilter(*this)
+  , contaminationConfig(*this)
+  , contaminationData(*this)
+  , contaminationResult(*this)
   , sensorTemperature(*this)
   , deviceState(*this)
   , deviceType(*this)
@@ -105,6 +108,47 @@ template <>
 auto SDK_EXPORT C::IsEnabledAccess<C::BloomingFilterSettings>::isEnabled() const -> bool
 {
   return m_configurator.readVariable<srt::multiScan200::bloomingFilter>()._enable;
+}
+
+auto C::ContaminationConfigAccess::get() const -> ContaminationConfiguration
+{
+  ContaminationConfiguration config;
+  config.strategy       = static_cast<uint8_t>(m_configurator.readVariable<srt::multiScan200::ContaminationConfig>()._eStrategy);
+  config.responseTime   = m_configurator.readVariable<srt::multiScan200::ContaminationConfig>()._usiResponseTime.value();
+  config.threshold      = static_cast<uint8_t>(m_configurator.readVariable<srt::multiScan200::ContaminationConfig>()._eThreshold);
+  config.cover          = static_cast<uint8_t>(m_configurator.readVariable<srt::multiScan200::ContaminationConfig>()._eCover);
+  config.customSectors  = m_configurator.readVariable<srt::multiScan200::ContaminationConfig>()._CustomSectors;
+  config.bEnableWarning = m_configurator.readVariable<srt::multiScan200::ContaminationConfig>()._bEnableWarning;
+  config.bEnableError   = m_configurator.readVariable<srt::multiScan200::ContaminationConfig>()._bEnableError;
+
+  return config;
+}
+
+auto C::ContaminationConfigAccess::set(ContaminationConfiguration const& configuration) const
+{
+  srt::multiScan200::ContaminationConfig::Post::Request req;
+  req._eStrategy       = static_cast<srt::multiScan200::ContaminationConfig::Post::Request::eStrategy>(configuration.strategy);
+  req._usiResponseTime = configuration.responseTime;
+  req._eThreshold      = static_cast<srt::multiScan200::ContaminationConfig::Post::Request::eThreshold>(configuration.threshold);
+  req._eCover          = static_cast<srt::multiScan200::ContaminationConfig::Post::Request::eCover>(configuration.cover);
+  req._CustomSectors   = configuration.customSectors;
+  req._bEnableWarning  = configuration.bEnableWarning;
+  req._bEnableError    = configuration.bEnableError;
+  m_configurator.writeVariable<srt::multiScan200::ContaminationConfig>(req);
+}
+
+auto C::ContaminationDataAccess::get() const -> std::vector<int>
+{
+  return m_configurator.readVariable<srt::multiScan200::ContaminationData>()._ContaminationData;
+}
+
+auto C::ContaminationResultAccess::get() const -> std::array<bool, 2>
+{
+  std::array<bool, 2> const arr {
+    m_configurator.readVariable<srt::multiScan200::ContaminationResult>()._bErrorActive,
+    m_configurator.readVariable<srt::multiScan200::ContaminationResult>()._bWarningActive
+  };
+  return arr;
 }
 
 // CurrentTempDev
@@ -304,6 +348,12 @@ auto C::IntervalFilterAccess::isEnabled() const -> bool
 auto C::LocationNameAccess::get() const -> std::string
 {
   return m_configurator.readVariable<srt::multiScan200::LocationName>()._LocationName;
+}
+
+void C::LocationNameAccess::set(std::string const& value) const
+{
+  srt::multiScan200::LocationName::Post::Request const request {value};
+  m_configurator.writeVariable<srt::multiScan200::LocationName>(request);
 }
 
 // OrderNumber

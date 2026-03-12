@@ -1,5 +1,5 @@
 # cmake versions >= 3.5 are compatible with cmake 4, versions >= 3.10 are not deprecated.
-cmake_minimum_required(VERSION 3.24)
+cmake_minimum_required(VERSION 3.22)
 
 include(${CMAKE_SOURCE_DIR}/cmake/install-library.cmake)
 include(${CMAKE_SOURCE_DIR}/cmake/compiler-defines.cmake)
@@ -24,6 +24,10 @@ set(LIB_SOURCES
 
 target_sources(${LIB_NAME} PRIVATE ${LIB_SOURCES})
 
+target_compile_options(${LIB_NAME} PRIVATE
+  $<$<CXX_COMPILER_ID:MSVC>:/bigobj>
+)
+
 target_include_directories(${LIB_NAME} PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>
@@ -42,15 +46,11 @@ target_link_libraries(${LIB_NAME}
   OpenSSL::Crypto
 )
 
-# Filter out generated files (*.g.hpp) from clang-tidy analysis
-set(LIB_SOURCES_FOR_CLANG_TIDY ${LIB_SOURCES})
-list(FILTER LIB_SOURCES_FOR_CLANG_TIDY EXCLUDE REGEX ".*\\.g\\.hpp$")
-
 target_enable_clang_tidy(
   TARGET 
     ${LIB_NAME}
   SOURCES
-    ${LIB_SOURCES_FOR_CLANG_TIDY}
+    ${LIB_SOURCES}
   INCLUDE_DIRS 
     ${CMAKE_CURRENT_SOURCE_DIR}/include
   LIBS

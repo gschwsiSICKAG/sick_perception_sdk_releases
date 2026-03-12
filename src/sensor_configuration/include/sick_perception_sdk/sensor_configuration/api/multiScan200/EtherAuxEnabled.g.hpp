@@ -5,7 +5,7 @@ SPDX-License-Identifier: MIT
 
 /**
  * @file EtherAuxEnabled.g.hpp Sensor REST API payload definitions.
- * @warning This file was generated for device 'multiScan200' version '0.6.0'.
+ * @warning This file was generated for device 'multiScan200' version '0.9.0-c.1+2407.172e2'.
  * Do not edit manually!
  */
 #pragma once
@@ -24,7 +24,7 @@ struct SDK_EXPORT EtherAuxEnabled
   constexpr static const bool isSopasMethod = false;
 
 /**
- * @brief Enables/disables the legacy interface CoLa A/B. If enabled CoLa A uses port 2111 and CoLa B uses 2112.
+ * @brief Enables Cola1 Interface. Cola-A on port 2111 and Cola-B on port 2112.
 */
 struct SDK_EXPORT Get
 {
@@ -42,7 +42,7 @@ struct SDK_EXPORT Response
 }; // struct Get
 
 /**
- * @brief Enables/disables the legacy interface CoLa A/B. If enabled CoLa A uses port 2111 and CoLa B uses 2112.
+ * @brief Enables Cola1 Interface. Cola-A on port 2111 and Cola-B on port 2112.
 
  This function requires at least user level: Authorized Client.
 */

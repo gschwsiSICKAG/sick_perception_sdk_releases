@@ -7,133 +7,158 @@ SPDX-License-Identifier: MIT
 
 #include <sick_perception_sdk/common/export.hpp>
 #include <sick_perception_sdk/common/logging/LogLevel.hpp>
-#include <sick_perception_sdk/compact_receiver/EncoderData.hpp>
-#include <sick_perception_sdk/compact_receiver/EncoderParser.hpp>
-#include <sick_perception_sdk/compact_receiver/ImuData.hpp>
-#include <sick_perception_sdk/compact_receiver/ImuParser.hpp>
-#include <sick_perception_sdk/compact_receiver/PackageLossMonitor.hpp>
-#include <sick_perception_sdk/compact_receiver/PointCloud.hpp>
-#include <sick_perception_sdk/compact_receiver/PointCloudCollector.hpp>
-#include <sick_perception_sdk/compact_receiver/PointCloudConfiguration.hpp>
-#include <sick_perception_sdk/compact_receiver/PointCloudConverter.hpp>
-#include <sick_perception_sdk/compact_receiver/ScanData.hpp>
-#include <sick_perception_sdk/compact_receiver/ScanDataParser.hpp>
-#include <sick_perception_sdk/compact_receiver/UdpCompactStream.hpp>
+#include <sick_perception_sdk/compact_format/PointCloud/MultiEchoPointCloud.hpp>
+#include <sick_perception_sdk/compact_format/PointCloud/PointCloudConfiguration.hpp>
+#include <sick_perception_sdk/compact_format/telegram_type_1_scan_data/DataLossMonitor.hpp>
+#include <sick_perception_sdk/compact_format/telegram_type_1_scan_data/PointCloudCollector.hpp>
+#include <sick_perception_sdk/compact_format/telegram_type_1_scan_data/PointCloudConverter.hpp>
+#include <sick_perception_sdk/compact_format/telegram_type_1_scan_data/ScanData.hpp>
+#include <sick_perception_sdk/compact_format/telegram_type_1_scan_data/ScanDataParser.hpp>
+#include <sick_perception_sdk/compact_format/telegram_type_2_imu/ImuData.hpp>
+#include <sick_perception_sdk/compact_format/telegram_type_2_imu/ImuParser.hpp>
+#include <sick_perception_sdk/compact_format/telegram_type_4_encoder/EncoderData.hpp>
+#include <sick_perception_sdk/compact_format/telegram_type_4_encoder/EncoderParser.hpp>
+#include <sick_perception_sdk/drivers/UdpPacketReceiver.hpp>
 
 #include <functional>
 #include <optional>
 #include <string>
+#include <utility>
 
 namespace sick {
 
-//! \brief This class listens for data packets of the picoScan100 in a non-blocking manner.
+/**
+ * @ingroup Drivers
+ * 
+ * See drivers.hpp for an overview.
+ */
 class SDK_EXPORT PicoScan100
 {
 public:
-  //! @param onError Callback function that is called when an unhandled exception is thrown
-  PicoScan100(std::function<void(std::exception)> onError = [](std::exception) {});
+  static constexpr std::chrono::milliseconds kDefaultFirstDataTimeout = std::chrono::milliseconds(3000);
+  static constexpr std::chrono::milliseconds kDefaultNewDataTimeout   = std::chrono::milliseconds(1000);
+
+  class SDK_EXPORT EncoderReceiver
+  {
+  public:
+    static constexpr std::uint16_t kDefaultPort = 7504;
+    using DataCallback                          = std::function<void(compact::encoder::EncoderData)>;
+
+    explicit EncoderReceiver(std::function<void(std::exception_ptr)> const& onError);
+    void setup(
+      std::uint16_t receiverPort                 = kDefaultPort,
+      std::chrono::milliseconds firstDataTimeout = PicoScan100::kDefaultFirstDataTimeout,
+      std::chrono::milliseconds newDataTimeout   = PicoScan100::kDefaultNewDataTimeout
+    );
+    void teardown();
+    void setOnNewDataCallback(DataCallback callback);
+
+  private:
+    friend class PicoScan100;
+
+    std::function<void(std::exception_ptr)> m_onError;
+    std::optional<compact::UdpPacketReceiver<compact::encoder::Parser, compact::encoder::EncoderData>> m_stream;
+    std::optional<DataCallback> m_onNewData;
+  };
+
+  class SDK_EXPORT ImuReceiver
+  {
+  public:
+    static constexpr std::uint16_t kDefaultPort = 7503;
+    using DataCallback                          = std::function<void(compact::imu::ImuData)>;
+
+    explicit ImuReceiver(std::function<void(std::exception_ptr)> const& onError);
+    void setup(
+      std::uint16_t receiverPort                 = kDefaultPort,
+      std::chrono::milliseconds firstDataTimeout = PicoScan100::kDefaultFirstDataTimeout,
+      std::chrono::milliseconds newDataTimeout   = PicoScan100::kDefaultNewDataTimeout
+    );
+    void teardown();
+    void setOnNewDataCallback(DataCallback callback);
+
+  private:
+    friend class PicoScan100;
+
+    std::function<void(std::exception_ptr)> m_onError;
+    std::optional<compact::UdpPacketReceiver<compact::imu::Parser, compact::imu::ImuData>> m_stream;
+    std::optional<DataCallback> m_onNewData;
+  };
+
+  class SDK_EXPORT ScanDataReceiver
+  {
+  public:
+    static constexpr std::uint16_t kDefaultPort = 2115;
+    using DataLossCallback                      = std::function<void(compact::scan_data::DataLossMonitor::LossCounts const&)>;
+    using PointCloudCallback                    = std::function<void(MultiEchoPointCloud const&)>;
+    using ScanDataCallback                      = std::function<void(compact::scan_data::ScanData const&)>;
+
+    explicit ScanDataReceiver(std::function<void(std::exception_ptr)> const& onError);
+    void setup(
+      std::uint16_t receiverPort                 = kDefaultPort,
+      std::chrono::milliseconds firstDataTimeout = PicoScan100::kDefaultFirstDataTimeout,
+      std::chrono::milliseconds newDataTimeout   = PicoScan100::kDefaultNewDataTimeout
+    );
+    void teardown();
+    void setDataLossMonitor(compact::scan_data::DataLossMonitor monitor, DataLossCallback callback);
+    void setOnNewFrameCallback(PointCloudCallback callback, PointCloudConfiguration const& pointCloudConfiguration = PointCloudConfiguration());
+    void setOnNewSegmentCallback(PointCloudCallback callback, PointCloudConfiguration const& pointCloudConfiguration = PointCloudConfiguration());
+    void setOnNewSegmentCallback(ScanDataCallback callback);
+
+  private:
+    friend class PicoScan100;
+
+    std::function<void(std::exception_ptr)> m_onError;
+    std::optional<compact::UdpPacketReceiver<compact::scan_data::Parser, compact::scan_data::ScanData>> m_stream;
+    std::optional<std::pair<compact::scan_data::DataLossMonitor, DataLossCallback>> m_dataLoss;
+    std::optional<ScanDataCallback> m_onNewSegmentScanData;
+    std::optional<std::pair<compact::scan_data::PointCloudCollector, PointCloudCallback>> m_framePointCloud;
+    std::optional<std::pair<compact::scan_data::PointCloudConverter, PointCloudCallback>> m_segmentPointCloud;
+    std::optional<std::uint64_t> m_lastFrameSequenceNumber;
+    bool m_firstFrameChangeDetected = false;
+
+    void multiplexScanData(compact::scan_data::ScanData const& data);
+  };
+
+  /** @param onError Callback function that is called when an unhandled exception is thrown */
+  explicit PicoScan100(std::function<void(std::exception_ptr)> const& onError = [](std::exception_ptr) -> void {});
+
+  PicoScan100(PicoScan100 const&)                    = delete;
+  auto operator=(PicoScan100 const&) -> PicoScan100& = delete;
+  PicoScan100(PicoScan100&&)                         = delete;
+  auto operator=(PicoScan100&&) -> PicoScan100&      = delete;
 
   ~PicoScan100();
 
-  //! \param onNewScanData Callback function that is called when new scan data is received and parsed
-  //! \param receiverPort The port on which to listen for incoming UDP packets. Listens on all interfaces.
-  //! \param firstDataTimeout If more time has passed than specified since the stream was started without receiving
-  //! any data, an exception is raised. A value of 0 means no timeout.
-  //! \param newDataTimeout If more time has passed than specified without receiving any data after the first data was
-  //! received, an exception is raised. A value of 0 means no timeout.
-  void setOnNewScanData(
-    std::function<void(compact::scan_data::ScanData)> onNewScanData,
-    std::uint16_t receiverPort                 = 2115,
-    std::chrono::milliseconds firstDataTimeout = std::chrono::milliseconds(3000),
-    std::chrono::milliseconds newDataTimeout   = std::chrono::milliseconds(1000)
-  );
+  auto encoderReceiver() -> EncoderReceiver&
+  {
+    return m_encoderReceiver;
+  }
 
-  //! \param pointCloudConfiguration The configuration for the point cloud
-  //! \param onNewPointCloud Callback function that is called when a new point cloud is available
-  //! \param receiverPort The port on which to listen for incoming UDP packets. Listens on all interfaces.
-  //! \param firstDataTimeout If more time has passed than specified since the stream was started without receiving
-  //! any data, an exception is raised. A value of 0 means no timeout.
-  //! \param newDataTimeout If more time has passed than specified without receiving any data after the first data was
-  //! received, an exception is raised. A value of 0 means no timeout.
-  void setOnNewPointCloud(
-    PointCloudConfiguration pointCloudConfiguration,
-    std::function<void(PointCloud)> onNewPointCloud,
-    std::uint16_t receiverPort                 = 2115,
-    std::chrono::milliseconds firstDataTimeout = std::chrono::milliseconds(3000),
-    std::chrono::milliseconds newDataTimeout   = std::chrono::milliseconds(1000)
-  );
+  auto imuReceiver() -> ImuReceiver&
+  {
+    return m_imuReceiver;
+  }
 
-  //! \param pointCloudConfiguration The configuration for the point cloud
-  //! \param onNewFullFrame Callback function that is called when a new full frame point cloud is available
-  //! \param receiverPort The port on which to listen for incoming UDP packets. Listens on all interfaces.
-  //! \param firstDataTimeout If more time has passed than specified since the stream was started without receiving
-  //! any data, an exception is raised. A value of 0 means no timeout.
-  //! \param newDataTimeout If more time has passed than specified without receiving any data after the first data was
-  //! received, an exception is raised. A value of 0 means no timeout.
-  void setOnNewFullFrame(
-    PointCloudConfiguration pointCloudConfiguration,
-    std::function<void(PointCloud)> onNewFullFrame,
-    std::uint16_t receiverPort                 = 2115,
-    std::chrono::milliseconds firstDataTimeout = std::chrono::milliseconds(3000),
-    std::chrono::milliseconds newDataTimeout   = std::chrono::milliseconds(1000)
-  );
+  auto scanDataReceiver() -> ScanDataReceiver&
+  {
+    return m_scanDataReceiver;
+  }
 
-  //! \param onNewImu Callback function that is called when new IMU data is received and parsed
-  //! \param receiverPort The port on which to listen for incoming UDP packets. Listens on all interfaces.
-  //! \param firstDataTimeout If more time has passed than specified since the stream was started without receiving
-  //! any data, an exception is raised. A value of 0 means no timeout.
-  //! \param newDataTimeout If more time has passed than specified without receiving any data after the first data was
-  //! received, an exception is raised. A value of 0 means no timeout.
-  void setOnNewImuData(
-    std::function<void(compact::imu::ImuData)> onNewImu,
-    std::uint16_t receiverPort                 = 2117,
-    std::chrono::milliseconds firstDataTimeout = std::chrono::milliseconds(3000),
-    std::chrono::milliseconds newDataTimeout   = std::chrono::milliseconds(1000)
-  );
-
-  //! \param onNewEncoder Callback function that is called when new encoder data is received and parsed
-  //! \param receiverPort The port on which to listen for incoming UDP packets. Listens on all interfaces.
-  //! \param firstDataTimeout If more time has passed than specified since the stream was started without receiving
-  //! any data, an exception is raised. A value of 0 means no timeout.
-  //! \param newDataTimeout If more time has passed than specified without receiving any data after the first data was
-  //! received, an exception is raised. A value of 0 means no timeout.
-  void setOnNewEncoderData(
-    std::function<void(compact::encoder::EncoderData)> onNewEncoder,
-    std::uint16_t receiverPort                 = 2118,
-    std::chrono::milliseconds firstDataTimeout = std::chrono::milliseconds(3000),
-    std::chrono::milliseconds newDataTimeout   = std::chrono::milliseconds(1000)
-  );
-
-  //! \brief Listens for incoming data packets.
-  //!        Forwards the received packets to the onNewData callbacks.
+  /**
+   * @brief Listens for incoming data packets.
+   *        Forwards the received packets to the onNewData callbacks.
+   */
   void run();
 
+  /**
+   * @brief Stops receiving data. Call @ref run() to start receiving data again.
+   */
   void stop();
 
-  //! \brief Set a PackageLossMonitor to detect losses of telegrams, frames or segments.
-  //!        If the callback from PackageLossMonitor is needed, set it before calling this function, because it is moved.
-  //! \param A PackageLossMonitor instance, with set callback if needed.
-  void setPackageLossMonitor(compact::scan_data::PackageLossMonitor monitor);
-
 private:
-  void enableScanDataStream(std::uint16_t receiverPort, std::chrono::milliseconds firstDataTimeout, std::chrono::milliseconds newDataTimeout);
-  void multiplexScanData(compact::scan_data::ScanData const& scanData);
-  std::optional<compact::UdpCompactStream<compact::scan_data::Parser, compact::scan_data::ScanData>> m_scanDataStream;
-  std::optional<compact::UdpCompactStream<compact::imu::Parser, compact::imu::ImuData>> m_imuStream;
-  std::optional<compact::UdpCompactStream<compact::encoder::Parser, compact::encoder::EncoderData>> m_encoderStream;
-
-  std::function<void(std::exception const&)> m_onError;
-
-  std::optional<std::function<void(compact::scan_data::ScanData)>> m_onNewScanData;
-
-  compact::PointCloudConverter m_pointCloudConverter;
-  std::optional<std::function<void(PointCloud)>> m_onNewPointCloud;
-
-  std::optional<std::uint64_t> m_lastFrameSequenceNumber;
-  bool m_firstFrameChangeDetected = false;
-  compact::PointCloudCollector m_pointCloudCollector;
-  std::optional<std::function<void(PointCloud)>> m_onNewFullFrame;
-  std::optional<compact::scan_data::PackageLossMonitor> m_packageLossMonitor;
+  EncoderReceiver m_encoderReceiver;
+  ImuReceiver m_imuReceiver;
+  ScanDataReceiver m_scanDataReceiver;
 };
 
 } // namespace sick

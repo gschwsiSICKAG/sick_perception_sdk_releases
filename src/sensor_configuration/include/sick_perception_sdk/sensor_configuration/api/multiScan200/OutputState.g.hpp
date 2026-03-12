@@ -5,7 +5,7 @@ SPDX-License-Identifier: MIT
 
 /**
  * @file OutputState.g.hpp Sensor REST API payload definitions.
- * @warning This file was generated for device 'multiScan200' version '0.6.0'.
+ * @warning This file was generated for device 'multiScan200' version '0.9.0-c.1+2407.172e2'.
  * Do not edit manually!
  */
 #pragma once
@@ -25,7 +25,7 @@ struct SDK_EXPORT OutputState
   constexpr static const bool isSopasMethod = false;
 
 /**
- * @brief Returns the state of all outputs.
+ * @brief State of digital outputs.
 */
 struct SDK_EXPORT Get
 {

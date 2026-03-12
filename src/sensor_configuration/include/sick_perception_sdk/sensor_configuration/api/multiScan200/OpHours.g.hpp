@@ -5,7 +5,7 @@ SPDX-License-Identifier: MIT
 
 /**
  * @file OpHours.g.hpp Sensor REST API payload definitions.
- * @warning This file was generated for device 'multiScan200' version '0.6.0'.
+ * @warning This file was generated for device 'multiScan200' version '0.9.0-c.1+2407.172e2'.
  * Do not edit manually!
  */
 #pragma once
@@ -24,7 +24,7 @@ struct SDK_EXPORT OpHours
   constexpr static const bool isSopasMethod = false;
 
 /**
- * @brief Returns the total number of operating hours during the lifetime of the device. The resolution is 1/10 hour.
+ * @brief The total number of operating hours during the lifetime of the device. Resolution is a 1/10 hour.
 */
 struct SDK_EXPORT Get
 {
@@ -40,6 +40,26 @@ struct SDK_EXPORT Response
 };
 
 }; // struct Get
+
+/**
+ * @brief The total number of operating hours during the lifetime of the device. Resolution is a 1/10 hour.
+
+ This function requires at least user level: Production.
+*/
+struct SDK_EXPORT Post
+{
+struct SDK_EXPORT Request
+{
+  Request() = default;
+
+  explicit Request(int OpHours)
+    : _OpHours(OpHours)
+  {}
+
+  int _OpHours;
+};
+
+}; // struct Post
 
 }; // struct OpHours
 

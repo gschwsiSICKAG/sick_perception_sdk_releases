@@ -55,7 +55,7 @@ protected:
 TEST_F(MultiScan200ConfiguratorTest, deviceType_get)
 {
   auto const deviceType = m_configurator.deviceType.get();
-  EXPECT_EQ(deviceType, "multiScan2xx");
+  EXPECT_EQ(deviceType, "multiScan200");
 }
 
 TEST_F(MultiScan200ConfiguratorTest, firmwareVersion_get)
@@ -143,7 +143,7 @@ TEST_F(MultiScan200ConfiguratorTest, intervalFilter_isEnabled)
   EXPECT_FALSE(isEnabled);
 }
 
-TEST_F(MultiScan200ConfiguratorTest, startStopMeasure)
+TEST_F(MultiScan200ConfiguratorTest, stopStartMeasure)
 {
   m_configurator.stopMeasurement();
   std::this_thread::sleep_for(1s);

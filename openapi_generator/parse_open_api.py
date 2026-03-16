@@ -1,83 +1,81 @@
 import argparse
+from packaging import version
 from prance import ResolvingParser
 from tabulate import tabulate
 from typing import Any, Dict, List, Optional, Tuple
-import yaml
 import os
 import glob
+import yaml
 
-from objects import *
+from objects import DeviceMetadata, EndpointDescription
 from parser import parse_path
-from generator import generate_code
+from generator import generate_code, generate_aggregate_headers
 from table_generator import generate_configuration_table
 
-SUPPORTED_DEVICE_TYPES = ["picoScan100", "multiScan100", "multiScan200", "LRS4000"]
 
-# Map device names from file names to the canonical device type used in code generation
-# This allows newer device models (e.g., picoScan150) to reuse the same API as their base model (picoScan100)
-DEVICE_TYPE_MAPPING = {
-    "picoScan150": "picoScan100",
-}
-
-
-def detect_device_type_from_filename(filename: str) -> str:
+def detect_device_metadata_from_path(filepath: str, schema_root: str) -> DeviceMetadata:
     """
-    Try to detect the device type from the filename by matching against supported device types.
-    Applies device type mapping to handle device variants (e.g., picoScan150 -> picoScan100).
+    Detect device family, device_type, and determine version placeholder from the file path.
+
+    Directory structure rules:
+    - If YAML is directly in family folder: no variant (e.g., schema/LRS4000/LRS4000_V1.9.0.yaml)
+    - If YAML is in a subfolder: that subfolder is the variant (e.g., schema/picoScan100/picoScan120/...)
 
     Args:
-        filename: Path to the OpenAPI specification file
+        filepath: Path to the OpenAPI specification file
+        schema_root: Path to the schema directory (families are immediate subdirectories)
 
     Returns:
-        Detected device type (after applying mapping)
+        DeviceMetadata with family, device_type, and placeholder version
 
     Raises:
-        Exception: If no supported device type is found in the filename
+        Exception: If the path structure doesn't match expected patterns
     """
-    # First check for mapped device types (e.g., picoScan150)
-    for source_device, target_device in DEVICE_TYPE_MAPPING.items():
-        if source_device in filename:
-            print(f"ℹ️  Mapping device type '{source_device}' -> '{target_device}'")
-            return target_device
+    abs_path = os.path.abspath(filepath)
+    abs_schema_root = os.path.abspath(schema_root)
 
-    # Then check for standard supported device types
-    for device_type in SUPPORTED_DEVICE_TYPES:
-        if device_type in filename:
-            return device_type
+    # Get the relative path from schema root
+    if not abs_path.startswith(abs_schema_root):
+        raise Exception(f"File '{filepath}' is not within schema root '{schema_root}'")
 
-    raise Exception(f"Could not detect device type from filename '{filename}'. " f"Filename must contain one of: {', '.join(SUPPORTED_DEVICE_TYPES + list(DEVICE_TYPE_MAPPING.keys()))}")
+    rel_path = os.path.relpath(abs_path, abs_schema_root)
+    parts = rel_path.split(os.sep)
+
+    if len(parts) == 2:
+        # No variant: family/file.yaml
+        family = parts[0]
+        device_type = family  # Same as family when no variant
+    elif len(parts) == 3:
+        # Has variant: family/variant/file.yaml
+        family = parts[0]
+        device_type = parts[1]  # Variant name
+    else:
+        raise Exception(f"Unexpected path structure: {filepath}. Expected family/file.yaml or family/variant/file.yaml")
+
+    # Version will be extracted from YAML later; use placeholder for now
+    return DeviceMetadata(family=family, device_type=device_type, version="unknown")
 
 
-def expand_file_arguments(paths: List[str]) -> List[str]:
+def find_yaml_files(schema_dir: str) -> List[str]:
     """
-    Expand file arguments: if a path is a directory, find all .yml/.yaml files in it.
+    Find all YAML files in the schema directory.
 
     Args:
-        paths: List of file or directory paths
+        schema_dir: Path to the schema directory
 
     Returns:
-        List of file paths (directories expanded to their .yml/.yaml files)
+        List of file paths to YAML files
     """
-    expanded_files = []
+    yml_files = glob.glob(os.path.join(schema_dir, "**", "*.yml"), recursive=True)
+    yaml_files = glob.glob(os.path.join(schema_dir, "**", "*.yaml"), recursive=True)
+    all_files = sorted(yml_files + yaml_files)
 
-    for path in paths:
-        if os.path.isdir(path):
-            # Find all .yml and .yaml files in the directory
-            yml_files = glob.glob(os.path.join(path, "*.yml"))
-            yaml_files = glob.glob(os.path.join(path, "*.yaml"))
-            dir_files = sorted(yml_files + yaml_files)
+    if not all_files:
+        print(f"⚠️  Warning: No .yml or .yaml files found in directory '{schema_dir}'")
+        return []
 
-            if not dir_files:
-                print(f"⚠️  Warning: No .yml or .yaml files found in directory '{path}'")
-            else:
-                print(f"ℹ️  Found {len(dir_files)} YAML file(s) in directory '{path}'")
-                expanded_files.extend(dir_files)
-        elif os.path.isfile(path):
-            expanded_files.append(path)
-        else:
-            raise Exception(f"Path '{path}' is neither a file nor a directory")
-
-    return expanded_files
+    print(f"ℹ️  Found {len(all_files)} YAML file(s) in directory '{schema_dir}'")
+    return all_files
 
 
 def get_blocked_paths(config_path) -> List[str]:
@@ -99,27 +97,44 @@ def get_blocked_paths(config_path) -> List[str]:
         return []
 
 
-def parse_openapi_file(filename: str, device_type: str, config_path: Optional[str] = None) -> Tuple[List[EndpointDescription], str]:
+def parse_openapi_file(filename: str, metadata: DeviceMetadata, config_path: Optional[str] = None) -> Tuple[List[EndpointDescription], DeviceMetadata]:
     """
-    Parse a single OpenAPI specification file and return endpoint descriptions and device version.
+    Parse a single OpenAPI specification file and return endpoint descriptions and updated metadata.
 
     Args:
         filename: Path to the OpenAPI specification file
-        device_type: Device type for this file
+        metadata: Device metadata (family, device_type - version will be updated from YAML)
         config_path: Optional path to configuration file with blocked paths
 
     Returns:
-        Tuple of (endpoint_descriptions, device_version)
+        Tuple of (endpoint_descriptions, updated_metadata with version from YAML)
     """
     # Get the list of blocked paths from the configuration file (if specified).
     blocked_paths = get_blocked_paths(config_path) if config_path else []
 
     # Parse the specified OpenAPI document. This gives us a deeply nested dictionary.
-    print(f"ℹ️  Parsing OpenAPI specification from '{filename}' for device '{device_type}'.")
+    device_desc = f"{metadata.family}/{metadata.device_type}" if metadata.device_type != metadata.family else metadata.family
+    print(f"ℹ️  Parsing OpenAPI specification from '{filename}' for device '{device_desc}'.")
     parser = ResolvingParser(filename)
     spec: Dict[str, Any] = parser.specification  # type: ignore
     device_version = spec["info"]["version"]
-    print(f"ℹ️  File contains specification for '{device_type}' version '{device_version}'.")
+
+    # Update metadata with actual version from YAML
+    metadata = DeviceMetadata(family=metadata.family, device_type=metadata.device_type, version=device_version)
+    print(f"ℹ️  Device '{metadata.device_type}' version '{device_version}'.")
+
+    min_version = "1.1.0"
+    if "x-sick-openapi-generator-version" in spec["info"]:
+        sick_openapi_generator_version = spec["info"]["x-sick-openapi-generator-version"]
+        if version.parse(sick_openapi_generator_version) < version.parse(min_version):
+            print(
+                f"⚠️  OpenAPI specification '{filename}' specifies 'info/x-sick-openapi-generator-version' as '{sick_openapi_generator_version}', which is below the minimum supported version of {min_version}. Skipping this file."
+            )
+            return [], metadata
+    else:
+        print(
+            f"⚠️  OpenAPI specification '{filename}' does not specify 'info/x-sick-openapi-generator-version'. The minimum supported version is {min_version}. If any errors occur, you are on your own."
+        )
 
     # Parse the paths and collect their data objects.
     print(f"ℹ️  Parsing paths...")
@@ -136,59 +151,44 @@ def parse_openapi_file(filename: str, device_type: str, config_path: Optional[st
             continue
     print(f"ℹ️  Found {len(endpoint_descriptions)} valid endpoint descriptions.")
 
-    return endpoint_descriptions, device_version
+    return endpoint_descriptions, metadata
 
 
 if __name__ == "__main__":
     # Fetch a few command line arguments
     parser = argparse.ArgumentParser(description="SICK Sensor SDK Open API Parser. Parses a SICK OpenAPI specification and generates C++ data objects.")
     parser.add_argument(
-        "filenames", nargs="+", help="Path(s) to the OpenAPI specification file(s) (YAML or JSON) or directory containing YAML files. Device types will be automatically detected from filenames."
+        "schema_dir",
+        help="Path to the schema directory containing device family subdirectories with YAML files.",
     )
     parser.add_argument("-c", "--config", help="Path to the configuration file (YAML)")
-    parser.add_argument(
-        "-d",
-        "--device-types",
-        nargs="+",
-        help=f"Device type(s) (optional). Supported types are {', '.join(SUPPORTED_DEVICE_TYPES)}. If not specified, device types will be automatically detected from filenames. If specified, must match the number of input files.",
-    )
     parser.add_argument("--dry-run", action="store_true", help="If set, only the OpenAPI document will be parsed; no C++ files will be written.")
     args = parser.parse_args()
 
-    # Expand directory arguments to file lists
-    filenames = expand_file_arguments(args.filenames)
+    # Find all YAML files in schema directory
+    filenames = find_yaml_files(args.schema_dir)
 
-    if not filenames:
-        raise Exception("No YAML files found to process")
-
-    # Determine device types - either from arguments or by auto-detection
-    if args.device_types:
-        device_types = args.device_types
-        # Validate that we have the same number of files and device types
-        if len(filenames) != len(device_types):
-            raise Exception(f"Number of files ({len(filenames)}) must match number of device types ({len(device_types)})")
-    else:
-        # Auto-detect device types from filenames
-        print(f"ℹ️  Auto-detecting device types from filenames...")
-        device_types = []
-        for filename in filenames:
-            device_type = detect_device_type_from_filename(filename)
-            device_types.append(device_type)
-            print(f"ℹ️  Detected '{device_type}' from '{filename}'")
-
-    # Validate all device types
-    for device_type in device_types:
-        if device_type not in SUPPORTED_DEVICE_TYPES:
-            raise Exception(f"Unsupported device type '{device_type}'. Supported types are {', '.join(SUPPORTED_DEVICE_TYPES)}")
+    # Auto-detect device metadata from directory structure
+    print(f"ℹ️  Auto-detecting device metadata from directory structure...")
+    metadata_list: List[DeviceMetadata] = []
+    for filename in filenames:
+        metadata = detect_device_metadata_from_path(filename, args.schema_dir)
+        metadata_list.append(metadata)
+        desc = f"{metadata.family}/{metadata.device_type}" if metadata.device_type != metadata.family else metadata.family
+        print(f"ℹ️  Detected '{desc}' from '{filename}'")
 
     # Parse all OpenAPI files
     print(f"\n\nℹ️  Parsing {len(filenames)} OpenAPI specification file(s)...")
-    all_endpoints = []
-    for filename, device_type in zip(filenames, device_types):
-        endpoint_descriptions, device_version = parse_openapi_file(filename, device_type, args.config)
+    all_endpoints: List[Tuple[List[EndpointDescription], DeviceMetadata]] = []
+    for filename, metadata in zip(filenames, metadata_list):
+        endpoint_descriptions, updated_metadata = parse_openapi_file(filename, metadata, args.config)
+        if len(endpoint_descriptions) == 0:
+            print(f"⚠️  No valid endpoint descriptions found for '{filename}'. Skipping code generation for this file.")
+            continue
 
         # Print a summary for this device
-        print(f"\nℹ️  Summary for {device_type}:")
+        desc = f"{updated_metadata.device_type} v{updated_metadata.version}"
+        print(f"\nℹ️  Summary for {desc}:")
         headers = ["path", "has GET response", "has POST request", "has POST response", "is SOPAS method"]
         lines = []
         for endpoint in endpoint_descriptions:
@@ -201,16 +201,22 @@ if __name__ == "__main__":
         print(tabulate(lines, headers, colalign=("left", "center", "center", "center", "center")))
 
         # Store for code generation
-        all_endpoints.append((endpoint_descriptions, device_type, device_version))
+        all_endpoints.append((endpoint_descriptions, updated_metadata))
 
     # Now that the payloads have been collected we can proceed to generating the C++ code and table.
     if not args.dry_run:
-        # Generate C++ code for each device
-        for endpoint_descriptions, device_type, device_version in all_endpoints:
-            generate_code(endpoint_descriptions, device_type, device_version)
+        # Generate C++ code for each device/version
+        for endpoint_descriptions, metadata in all_endpoints:
+            generate_code(endpoint_descriptions, metadata)
+
+        # Generate aggregate headers (variant/family headers with latest alias)
+        generate_aggregate_headers(all_endpoints)
 
         # Generate configuration overview table
-        device_data = {device_type: (endpoint_descriptions, device_version) for endpoint_descriptions, device_type, device_version in all_endpoints}
+        device_data = {
+            metadata: endpoint_descriptions
+            for endpoint_descriptions, metadata in all_endpoints
+        }
         generate_configuration_table(device_data)
     else:
         print(f"\nℹ️  Skipping output generation because dry run was specified.")

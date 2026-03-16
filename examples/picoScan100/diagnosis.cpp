@@ -7,10 +7,10 @@ SPDX-License-Identifier: MIT
 
 #include "../examples_helper.hpp"
 #include <sick_perception_sdk/compact_format/telegram_type_1_scan_data/DataLossMonitor.hpp>
-#include <sick_perception_sdk/drivers/PicoScan100.hpp>
+#include <sick_perception_sdk/drivers/picoScan100/Driver.hpp>
 #include <sick_perception_sdk/sensor_configuration/HttpClient/httplib_client/HttpClient.hpp>
-#include <sick_perception_sdk/sensor_configuration/PicoScan100Configurator.hpp>
-#include <sick_perception_sdk/sensor_configuration/api/picoScan100.g.hpp>
+#include <sick_perception_sdk/sensor_configuration/api/picoScan100/picoScan150.g.hpp>
+#include <sick_perception_sdk/sensor_configuration/picoScan150/Configurator.hpp>
 
 #include <chrono>
 #include <iostream>
@@ -50,7 +50,7 @@ int main(int argc, char* argv[])
   // Change the default passwords during initial commissioning to secure your device.
   // Passwords can be updated via the web browser or API.
   // For production use, store passwords in a secure vault rather than in plain text.
-  sick::PicoScan100Configurator configurator(httpClient, sick::UserLevel::Service, "servicelevel");
+  sick::picoScan150::v2_2_1::Configurator configurator(httpClient, sick::UserLevel::Service, "servicelevel");
 
   try
   {
@@ -113,7 +113,7 @@ int main(int argc, char* argv[])
 
   sick::compact::scan_data::DataLossMonitor dataLossMonitor {expectedFrameSequenceNumberIncrement, expectedNumberOfSegments};
 
-  sick::PicoScan100 driver(sick::examples::printExceptionMessage);
+  sick::picoScan100::Driver driver(sick::examples::printExceptionMessage);
   driver.scanDataReceiver().setup();
   driver.scanDataReceiver().setDataLossMonitor(std::move(dataLossMonitor), onDataLoss);
   driver.scanDataReceiver().setOnNewSegmentCallback(onNewScanData);

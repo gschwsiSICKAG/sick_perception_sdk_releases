@@ -1,4 +1,14 @@
+from dataclasses import dataclass
 from typing import List, Optional
+
+
+@dataclass(frozen=True)
+class DeviceMetadata:
+    """Metadata extracted from schema directory structure and YAML file."""
+
+    family: str  # e.g., "picoScan100", "multiScan100"
+    device_type: str  # e.g., "picoScan150" for variants, or family name if no variant
+    version: str  # e.g., "2.2.1" from info/version in YAML
 
 
 class EnumFieldDescription:

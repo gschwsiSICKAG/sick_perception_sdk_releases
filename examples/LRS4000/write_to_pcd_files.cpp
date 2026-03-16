@@ -8,16 +8,13 @@ SPDX-License-Identifier: MIT
 #include "../examples_helper.hpp"
 #include <sick_perception_sdk/compact_format/PointCloud/MultiEchoPointCloud.hpp>
 #include <sick_perception_sdk/compact_format/PointCloud/PointCloudToPCDConverter.hpp>
-#include <sick_perception_sdk/drivers/LRS4000.hpp>
+#include <sick_perception_sdk/drivers/LRS4000/Driver.hpp>
 #include <sick_perception_sdk/sensor_configuration/HttpClient/httplib_client/HttpClient.hpp>
-#include <sick_perception_sdk/sensor_configuration/LRS4000Configurator.hpp>
+#include <sick_perception_sdk/sensor_configuration/LRS4000/Configurator.hpp>
 
 #include <filesystem>
 #include <iostream>
 #include <thread>
-
-using ConfiguratorT = sick::LRS4000Configurator;
-using DriverT       = sick::LRS4000;
 
 using namespace std::chrono_literals;
 
@@ -36,10 +33,10 @@ int main(int argc, char* argv[])
     // Change the default passwords during initial commissioning to secure your device.
     // Passwords can be updated via the web browser or API.
     // For production use, store passwords in a secure vault rather than in plain text.
-    ConfiguratorT configurator(httpClient, sick::UserLevel::Service, "servicelevel");
+    sick::LRS4000::v1_9_0_0R::Configurator configurator(httpClient, sick::UserLevel::Service, "servicelevel");
 
     std::cout << "Configuring compact streaming...\n";
-    configurator.streaming.set(ConfiguratorT::StreamingMode::Compact);
+    configurator.streaming.set(sick::LRS4000::v1_9_0_0R::Configurator::StreamingMode::Compact);
 
     // Create pcd_files directory if it doesn't exist
     std::filesystem::create_directories(basePath);
@@ -54,7 +51,7 @@ int main(int argc, char* argv[])
   config.fields.enableCartesian = true;
   config.fields.enableIntensity = true;
 
-  DriverT driver(deviceAddress, sick::examples::printExceptionMessage);
+  sick::LRS4000::Driver driver(deviceAddress, sick::examples::printExceptionMessage);
   driver.scanDataReceiver().setup();
   driver.scanDataReceiver().setOnNewFrameCallback(
     [basePath](sick::MultiEchoPointCloud const& framePointCloud) {

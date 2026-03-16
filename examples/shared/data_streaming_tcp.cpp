@@ -10,15 +10,15 @@ SPDX-License-Identifier: MIT
 #include <sick_perception_sdk/sensor_configuration/HttpClient/httplib_client/HttpClient.hpp>
 
 #if defined(USE_LRS4000)
-#  include <sick_perception_sdk/drivers/LRS4000.hpp>
-#  include <sick_perception_sdk/sensor_configuration/LRS4000Configurator.hpp>
-using ConfiguratorT = sick::LRS4000Configurator;
-using DriverT       = sick::LRS4000;
+#  include <sick_perception_sdk/drivers/LRS4000/Driver.hpp>
+#  include <sick_perception_sdk/sensor_configuration/LRS4000/Configurator.hpp>
+using ConfiguratorT = sick::LRS4000::v1_9_0_0R::Configurator;
+using DriverT       = sick::LRS4000::Driver;
 #else // Defaults to multiScan200
-#  include <sick_perception_sdk/drivers/MultiScan200.hpp>
-#  include <sick_perception_sdk/sensor_configuration/MultiScan200Configurator.hpp>
-using ConfiguratorT = sick::MultiScan200Configurator;
-using DriverT       = sick::MultiScan200;
+#  include <sick_perception_sdk/drivers/multiScan200/Driver.hpp>
+#  include <sick_perception_sdk/sensor_configuration/multiScan200/Configurator.hpp>
+using ConfiguratorT = sick::multiScan200::v0_9_0::Configurator;
+using DriverT       = sick::multiScan200::Driver;
 #endif
 
 #include <chrono>

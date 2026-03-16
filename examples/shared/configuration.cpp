@@ -9,31 +9,29 @@ SPDX-License-Identifier: MIT
 #include <sick_perception_sdk/sensor_configuration/HttpClient/httplib_client/HttpClient.hpp>
 
 #if defined(USE_MULTISCAN100)
-#  include <sick_perception_sdk/drivers/MultiScan100.hpp>
-#  include <sick_perception_sdk/sensor_configuration/MultiScan100Configurator.hpp>
-#  include <sick_perception_sdk/sensor_configuration/api/multiScan100.g.hpp>
-using ConfiguratorT = sick::MultiScan100Configurator;
-namespace srt       = sick::srt::multiScan100;
+#  include <sick_perception_sdk/drivers/multiScan100/Driver.hpp>
+#  include <sick_perception_sdk/sensor_configuration/api/multiScan100/multiScan100.g.hpp>
+#  include <sick_perception_sdk/sensor_configuration/multiScan100/Configurator.hpp>
+using ConfiguratorT = sick::multiScan100::v2_4_1::Configurator;
+namespace srt       = sick::multiScan100::v2_4_1::api::rest;
 #elif defined(USE_MULTISCAN200)
-#  include <sick_perception_sdk/drivers/MultiScan200.hpp>
-#  include <sick_perception_sdk/sensor_configuration/MultiScan200Configurator.hpp>
-#  include <sick_perception_sdk/sensor_configuration/api/multiScan200.g.hpp>
-using ConfiguratorT = sick::MultiScan200Configurator;
-namespace srt       = sick::srt::multiScan200;
+#  include <sick_perception_sdk/drivers/multiScan200/Driver.hpp>
+#  include <sick_perception_sdk/sensor_configuration/api/multiScan200/multiScan200.g.hpp>
+#  include <sick_perception_sdk/sensor_configuration/multiScan200/Configurator.hpp>
+using ConfiguratorT = sick::multiScan200::v0_9_0::Configurator;
+namespace srt       = sick::multiScan200::v0_9_0::api::rest;
 #elif defined(USE_LRS4000)
-#  include <sick_perception_sdk/drivers/LRS4000.hpp>
-#  include <sick_perception_sdk/sensor_configuration/LRS4000Configurator.hpp>
-#  include <sick_perception_sdk/sensor_configuration/api/LRS4000.g.hpp>
-#  include <sick_perception_sdk/sensor_configuration/api/LRS4000/OpHours.g.hpp>
-using ConfiguratorT = sick::LRS4000Configurator;
-namespace srt       = sick::srt::LRS4000;
+#  include <sick_perception_sdk/drivers/LRS4000/Driver.hpp>
+#  include <sick_perception_sdk/sensor_configuration/LRS4000/Configurator.hpp>
+#  include <sick_perception_sdk/sensor_configuration/api/LRS4000/LRS4000.g.hpp>
+using ConfiguratorT = sick::LRS4000::v1_9_0_0R::Configurator;
+namespace srt       = sick::LRS4000::v1_9_0_0R::api::rest;
 #else // Default to picoScan100
-#  include <sick_perception_sdk/drivers/PicoScan100.hpp>
-#  include <sick_perception_sdk/sensor_configuration/PicoScan100Configurator.hpp>
-#  include <sick_perception_sdk/sensor_configuration/api/picoScan100.g.hpp>
-#  include <sick_perception_sdk/sensor_configuration/api/picoScan100/LFPintervalFilter.g.hpp>
-using ConfiguratorT = sick::PicoScan100Configurator;
-namespace srt       = sick::srt::picoScan100;
+#  include <sick_perception_sdk/drivers/picoScan100/Driver.hpp>
+#  include <sick_perception_sdk/sensor_configuration/api/picoScan100/picoScan150.g.hpp>
+#  include <sick_perception_sdk/sensor_configuration/picoScan150/Configurator.hpp>
+using ConfiguratorT = sick::picoScan150::v2_2_1::Configurator;
+namespace srt       = sick::picoScan150::v2_2_1::api::rest;
 #endif
 
 #include <cstdint>

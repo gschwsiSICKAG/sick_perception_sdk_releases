@@ -11,15 +11,15 @@ SPDX-License-Identifier: MIT
 #include <sick_perception_sdk/sensor_configuration/HttpClient/httplib_client/HttpClient.hpp>
 
 #if defined(USE_MULTISCAN100)
-#  include <sick_perception_sdk/drivers/MultiScan100.hpp>
-#  include <sick_perception_sdk/sensor_configuration/MultiScan100Configurator.hpp>
-using ConfiguratorT = sick::MultiScan100Configurator;
-using DriverT       = sick::MultiScan100;
+#  include <sick_perception_sdk/drivers/multiScan100/Driver.hpp>
+#  include <sick_perception_sdk/sensor_configuration/multiScan100/Configurator.hpp>
+using ConfiguratorT = sick::multiScan100::v2_4_1::Configurator;
+using DriverT       = sick::multiScan100::Driver;
 #else // Default to picoScan100
-#  include <sick_perception_sdk/drivers/PicoScan100.hpp>
-#  include <sick_perception_sdk/sensor_configuration/PicoScan100Configurator.hpp>
-using ConfiguratorT = sick::PicoScan100Configurator;
-using DriverT       = sick::PicoScan100;
+#  include <sick_perception_sdk/drivers/picoScan100/Driver.hpp>
+#  include <sick_perception_sdk/sensor_configuration/picoScan150/Configurator.hpp>
+using ConfiguratorT = sick::picoScan150::v2_2_1::Configurator;
+using DriverT       = sick::picoScan100::Driver;
 #endif
 
 #include <filesystem>

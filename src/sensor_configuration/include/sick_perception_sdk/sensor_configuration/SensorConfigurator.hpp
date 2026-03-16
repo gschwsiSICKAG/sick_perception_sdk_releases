@@ -181,7 +181,7 @@ public:
   /**
    * @brief Base function to read the sensor position.
    *
-   * @tparam Derived classes must provide the appropriate payload type (typically `srt::<sensor type>::SensorPosition`).
+   * @tparam Derived classes must provide the appropriate payload type (typically `sick::<sensor type>::<firmware_version>::api::rest::SensorPosition`).
    */
   template <class PayloadT>
   auto getSensorPosition() const -> SensorPosition
@@ -201,7 +201,7 @@ public:
   /**
    * @brief Base function to set the sensor position.
    *
-   * @tparam Derived classes must provide the appropriate payload type (typically `srt::<sensor type>::SensorPosition`).
+   * @tparam Derived classes must provide the appropriate payload type (typically `sick::<sensor type>::<firmware_version>::api::rest::SensorPosition`).
    */
   template <class PayloadT>
   void setSensorPosition(SensorPosition const& position) const
@@ -220,8 +220,7 @@ public:
   /**
    * @brief Get the current system time of the sensor.
    *
-   * @tparam PayloadT Derived classes must provide the appropriate payload type (typically `srt::<sensor
-   * type>::LSPdatetime`).
+   * @tparam PayloadT Derived classes must provide the appropriate payload type (typically `sick::<sensor type>::<firmware_version>::api::rest::LSPdatetime`).
    */
   template <class PayloadT>
   auto getSystemTime() const -> std::chrono::microseconds
@@ -252,8 +251,7 @@ public:
    *
    * @param timeSinceEpoch The time to set, expressed as microseconds since the Unix epoch (1970-01-01T00:00:00Z).
    *
-   * @tparam PayloadT Derived classes must provide the appropriate payload type (typically `srt::<sensor
-   * type>::LSPsetdatetime`, **not** `srt::<sensor type>::LSPdatetime`!).
+   * @tparam PayloadT Derived classes must provide the appropriate payload type (typically `sick::<sensor type>::<firmware_version>::api::rest::LSPsetdatetime`, **not** `sick::<sensor type>::<firmware_version>::api::rest::LSPdatetime`!).
    */
   template <class PayloadT>
   auto setSystemTime(std::chrono::microseconds timeSinceEpoch) const -> typename PayloadT::Post::Response::ErrorCode

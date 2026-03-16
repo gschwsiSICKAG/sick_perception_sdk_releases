@@ -9,29 +9,29 @@ SPDX-License-Identifier: MIT
 #include <sick_perception_sdk/sensor_configuration/HttpClient/httplib_client/HttpClient.hpp>
 
 #if defined(USE_MULTISCAN100)
-#  include <sick_perception_sdk/drivers/MultiScan100.hpp>
-#  include <sick_perception_sdk/sensor_configuration/MultiScan100Configurator.hpp>
-using ConfiguratorT         = sick::MultiScan100Configurator;
-using SetContourRequest     = sick::srt::multiScan100::SetFieldEvaluationContour::Post::Request;
-using GetContourRequest     = sick::srt::multiScan100::GetFieldEvaluationContour::Post::Response;
-using FieldEvaluationResult = sick::srt::multiScan100::FieldEvaluationResult::Get::Response::FieldEvaluationResult;
-using EvaluationState       = sick::srt::multiScan100::FieldEvaluationResult::Get::Response::FieldEvaluationResult::EvaluationResultListItem::State;
+#  include <sick_perception_sdk/drivers/multiScan100/Driver.hpp>
+#  include <sick_perception_sdk/sensor_configuration/multiScan100/Configurator.hpp>
+using ConfiguratorT         = sick::multiScan100::v2_4_1::Configurator;
+using SetContourRequest     = sick::multiScan100::v2_4_1::api::rest::SetFieldEvaluationContour::Post::Request;
+using GetContourRequest     = sick::multiScan100::v2_4_1::api::rest::GetFieldEvaluationContour::Post::Response;
+using FieldEvaluationResult = sick::multiScan100::v2_4_1::api::rest::FieldEvaluationResult::Get::Response::FieldEvaluationResult;
+using EvaluationState = sick::multiScan100::v2_4_1::api::rest::FieldEvaluationResult::Get::Response::FieldEvaluationResult::EvaluationResultListItem::State;
 #elif defined(USE_LRS4000)
-#  include <sick_perception_sdk/drivers/LRS4000.hpp>
-#  include <sick_perception_sdk/sensor_configuration/LRS4000Configurator.hpp>
-using ConfiguratorT         = sick::LRS4000Configurator;
-using SetContourRequest     = sick::srt::LRS4000::SetFieldEvaluationContour::Post::Request;
-using GetContourRequest     = sick::srt::LRS4000::GetFieldEvaluationContour::Post::Response;
-using FieldEvaluationResult = sick::srt::LRS4000::FieldEvaluationResult::Get::Response::FieldEvaluationResult;
-using EvaluationState       = sick::srt::LRS4000::FieldEvaluationResult::Get::Response::FieldEvaluationResult::EvaluationResultListItem::State;
-#else // Default to picoScan100
-#  include <sick_perception_sdk/drivers/PicoScan100.hpp>
-#  include <sick_perception_sdk/sensor_configuration/PicoScan100Configurator.hpp>
-using ConfiguratorT         = sick::PicoScan100Configurator;
-using SetContourRequest     = sick::srt::picoScan100::SetFieldEvaluationContour::Post::Request;
-using GetContourRequest     = sick::srt::picoScan100::GetFieldEvaluationContour::Post::Response;
-using FieldEvaluationResult = sick::srt::picoScan100::FieldEvaluationResult::Get::Response::FieldEvaluationResult;
-using EvaluationState       = sick::srt::picoScan100::FieldEvaluationResult::Get::Response::FieldEvaluationResult::EvaluationResultListItem::State;
+#  include <sick_perception_sdk/drivers/LRS4000/Driver.hpp>
+#  include <sick_perception_sdk/sensor_configuration/LRS4000/Configurator.hpp>
+using ConfiguratorT         = sick::LRS4000::v1_9_0_0R::Configurator;
+using SetContourRequest     = sick::LRS4000::v1_9_0_0R::api::rest::SetFieldEvaluationContour::Post::Request;
+using GetContourRequest     = sick::LRS4000::v1_9_0_0R::api::rest::GetFieldEvaluationContour::Post::Response;
+using FieldEvaluationResult = sick::LRS4000::v1_9_0_0R::api::rest::FieldEvaluationResult::Get::Response::FieldEvaluationResult;
+using EvaluationState       = sick::LRS4000::v1_9_0_0R::api::rest::FieldEvaluationResult::Get::Response::FieldEvaluationResult::EvaluationResultListItem::State;
+#else // Default to picoScan150
+#  include <sick_perception_sdk/drivers/picoScan100/Driver.hpp>
+#  include <sick_perception_sdk/sensor_configuration/picoScan150/Configurator.hpp>
+using ConfiguratorT         = sick::picoScan150::v2_2_1::Configurator;
+using SetContourRequest     = sick::picoScan150::v2_2_1::api::rest::SetFieldEvaluationContour::Post::Request;
+using GetContourRequest     = sick::picoScan150::v2_2_1::api::rest::GetFieldEvaluationContour::Post::Response;
+using FieldEvaluationResult = sick::picoScan150::v2_2_1::api::rest::FieldEvaluationResult::Get::Response::FieldEvaluationResult;
+using EvaluationState = sick::picoScan150::v2_2_1::api::rest::FieldEvaluationResult::Get::Response::FieldEvaluationResult::EvaluationResultListItem::State;
 #endif
 
 #include <array>

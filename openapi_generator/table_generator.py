@@ -3,8 +3,9 @@ from typing import Dict, List, Tuple
 from tabulate import tabulate
 import re
 
-from objects import EndpointDescription
+from objects import DeviceMetadata, EndpointDescription
 
+DeviceData = Dict[DeviceMetadata, List[EndpointDescription]]
 
 CONFIG_OVERVIEW_OUT_DIR = "doc"
 CONFIG_OVERVIEW_FILENAME = "device_configuration_overview.md"
@@ -36,12 +37,12 @@ def _normalize_tag(tag: str) -> str:
     return cleaned_tag.upper()
 
 
-def generate_configuration_table(device_data: Dict[str, Tuple[List[EndpointDescription], str]]):
+def generate_configuration_table(device_data: DeviceData):
     """
     Generate a markdown table showing which configuration objects are supported by which devices.
 
-    Args:
-        device_data: Dictionary mapping device_type -> (endpoint_descriptions, device_version)
+    If a device type has multiple firmware versions, each version gets its own column.
+
     """
     if not device_data:
         print("⚠️  No device data provided. Skipping table generation.")
@@ -68,13 +69,27 @@ def generate_configuration_table(device_data: Dict[str, Tuple[List[EndpointDescr
         _generate_header(f)
         _generate_table(f, device_data, config_objects, tag_groups)
 
-    print(f"✅  Generated configuration overview with {len(config_objects)} configuration objects for {len(device_data)} devices.")
+    device_version_keys = _build_device_version_keys(device_data)
+    print(f"✅  Generated configuration overview with {len(config_objects)} configuration objects for {len(device_version_keys)} device/version columns.")
 
 
-def _collect_configuration_objects(device_data: Dict[str, Tuple[List[EndpointDescription], str]]) -> List[str]:
+def _build_device_version_keys(device_data: DeviceData) -> List[DeviceMetadata]:
+    """
+    Build a sorted list of DeviceMetadata for column identification.
+
+    Args:
+        device_data: Dictionary mapping DeviceMetadata -> endpoint_descriptions
+
+    Returns:
+        Sorted list of DeviceMetadata (by device_type, then version)
+    """
+    return sorted(device_data.keys(), key=lambda m: (m.device_type, m.version))
+
+
+def _collect_configuration_objects(device_data: DeviceData) -> List[str]:
     """
     Collect all unique configuration object names that have GET or POST operations.
-    Uses exact name matching to identify the same configuration object across different devices.
+    Uses exact name matching to identify the same configuration object across different devices and firmwares.
 
     Filtering rules:
     - INCLUDE: Endpoints with GET operation (read access)
@@ -87,7 +102,7 @@ def _collect_configuration_objects(device_data: Dict[str, Tuple[List[EndpointDes
     config_objects = set()
     filtered_count = 0
 
-    for device_type, (endpoints, _) in device_data.items():
+    for metadata, endpoints in device_data.items():
         for endpoint in endpoints:
             # Filter: Only include endpoints that have GET or POST operations
             has_get = endpoint.get is not None
@@ -106,46 +121,46 @@ def _collect_configuration_objects(device_data: Dict[str, Tuple[List[EndpointDes
     return sorted(config_objects)
 
 
-def _report_matching_statistics(device_data: Dict[str, Tuple[List[EndpointDescription], str]], config_objects: List[str]):
+def _report_matching_statistics(device_data: DeviceData, config_objects: List[str]):
     """
     Analyze and report statistics about configuration object matching across devices.
 
     Args:
-        device_data: Dictionary mapping device_type -> (endpoint_descriptions, device_version)
+        device_data: Dictionary mapping DeviceMetadata -> endpoint_descriptions
         config_objects: List of all unique configuration object names
     """
-    device_types = sorted(device_data.keys())
+    device_version_keys = _build_device_version_keys(device_data)
 
-    # Build mapping of config object to list of devices that support it
+    # Build mapping of config object to list of DeviceMetadata that support it
     config_to_devices = {}
     for config_name in config_objects:
         supporting_devices = []
-        for device_type, (endpoints, _) in device_data.items():
+        for metadata, endpoints in device_data.items():
             # Find endpoint by exact name match
             endpoint = next((ep for ep in endpoints if ep.class_name == config_name), None)
             if endpoint and (endpoint.get is not None or endpoint.post is not None):
-                supporting_devices.append(device_type)
+                supporting_devices.append(metadata)
         config_to_devices[config_name] = supporting_devices
 
     # Count shared vs device-specific configuration objects
     shared_objects = [name for name, devices in config_to_devices.items() if len(devices) > 1]
     device_specific_objects = [name for name, devices in config_to_devices.items() if len(devices) == 1]
-    common_to_all = [name for name, devices in config_to_devices.items() if len(devices) == len(device_types)]
+    common_to_all = [name for name, devices in config_to_devices.items() if len(devices) == len(device_version_keys)]
 
     print(f"ℹ️  Configuration object matching statistics:")
     print(f"    - Total unique configuration objects: {len(config_objects)}")
-    print(f"    - Shared across multiple devices: {len(shared_objects)}")
-    print(f"    - Common to all devices: {len(common_to_all)}")
-    print(f"    - Device-specific: {len(device_specific_objects)}")
+    print(f"    - Shared across multiple devices/versions: {len(shared_objects)}")
+    print(f"    - Common to all devices/versions: {len(common_to_all)}")
+    print(f"    - Device/version-specific: {len(device_specific_objects)}")
 
-    # Report per-device totals
-    print(f"ℹ️  Configuration objects per device:")
-    for device_type in device_types:
-        device_count = sum(1 for devices in config_to_devices.values() if device_type in devices)
-        print(f"    - {device_type}: {device_count}")
+    # Report per-device/version totals
+    print(f"ℹ️  Configuration objects per device/version:")
+    for metadata in device_version_keys:
+        device_count = sum(1 for devices in config_to_devices.values() if metadata in devices)
+        print(f"    - {metadata.device_type} ({metadata.version}): {device_count}")
 
 
-def _group_by_tags(device_data: Dict[str, Tuple[List[EndpointDescription], str]], config_objects: List[str]) -> Tuple[str, Dict[str, List[str]]]:
+def _group_by_tags(device_data: DeviceData, config_objects: List[str]) -> Tuple[str, Dict[str, List[str]]]:
     """
     Determine the reference device and group configuration objects by tags.
     The device with the highest number of tags determines the grouping structure.
@@ -161,28 +176,32 @@ def _group_by_tags(device_data: Dict[str, Tuple[List[EndpointDescription], str]]
     - Example: "13 - Measurement data output" and "10 - Measurement Data Output" group together
 
     Args:
-        device_data: Dictionary mapping device_type -> (endpoint_descriptions, device_version)
+        device_data: Dictionary mapping DeviceMetadata -> endpoint_descriptions
         config_objects: List of all configuration object names
 
     Returns:
         Tuple of (reference_device_type, tag_groups)
         where tag_groups is a Dict mapping normalized_tag -> list of config_object names
     """
-    # Find all unique tags across all devices and count them
+    # Find all unique tags across all devices and count them per device_type
     device_tags = {}
-    for device_type, (endpoints, _) in device_data.items():
-        tags_in_device = set()
+    for metadata, endpoints in device_data.items():
+        if metadata.device_type not in device_tags:
+            device_tags[metadata.device_type] = set()
         for endpoint in endpoints:
             if endpoint.tags:
-                tags_in_device.update(endpoint.tags)
-        device_tags[device_type] = tags_in_device
+                device_tags[metadata.device_type].update(endpoint.tags)
 
     # Determine reference device (device with most tags)
     reference_device = max(device_tags.keys(), key=lambda d: len(device_tags[d]))
     print(f"ℹ️  Using '{reference_device}' as reference device ({len(device_tags[reference_device])} tags).")
 
-    # Get reference device endpoints
-    reference_endpoints, _ = device_data[reference_device]
+    # Get reference device endpoints (use first version found for this device_type)
+    reference_endpoints = None
+    for metadata, endpoints in device_data.items():
+        if metadata.device_type == reference_device:
+            reference_endpoints = endpoints
+            break
     reference_config_names = {ep.class_name for ep in reference_endpoints}
 
     # Build mapping: config_name -> normalized_tag_key
@@ -224,7 +243,7 @@ def _group_by_tags(device_data: Dict[str, Tuple[List[EndpointDescription], str]]
             # This config exists in other devices but not in reference
             # Try to find it in any device and get its normalized tag
             found = False
-            for device_type, (endpoints, _) in device_data.items():
+            for metadata, endpoints in device_data.items():
                 endpoint = next((ep for ep in endpoints if ep.class_name == config_name), None)
                 if endpoint and endpoint.tags:
                     normalized_tag = _normalize_tag(endpoint.tags[0])
@@ -274,38 +293,84 @@ def _generate_header(f):
     )
 
 
-def _generate_table(f, device_data: Dict[str, Tuple[List[EndpointDescription], str]], config_objects: List[str], tag_groups: Dict[str, List[str]]):
+def _generate_table(f, device_data: DeviceData, config_objects: List[str], tag_groups: Dict[str, List[str]]):
     """
     Generate the markdown table with configuration objects and device support.
     Configuration objects are matched across devices using exact name matching.
     Objects are grouped by tags with rows showing the tag name in bold separating groups.
 
+    If multiple firmware versions exist for a device type, each version gets its own column.
+
+    The header consists of 3 rows:
+    1. Device family (bold, shown once per family, empty for subsequent columns of same family)
+    2. Device variant (shown if device_type != family, else empty)
+    3. Firmware version
+
     Args:
         f: File handle to write to
-        device_data: Dictionary mapping device_type -> (endpoint_descriptions, device_version)
+        device_data: Dictionary mapping DeviceMetadata -> endpoint_descriptions
         config_objects: List of all configuration object names to include
         tag_groups: Dictionary mapping normalized_tag_name -> list of config_object names in that group
     """
-    device_types = sorted(device_data.keys())
+    device_version_keys = _build_device_version_keys(device_data)
 
-    # Create a mapping of device_type -> config_name -> endpoint for quick lookup
-    # This ensures exact name matching when checking device support
-    device_configs = {}
-    for device_type, (endpoints, _) in device_data.items():
-        device_configs[device_type] = {ep.class_name: ep for ep in endpoints}
+    # Create a mapping of DeviceMetadata -> config_name -> endpoint for quick lookup
+    # This ensures exact name matching when checking device support per version
+    device_version_configs = {}
+    for metadata, endpoints in device_data.items():
+        device_version_configs[metadata] = {ep.class_name: ep for ep in endpoints}
 
-    # Prepare table headers
-    headers = ["Configuration Object"] + device_types
+    num_columns = len(device_version_keys)
 
-    # Prepare table data
+    # Build 3-row header structure
+    # Row 1: Device family (only show first occurrence of each family)
+    family_row = ["**Device Family**"]
+    prev_family = None
+    for metadata in device_version_keys:
+        if metadata.family != prev_family:
+            family_row.append(f"**{metadata.family}**")
+            prev_family = metadata.family
+        else:
+            family_row.append("")
+
+    # Row 2: Device variant (show only first occurrence of each variant, empty if device_type == family)
+    variant_row = ["**Device Variant**"]
+    prev_variant = None
+    for metadata in device_version_keys:
+        if metadata.device_type != metadata.family:
+            if metadata.device_type != prev_variant:
+                variant_row.append(metadata.device_type)
+                prev_variant = metadata.device_type
+            else:
+                variant_row.append("")
+        else:
+            variant_row.append("")
+            prev_variant = None  # Reset when switching to non-variant device
+
+    # Row 3: Firmware version
+    version_row = ["**Firmware Version**"]
+    for metadata in device_version_keys:
+        version_row.append(metadata.version)
+
+    # Prepare table data (header rows + data rows)
     table_data = []
 
-    # First row: links to code
+    # Add header rows as data rows (we'll use empty headers with tabulate)
+    table_data.append(family_row)
+    table_data.append(variant_row)
+    table_data.append(version_row)
+
+    # Links to code row
     link_row = [""]
-    for device_type in device_types:
+    for metadata in device_version_keys:
         # Use relative path from doc/ folder (where the markdown file is located)
         # Path needs ../ to go up from doc folder, then down to src
-        link_path = f"../{API_INCLUDE_BASE_PATH}/{device_type}".replace("\\", "/")
+        # For variants (device_type != family), include family in path: api/{family}/{device_type}
+        # For non-variants, just use: api/{family}
+        if metadata.device_type != metadata.family:
+            link_path = f"../{API_INCLUDE_BASE_PATH}/{metadata.family}/{metadata.device_type}".replace("\\", "/")
+        else:
+            link_path = f"../{API_INCLUDE_BASE_PATH}/{metadata.family}".replace("\\", "/")
         link_row.append(f"[link to code]({link_path})")
     table_data.append(link_row)
 
@@ -314,17 +379,17 @@ def _generate_table(f, device_data: Dict[str, Tuple[List[EndpointDescription], s
         # Add separator row with tag name in bold before each group
         if config_names_in_group:
             # Add row with tag name in bold as group header
-            separator_row = [f"**{tag}**"] + [""] * len(device_types)
+            separator_row = [f"**{tag}**"] + [""] * num_columns
             table_data.append(separator_row)
 
         # Generate rows for each configuration object in this group
         for config_name in config_names_in_group:
             row_cells = [config_name]
 
-            for device_type in device_types:
-                endpoint = device_configs[device_type].get(config_name)
+            for metadata in device_version_keys:
+                endpoint = device_version_configs[metadata].get(config_name)
 
-                # Apply filter: Check if this device supports this config object
+                # Apply filter: Check if this device/version supports this config object
                 # Only show support (✅) if endpoint has GET or POST operations
                 if endpoint and (endpoint.get is not None or endpoint.post is not None):
                     row_cells.append("✅")
@@ -333,10 +398,10 @@ def _generate_table(f, device_data: Dict[str, Tuple[List[EndpointDescription], s
 
             table_data.append(row_cells)
 
-    # Generate markdown table using tabulate
-    # Use 'pipe' format which supports alignment markers (:---: for center)
-    # Center-align device columns (all except the first "Configuration Object" column)
-    colalign = ["left"] + ["center"] * len(device_types)
-    markdown_table = tabulate(table_data, headers=headers, tablefmt="pipe", colalign=colalign)
+    # Generate markdown table manually to have empty header row
+    # This allows the first 3 data rows to serve as the visual header
+    empty_headers = [""] * (num_columns + 1)
+    colalign = ["left"] + ["center"] * num_columns
+    markdown_table = tabulate(table_data, headers=empty_headers, tablefmt="pipe", colalign=colalign)
     f.write(markdown_table)
     f.write("\n\n")

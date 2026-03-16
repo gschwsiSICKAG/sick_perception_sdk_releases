@@ -4,9 +4,9 @@ SPDX-License-Identifier: MIT
 */
 
 #include "test_utils/TestHttpClient.hpp"
-#include <sick_perception_sdk/sensor_configuration/MultiScan100Configurator.hpp>
-#include <sick_perception_sdk/sensor_configuration/MultiScan200Configurator.hpp>
-#include <sick_perception_sdk/sensor_configuration/PicoScan100Configurator.hpp>
+#include <sick_perception_sdk/sensor_configuration/multiScan100/Configurator.hpp>
+#include <sick_perception_sdk/sensor_configuration/multiScan200/Configurator.hpp>
+#include <sick_perception_sdk/sensor_configuration/picoScan150/Configurator.hpp>
 
 #include <deque>
 #include <gtest/gtest.h>
@@ -28,7 +28,8 @@ protected:
   ConfiguratorT m_configurator;
 };
 
-using ConfiguratorTypes = ::testing::Types<sick::PicoScan100Configurator, sick::MultiScan100Configurator, sick::MultiScan200Configurator>;
+using ConfiguratorTypes =
+  ::testing::Types<sick::multiScan100::v2_4_1::Configurator, sick::multiScan200::v0_9_0::Configurator, sick::picoScan150::v2_2_1::Configurator>;
 TYPED_TEST_SUITE(SensorConfiguratorTest, ConfiguratorTypes);
 
 TYPED_TEST(SensorConfiguratorTest, reading_variable_works_with_successful_response)

@@ -1,0 +1,66 @@
+/*
+Copyright (c) 2026 SICK AG
+SPDX-License-Identifier: MIT
+*/
+
+/**
+ * @file ImuDataEnable.g.hpp Sensor REST API payload definitions.
+ * @warning This file was generated for device 'multiScan100' version '2.4.1'.
+ * Do not edit manually!
+ */
+#pragma once
+
+#include <sick_perception_sdk/common/export.hpp>
+
+namespace sick::multiScan100::v2_4_1::api::rest {
+
+/**
+ * @brief Payloads for endpoint /ImuDataEnable.
+*/
+struct SDK_EXPORT ImuDataEnable
+{
+
+  constexpr static const char* variableName = "ImuDataEnable";
+  constexpr static const bool isSopasMethod = false;
+
+  /**
+   * @brief Enables/Disables IMU data streaming.
+   */
+  struct SDK_EXPORT Get
+  {
+    struct SDK_EXPORT Response
+    {
+      Response() = default;
+
+      explicit Response(bool ImuDataEnable)
+        : _ImuDataEnable(ImuDataEnable)
+      {}
+
+      bool _ImuDataEnable;
+    };
+
+  }; // struct Get
+
+  /**
+   * @brief Enables/Disables IMU data streaming.
+
+ This function requires at least user level: Authorized Client.
+   */
+  struct SDK_EXPORT Post
+  {
+    struct SDK_EXPORT Request
+    {
+      Request() = default;
+
+      explicit Request(bool ImuDataEnable)
+        : _ImuDataEnable(ImuDataEnable)
+      {}
+
+      bool _ImuDataEnable;
+    };
+
+  }; // struct Post
+
+}; // struct ImuDataEnable
+
+} // namespace sick::multiScan100::v2_4_1::api::rest

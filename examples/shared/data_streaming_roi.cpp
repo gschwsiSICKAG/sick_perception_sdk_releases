@@ -12,26 +12,26 @@ SPDX-License-Identifier: MIT
 
 #if defined(USE_MULTISCAN100)
 #  include <sick_perception_sdk/compact_format/telegram_type_1_scan_data/PointCloudCollector.hpp>
-#  include <sick_perception_sdk/drivers/MultiScan100.hpp>
-#  include <sick_perception_sdk/sensor_configuration/MultiScan100Configurator.hpp>
-using ConfiguratorT = sick::MultiScan100Configurator;
-using DriverT       = sick::MultiScan100;
+#  include <sick_perception_sdk/drivers/multiScan100/Driver.hpp>
+#  include <sick_perception_sdk/sensor_configuration/multiScan100/Configurator.hpp>
+using ConfiguratorT = sick::multiScan100::v2_4_1::Configurator;
+using DriverT       = sick::multiScan100::Driver;
 #elif defined(USE_MULTISCAN200)
-#  include <sick_perception_sdk/drivers/MultiScan200.hpp>
-#  include <sick_perception_sdk/sensor_configuration/MultiScan200Configurator.hpp>
-using ConfiguratorT = sick::MultiScan200Configurator;
-using DriverT       = sick::MultiScan200;
+#  include <sick_perception_sdk/drivers/multiScan200/Driver.hpp>
+#  include <sick_perception_sdk/sensor_configuration/multiScan200/Configurator.hpp>
+using ConfiguratorT = sick::multiScan200::v0_9_0::Configurator;
+using DriverT       = sick::multiScan200::Driver;
 #elif defined(USE_LRS4000)
 #  include <sick_perception_sdk/compact_format/telegram_type_1_scan_data/PointCloudCollector.hpp>
-#  include <sick_perception_sdk/drivers/LRS4000.hpp>
-#  include <sick_perception_sdk/sensor_configuration/LRS4000Configurator.hpp>
-using ConfiguratorT = sick::LRS4000Configurator;
-using DriverT       = sick::LRS4000;
+#  include <sick_perception_sdk/drivers/LRS4000/Driver.hpp>
+#  include <sick_perception_sdk/sensor_configuration/LRS4000/Configurator.hpp>
+using ConfiguratorT = sick::LRS4000::v1_9_0_0R::Configurator;
+using DriverT       = sick::LRS4000::Driver;
 #else // Default to picoScan100
-#  include <sick_perception_sdk/drivers/PicoScan100.hpp>
-#  include <sick_perception_sdk/sensor_configuration/PicoScan100Configurator.hpp>
-using ConfiguratorT = sick::PicoScan100Configurator;
-using DriverT       = sick::PicoScan100;
+#  include <sick_perception_sdk/drivers/picoScan100/Driver.hpp>
+#  include <sick_perception_sdk/sensor_configuration/picoScan150/Configurator.hpp>
+using ConfiguratorT = sick::picoScan150::v2_2_1::Configurator;
+using DriverT       = sick::picoScan100::Driver;
 #endif
 
 #include <cstdint>

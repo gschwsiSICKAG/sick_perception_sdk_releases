@@ -8,20 +8,14 @@ SPDX-License-Identifier: MIT
 #include "../examples_helper.hpp"
 
 #if defined(USE_MULTISCAN100)
-#  include <sick_perception_sdk/sensor_configuration/MultiScan100Configurator.hpp>
-#  include <sick_perception_sdk/sensor_configuration/api/multiScan100/LocationName.g.hpp>
-using ConfiguratorT = sick::MultiScan100Configurator;
-namespace srt       = sick::srt::multiScan100;
+#  include <sick_perception_sdk/sensor_configuration/multiScan100/Configurator.hpp>
+using ConfiguratorT = sick::multiScan100::v2_4_1::Configurator;
 #elif defined(USE_MULTISCAN200)
-#  include <sick_perception_sdk/sensor_configuration/MultiScan200Configurator.hpp>
-#  include <sick_perception_sdk/sensor_configuration/api/multiScan200/LocationName.g.hpp>
-using ConfiguratorT = sick::MultiScan200Configurator;
-namespace srt       = sick::srt::multiScan200;
-#else // Default to picoScan100
-#  include <sick_perception_sdk/sensor_configuration/PicoScan100Configurator.hpp>
-#  include <sick_perception_sdk/sensor_configuration/api/picoScan100/LocationName.g.hpp>
-using ConfiguratorT = sick::PicoScan100Configurator;
-namespace srt       = sick::srt::picoScan100;
+#  include <sick_perception_sdk/sensor_configuration/multiScan200/Configurator.hpp>
+using ConfiguratorT = sick::multiScan200::v0_9_0::Configurator;
+#else // Default to picoScan150
+#  include <sick_perception_sdk/sensor_configuration/picoScan150/Configurator.hpp>
+using ConfiguratorT = sick::picoScan150::v2_2_1::Configurator;
 #endif
 
 #include <sick_perception_sdk/sensor_configuration/HttpClient/httplib_client/HttpClient.hpp>

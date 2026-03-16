@@ -10,10 +10,10 @@ add_library(${LIB_NAME})
 add_library(${PROJECT_NAME}::${LIB_NAME} ALIAS ${LIB_NAME})
 
 set(LIB_SOURCES
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/LRS4000.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/MultiScan100.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/MultiScan200.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/PicoScan100.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/LRS4000/Driver.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/multiScan100/Driver.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/multiScan200/Driver.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/picoScan100/Driver.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/socket/ConnectionError.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/socket/ReceiveError.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/socket/SocketError.cpp

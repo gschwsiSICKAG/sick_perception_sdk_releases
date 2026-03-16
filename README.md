@@ -421,11 +421,11 @@ classDiagram
         + invokeMethod(...) : ResponsePayloadType
     }
     class MultiScan100Configurator
-    class PicoScan100Configurator
+    class PicoScan150Configurator
     class OtherConfigurator["..."]
 
     SensorConfigurator <|-- MultiScan100Configurator
-    SensorConfigurator <|-- PicoScan100Configurator
+    SensorConfigurator <|-- PicoScan150Configurator
     SensorConfigurator <|-- OtherConfigurator
 ```
 
@@ -468,17 +468,17 @@ An example with a request payload and a response payload is given below (the `si
 
 // Create a generic device configurator.
 auto const httpClient = std::make_shared<httplib_client::HttpClient>(deviceAddress, 80);
-PicoScan100Configurator configurator(httpClient, UserLevel::Service, "servicelevel");
+PicoScan150Configurator configurator(httpClient, UserLevel::Service, "servicelevel");
 
 // Read the field evaluation contours. This requires a request payload that indicates which evaluation ID to query.
 // The POST call returns a response payload with the field contours.
 int const evaluationId = 1;
-sick::srt::picoScan100::GetFieldEvaluationContour::Post::Request const request {evaluationId};
+sick::srt::picoScan150::latest::GetFieldEvaluationContour::Post::Request const request {evaluationId};
 auto const response
-  = m_configurator.post(sick::srt::picoScan100::GetFieldEvaluationContour::methodName)
+  = m_configurator.post(sick::srt::picoScan150::latest::GetFieldEvaluationContour::methodName)
                   .withPlainRequestPayload(request)
                   .execute()
-                  .withPlainResponsePayload<sick::srt::picoScan100::GetFieldEvaluationContour::Post::Response>();
+                  .withPlainResponsePayload<sick::srt::picoScan150::latest::GetFieldEvaluationContour::Post::Response>();
 ```
 
 #### Convenience Accessors
@@ -528,11 +528,11 @@ User code can access these convenience accessors via the device-specific configu
 
 ```cpp
 #include <sick_perception_sdk/sensor_configuration/HttpClient/httplib_client/HttpClient.hpp>
-#include <sick_perception_sdk/sensor_configuration/PicoScan100Configurator.hpp>
+#include <sick_perception_sdk/sensor_configuration/PicoScan150Configurator.hpp>
 
 // Create the convenience device configurator for a picoScan100 sensor.
 auto const httpClient = std::make_shared<httplib_client::HttpClient>(deviceAddress, 80);
-PicoScan100Configurator configurator(httpClient, UserLevel::Service, "servicelevel");
+PicoScan150Configurator configurator(httpClient, UserLevel::Service, "servicelevel");
 
 // Configure and enable the interval filter.
 configurator.intervalFilter.enable(2);

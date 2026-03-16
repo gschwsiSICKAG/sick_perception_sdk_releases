@@ -10,9 +10,9 @@ SPDX-License-Identifier: MIT
 #include <sick_perception_sdk/compact_format/PointCloud/MultiEchoPointCloud.hpp>
 #include <sick_perception_sdk/compact_format/PointCloud/PointCloudToPCDConverter.hpp>
 #include <sick_perception_sdk/compact_format/telegram_type_6_multiScan200/MultiScan200Data.hpp>
-#include <sick_perception_sdk/drivers/MultiScan200.hpp>
+#include <sick_perception_sdk/drivers/multiScan200/Driver.hpp>
 #include <sick_perception_sdk/sensor_configuration/HttpClient/httplib_client/HttpClient.hpp>
-#include <sick_perception_sdk/sensor_configuration/MultiScan200Configurator.hpp>
+#include <sick_perception_sdk/sensor_configuration/multiScan200/Configurator.hpp>
 
 #include <filesystem>
 #include <fstream>
@@ -76,10 +76,10 @@ int main(int argc, char* argv[])
     // Change the default passwords during initial commissioning to secure your device.
     // Passwords can be updated via the web browser or API.
     // For production use, store passwords in a secure vault rather than in plain text.
-    sick::MultiScan200Configurator configurator(httpClient, sick::UserLevel::Service, "servicelevel");
+    sick::multiScan200::v0_9_0::Configurator configurator(httpClient, sick::UserLevel::Service, "servicelevel");
 
     std::cout << "Configuring compact streaming...\n";
-    configurator.streaming.set(sick::MultiScan200Configurator::StreamingMode::Compact);
+    configurator.streaming.set(sick::multiScan200::v0_9_0::Configurator::StreamingMode::Compact);
 
     // Create multiScan200_files directory if it doesn't exist
     std::filesystem::create_directories(basePath);
@@ -98,7 +98,7 @@ int main(int argc, char* argv[])
   config.fields.enableTimeOffset = true;
   config.fields.enableEcho       = true;
 
-  sick::MultiScan200 driver(deviceAddress, sick::examples::printExceptionMessage);
+  sick::multiScan200::Driver driver(deviceAddress, sick::examples::printExceptionMessage);
   driver.scanDataReceiver().setup();
   driver.scanDataReceiver().setOnNewFrameCallback(
     [basePath](sick::MultiEchoPointCloud const& framePointCloud) {

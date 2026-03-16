@@ -7,9 +7,9 @@ SPDX-License-Identifier: MIT
 
 #include "../examples_helper.hpp"
 #include <sick_perception_sdk/compact_format/telegram_type_1_scan_data/DataLossMonitor.hpp>
-#include <sick_perception_sdk/drivers/MultiScan100.hpp>
+#include <sick_perception_sdk/drivers/multiScan100/Driver.hpp>
 #include <sick_perception_sdk/sensor_configuration/HttpClient/httplib_client/HttpClient.hpp>
-#include <sick_perception_sdk/sensor_configuration/MultiScan100Configurator.hpp>
+#include <sick_perception_sdk/sensor_configuration/multiScan100/Configurator.hpp>
 
 #include <chrono>
 #include <iostream>
@@ -49,7 +49,7 @@ int main(int argc, char* argv[])
   // Change the default passwords during initial commissioning to secure your device.
   // Passwords can be updated via the web browser or API.
   // For production use, store passwords in a secure vault rather than in plain text.
-  sick::MultiScan100Configurator configurator(httpClient, sick::UserLevel::Service, "servicelevel");
+  sick::multiScan100::v2_4_1::Configurator configurator(httpClient, sick::UserLevel::Service, "servicelevel");
 
   try
   {
@@ -113,7 +113,7 @@ int main(int argc, char* argv[])
 
   sick::compact::scan_data::DataLossMonitor dataLossMonitor {expectedFrameSequenceNumberIncrement, expectedNumberOfSegments};
 
-  sick::MultiScan100 driver(sick::examples::printExceptionMessage);
+  sick::multiScan100::Driver driver(sick::examples::printExceptionMessage);
   driver.scanDataReceiver().setup();
   driver.scanDataReceiver().setDataLossMonitor(std::move(dataLossMonitor), onDataLoss);
   driver.scanDataReceiver().setOnNewSegmentCallback(onNewScanData);

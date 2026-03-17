@@ -40,12 +40,18 @@ public:
     }
 
     auto const numberOfLosses = [this, currentSequenceNumber]() -> int {
-      // The weird case first. The sequence number should always be increasing.
-      // We don't bother with the case that the sequence number has wrapped around.
-      if (currentSequenceNumber <= m_lastSequenceNumber)
+      // The weird case first: if the sequence number does not change at all we don't really know
+      // what's wrong so we'll assume that at least one element was lost.
+      if (currentSequenceNumber == m_lastSequenceNumber)
       {
-        // Losses are a bit strange to compute here so we return just 1.
         return 1;
+      }
+
+      // If the sequence number has decreased the underlying counter was most probably reset.
+      // Therefore, we treat a decrement as no loss.
+      if (currentSequenceNumber < m_lastSequenceNumber)
+      {
+        return 0;
       }
 
       // From here we know that the diff is always greater than 0.

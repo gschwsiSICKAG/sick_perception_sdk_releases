@@ -10,7 +10,6 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 #include <sick_perception_sdk/sensor_configuration/api/NumericRange.hpp>
 
 namespace sick::picoScan150::v2_2_1::api::rest {
@@ -18,7 +17,7 @@ namespace sick::picoScan150::v2_2_1::api::rest {
 /**
  * @brief Payloads for endpoint /SensorPosition.
 */
-struct SDK_EXPORT SensorPosition
+struct SensorPosition
 {
 
   constexpr static const char* variableName = "SensorPosition";
@@ -27,9 +26,9 @@ struct SDK_EXPORT SensorPosition
   /**
    * @brief Returns/sets the mounting position in 1/10000 deg. This only affects the PointCloud2 format output by native ROS2.
    */
-  struct SDK_EXPORT Get
+  struct Get
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
       Response() = default;
 
@@ -52,9 +51,9 @@ struct SDK_EXPORT SensorPosition
 
  This function requires at least user level: Authorized Client.
    */
-  struct SDK_EXPORT Post
+  struct Post
   {
-    struct SDK_EXPORT Request
+    struct Request
     {
       Request() = default;
 

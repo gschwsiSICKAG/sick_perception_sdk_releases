@@ -10,7 +10,6 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 #include <sick_perception_sdk/sensor_configuration/api/NumericRange.hpp>
 
 namespace sick::LRS4000::v1_9_0_0R::api::rest {
@@ -18,7 +17,7 @@ namespace sick::LRS4000::v1_9_0_0R::api::rest {
 /**
  * @brief Payloads for endpoint /LFPmedianfilter.
 */
-struct SDK_EXPORT LFPmedianfilter
+struct LFPmedianfilter
 {
 
   constexpr static const char* variableName = "LFPmedianfilter";
@@ -27,9 +26,9 @@ struct SDK_EXPORT LFPmedianfilter
   /**
    * @brief Returns/sets the median filter settings. This filter smooths the distance values by transmitting just the median value of the last X scans.
    */
-  struct SDK_EXPORT Get
+  struct Get
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
       Response() = default;
 
@@ -48,9 +47,9 @@ struct SDK_EXPORT LFPmedianfilter
 
  This function requires at least user level: Authorized Client.
    */
-  struct SDK_EXPORT Post
+  struct Post
   {
-    struct SDK_EXPORT Request
+    struct Request
     {
       Request() = default;
 

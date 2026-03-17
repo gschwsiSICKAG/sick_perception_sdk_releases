@@ -10,7 +10,6 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 #include <string>
 
 namespace sick::multiScan100::v2_4_1::api::rest {
@@ -18,7 +17,7 @@ namespace sick::multiScan100::v2_4_1::api::rest {
 /**
  * @brief Payloads for endpoint /OrderNumber.
 */
-struct SDK_EXPORT OrderNumber
+struct OrderNumber
 {
 
   constexpr static const char* variableName = "OrderNumber";
@@ -27,9 +26,9 @@ struct SDK_EXPORT OrderNumber
   /**
    * @brief Returns the order number (SICK part number).
    */
-  struct SDK_EXPORT Get
+  struct Get
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
       Response() = default;
 

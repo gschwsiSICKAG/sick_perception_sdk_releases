@@ -34,108 +34,6 @@ std::set<std::uint32_t> const kSupportedTelegramVersions = {1};
 constexpr std::size_t kSizeOfIntensityInBits             = 12;
 constexpr auto maxIntensityValue                         = static_cast<float>((1 << kSizeOfIntensityInBits) - 1);
 
-template <bool HasIntensity, bool HasProperties, bool HasPulseWidth>
-void assembleBeams(
-  MultiScan200Data& scanData,
-  std::vector<Distance> const& distances,
-  std::vector<std::uint16_t> const& intensities,
-  std::vector<std::uint8_t> const& echoProperties,
-  std::vector<Duration> const& pulseWidths
-)
-{
-  auto const numberOfEchoes  = static_cast<std::size_t>(scanData.segmentMetaData.numberOfEchoes);
-  auto const numberOfRows    = static_cast<std::size_t>(scanData.segmentMetaData.numberOfRows);
-  auto const numberOfColumns = static_cast<std::size_t>(scanData.segmentMetaData.numberOfColumnsInSegment);
-  auto const numberOfBeams   = static_cast<std::size_t>(numberOfRows * numberOfColumns);
-
-  scanData.scanData.reserve(numberOfColumns);
-
-  for (std::size_t columnIndex = 0; columnIndex < numberOfColumns; ++columnIndex)
-  {
-    ScanColumn column;
-    column.reserve(numberOfRows);
-    auto const azimuth = scanData.geometry.azimuths[columnIndex];
-
-    for (std::size_t rowIndex = 0; rowIndex < numberOfRows; ++rowIndex)
-    {
-      Beam beam;
-      beam.azimuth   = azimuth;
-      beam.elevation = scanData.geometry.elevations[rowIndex];
-      beam.echoes.reserve(numberOfEchoes);
-
-      for (std::size_t echoIndex = 0; echoIndex < numberOfEchoes; ++echoIndex)
-      {
-        std::size_t const sampleIndex = echoIndex * numberOfBeams + columnIndex * numberOfRows + rowIndex;
-
-        Echo echo;
-        echo.distance = distances[sampleIndex];
-
-        if constexpr (HasIntensity)
-        {
-          echo.intensity = static_cast<float>(intensities[sampleIndex]) / maxIntensityValue;
-        }
-        if constexpr (HasProperties)
-        {
-          echo.properties = BitField<EchoProperties>(echoProperties[sampleIndex]);
-        }
-        if constexpr (HasPulseWidth)
-        {
-          echo.pulseWidth = pulseWidths[sampleIndex];
-        }
-
-        beam.echoes.emplace_back(echo);
-      }
-      column.emplace_back(std::move(beam));
-    }
-    scanData.scanData.emplace_back(std::move(column));
-  }
-}
-
-using AssembleBeamsFn = void (*)(
-  MultiScan200Data& scanData,
-  std::vector<Distance> const& distances,
-  std::vector<std::uint16_t> const& intensities,
-  std::vector<std::uint8_t> const& echoProperties,
-  std::vector<Duration> const& pulseWidths
-);
-
-constexpr std::size_t kIntensitiesPresentMask = 4;
-constexpr std::size_t kPropertiesPresentMask  = 2;
-constexpr std::size_t kPulseWidthPresentMask  = 1;
-
-template <std::size_t Index>
-constexpr auto getAssembleBeamsFn() -> AssembleBeamsFn
-{
-  constexpr bool hasIntensities = (Index & kIntensitiesPresentMask) != 0;
-  constexpr bool hasProperties  = (Index & kPropertiesPresentMask) != 0;
-  constexpr bool hasPulseWidth  = (Index & kPulseWidthPresentMask) != 0;
-  return &assembleBeams<hasIntensities, hasProperties, hasPulseWidth>;
-}
-
-template <std::size_t... Indices>
-constexpr auto makeDispatchTable(std::index_sequence<Indices...>) -> std::array<AssembleBeamsFn, sizeof...(Indices)>
-{
-  return {{getAssembleBeamsFn<Indices>()...}};
-}
-
-constexpr auto kAssembleBeamsDispatch = makeDispatchTable(std::make_index_sequence<8> {});
-
-void dispatchAssembleBeams(
-  MultiScan200Data& scanData,
-  std::vector<Distance> const& distances,
-  std::vector<std::uint16_t> const& intensities,
-  std::vector<std::uint8_t> const& echoProperties,
-  std::vector<Duration> const& pulseWidths
-)
-{
-  // Encode booleans as index: hasIntensity*4 + hasProperties*2 + hasPulseWidth*1
-  std::size_t const index =
-    (!intensities.empty() ? kIntensitiesPresentMask : 0u)     //
-    + (!echoProperties.empty() ? kPropertiesPresentMask : 0u) //
-    + (!pulseWidths.empty() ? kPulseWidthPresentMask : 0u);
-  kAssembleBeamsDispatch.at(index)(scanData, distances, intensities, echoProperties, pulseWidths);
-}
-
 auto readSegmentMetaData(ByteView data, SegmentMetaData& metaData) -> std::size_t
 {
   if (data.size() < sizeof(SegmentMetaData))
@@ -246,52 +144,53 @@ auto readScanData(ByteView data, MultiScan200Data& scanData) -> std::size_t
   auto const numberOfBeams   = static_cast<std::size_t>(numberOfRows * numberOfColumns);
   auto const numberOfSamples = static_cast<std::size_t>(numberOfEchoes * numberOfBeams);
 
-  // Caution! The order of the following readValueUnsafe calls is important and defined by the protocol!
+  // Bulk read raw distances and convert
+  std::vector<std::uint16_t> rawDistances(numberOfSamples);
+  std::memcpy(rawDistances.data(), data.data() + readPosition, numberOfSamples * sizeof(std::uint16_t));
+  readPosition += numberOfSamples * sizeof(std::uint16_t);
 
-  // First we collect the raw data into temporary vectors, then we assemble the beams from these vectors.
-  std::vector<Distance> distances;
-  distances.reserve(numberOfSamples);
+  scanData.distances.resize(numberOfSamples);
+  auto const scalingFactor = scanData.segmentMetaData.distanceScalingFactor;
   for (std::size_t i = 0; i < numberOfSamples; ++i)
   {
-    std::uint16_t rawDistance = 0;
-    readPosition += CompactParser::readValueUnsafe(data.subview(readPosition), rawDistance);
-    distances.push_back(Distance::fromMillimeters(static_cast<Distance::value_type>(rawDistance) * scanData.segmentMetaData.distanceScalingFactor));
+    scanData.distances[i] = Distance::fromMillimeters(static_cast<Distance::value_type>(rawDistances[i]) * scalingFactor);
   }
 
-  std::vector<std::uint16_t> intensities;
+  // Intensities
   if ((scanData.segmentMetaData.echoDataContent.isSet(EchoDataContent::Intensity)))
   {
-    readPosition += convertSubByteArray<std::uint16_t, kSizeOfIntensityInBits>(data.subview(readPosition), numberOfSamples, intensities);
+    std::vector<std::uint16_t> rawIntensities;
+    readPosition += convertSubByteArray<std::uint16_t, kSizeOfIntensityInBits>(data.subview(readPosition), numberOfSamples, rawIntensities);
+
+    scanData.intensities.resize(numberOfSamples);
+    for (std::size_t i = 0; i < numberOfSamples; ++i)
+    {
+      scanData.intensities[i] = static_cast<float>(rawIntensities[i]) / maxIntensityValue;
+    }
   }
 
-  std::vector<Duration> pulseWidths;
+  // Pulse widths - bulk read and convert
   if ((scanData.segmentMetaData.echoDataContent.isSet(EchoDataContent::PulseWidth)))
   {
-    pulseWidths.reserve(numberOfSamples);
+    std::vector<std::uint8_t> rawPulseWidths(numberOfSamples);
+    std::memcpy(rawPulseWidths.data(), data.data() + readPosition, numberOfSamples);
+    readPosition += numberOfSamples;
+
+    scanData.pulseWidths.resize(numberOfSamples);
+    constexpr double pulseWidthScalingFactor = 8.0;
     for (std::size_t i = 0; i < numberOfSamples; ++i)
     {
-      std::uint8_t pulseWidth = 0;
-      readPosition += CompactParser::readValueUnsafe(data.subview(readPosition), pulseWidth);
-      constexpr double pulseWidthScalingFactor = 8.0; // The protocol defines the unit of the pulse width value to be 1/8ns
-      pulseWidths.push_back(Duration::fromNanoseconds(static_cast<double>(pulseWidth) / pulseWidthScalingFactor));
+      scanData.pulseWidths[i] = Duration::fromNanoseconds(static_cast<double>(rawPulseWidths[i]) / pulseWidthScalingFactor);
     }
   }
 
-  std::vector<std::uint8_t> echoProperties;
+  // Echo properties - bulk read directly into target
   if ((scanData.segmentMetaData.echoDataContent.isSet(EchoDataContent::Properties)))
   {
-    echoProperties.reserve(numberOfSamples);
-    for (std::size_t i = 0; i < numberOfSamples; ++i)
-    {
-      std::uint8_t echoProperty = 0;
-      readPosition += CompactParser::readValueUnsafe(data.subview(readPosition), echoProperty);
-      echoProperties.push_back(echoProperty);
-    }
+    scanData.echoProperties.resize(numberOfSamples);
+    std::memcpy(scanData.echoProperties.data(), data.data() + readPosition, numberOfSamples);
+    readPosition += numberOfSamples;
   }
-
-  // Done reading raw data, now assemble the beams. No more reading from the data vector after this line!
-
-  dispatchAssembleBeams(scanData, distances, intensities, echoProperties, pulseWidths);
 
   return readPosition;
 }
@@ -325,7 +224,7 @@ auto Parser::validateAndParse(ByteView data, bool validateChecksum) -> MultiScan
 
   // Read the scan data. The resulting data is quite different from the protocol layout so it needs the
   // geometry information to assemble the beams correctly.
-  readPosition += readScanData(data.subview(readPosition), scanData);
+  readScanData(data.subview(readPosition), scanData);
 
   return scanData;
 }

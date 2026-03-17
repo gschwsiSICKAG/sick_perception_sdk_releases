@@ -10,7 +10,6 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 #include <string>
 
 namespace sick::multiScan100::v2_4_1::api::rest {
@@ -18,7 +17,7 @@ namespace sick::multiScan100::v2_4_1::api::rest {
 /**
  * @brief Payloads for endpoint /certificateBundleInfo.
 */
-struct SDK_EXPORT certificateBundleInfo
+struct certificateBundleInfo
 {
 
   constexpr static const char* variableName = "certificateBundleInfo";
@@ -27,13 +26,13 @@ struct SDK_EXPORT certificateBundleInfo
   /**
    * @brief Returns information about the uploaded certificate bundle.
    */
-  struct SDK_EXPORT Get
+  struct Get
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
-      struct SDK_EXPORT certificatesItem
+      struct certificatesItem
       {
-        struct SDK_EXPORT namesItem
+        struct namesItem
         {
           namesItem() = default;
 
@@ -59,7 +58,7 @@ struct SDK_EXPORT certificateBundleInfo
         std::string _validNotAfter;
       };
 
-      struct SDK_EXPORT errorCode
+      struct errorCode
       {
         errorCode() = default;
 

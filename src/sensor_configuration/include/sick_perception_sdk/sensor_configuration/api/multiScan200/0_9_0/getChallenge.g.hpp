@@ -12,7 +12,6 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 #include <string>
 
 namespace sick::multiScan200::v0_9_0::api::rest {
@@ -20,7 +19,7 @@ namespace sick::multiScan200::v0_9_0::api::rest {
 /**
  * @brief Payloads for endpoint /getChallenge.
 */
-struct SDK_EXPORT getChallenge
+struct getChallenge
 {
 
   constexpr static const char* methodName = "getChallenge";
@@ -29,9 +28,9 @@ struct SDK_EXPORT getChallenge
   /**
    * @brief Returns a challenge for the challenge and response authentication method. For more details see https://github.com/SICKAG/sick_scan_rest_client
    */
-  struct SDK_EXPORT Post
+  struct Post
   {
-    struct SDK_EXPORT Request
+    struct Request
     {
       Request() = default;
 

@@ -12,7 +12,6 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 #include <sick_perception_sdk/sensor_configuration/api/NumericRange.hpp>
 
 namespace sick::multiScan100::v2_4_1::api::rest {
@@ -20,7 +19,7 @@ namespace sick::multiScan100::v2_4_1::api::rest {
 /**
  * @brief Payloads for endpoint /GetFieldEvaluationContour.
 */
-struct SDK_EXPORT GetFieldEvaluationContour
+struct GetFieldEvaluationContour
 {
 
   constexpr static const char* methodName = "GetFieldEvaluationContour";
@@ -31,9 +30,9 @@ struct SDK_EXPORT GetFieldEvaluationContour
 
  This function requires at least user level: Authorized Client.
    */
-  struct SDK_EXPORT Post
+  struct Post
   {
-    struct SDK_EXPORT Request
+    struct Request
     {
       Request() = default;
 
@@ -44,11 +43,11 @@ struct SDK_EXPORT GetFieldEvaluationContour
       int _EvaluationId;
     };
 
-    struct SDK_EXPORT Response
+    struct Response
     {
-      struct SDK_EXPORT ContourItem
+      struct ContourItem
       {
-        struct SDK_EXPORT PointsItem
+        struct PointsItem
         {
           PointsItem() = default;
 

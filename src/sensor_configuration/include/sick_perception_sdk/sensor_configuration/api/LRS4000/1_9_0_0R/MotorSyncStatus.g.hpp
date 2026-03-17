@@ -10,14 +10,13 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 
 namespace sick::LRS4000::v1_9_0_0R::api::rest {
 
 /**
  * @brief Payloads for endpoint /MotorSyncStatus.
 */
-struct SDK_EXPORT MotorSyncStatus
+struct MotorSyncStatus
 {
 
   constexpr static const char* variableName = "MotorSyncStatus";
@@ -28,9 +27,9 @@ struct SDK_EXPORT MotorSyncStatus
 
  This function requires at least user level: Authorized Client.
    */
-  struct SDK_EXPORT Get
+  struct Get
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
       enum class MotorSyncStatus
       {

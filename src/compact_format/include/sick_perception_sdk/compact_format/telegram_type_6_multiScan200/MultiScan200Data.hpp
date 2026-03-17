@@ -23,6 +23,8 @@ SPDX-License-Identifier: MIT
  */
 namespace sick::compact::multiscan200 {
 
+// NOLINTBEGIN(misc-non-private-member-variables-in-classes)
+
 enum class EchoDataContent : std::uint8_t
 {
   None       = 0x00,
@@ -39,7 +41,10 @@ enum class ColumnProperties : std::uint16_t
 
 enum class EchoProperties : std::uint8_t
 {
-  IDK = 0,
+  Reserved    = 0,
+  IsReflector = 1,
+  IsBlooming  = 2,
+  IsParticle  = 6,
 };
 
 struct SDK_EXPORT SegmentMetaData
@@ -64,21 +69,6 @@ struct SDK_EXPORT SegmentMetaData
 using AmbientLightColumn                              = std::vector<std::uint16_t>;
 static constexpr std::size_t kSizeOfAmbientLightPixel = sizeof(AmbientLightColumn::value_type);
 
-struct SDK_EXPORT Echo
-{
-  Distance distance;
-  std::optional<float> intensity;
-  std::optional<BitField<EchoProperties>> properties;
-  std::optional<Duration> pulseWidth;
-};
-
-struct SDK_EXPORT Beam
-{
-  std::vector<Echo> echoes;
-  Angle azimuth;
-  Angle elevation;
-};
-
 struct Geometry
 {
   std::vector<Angle> elevations;
@@ -87,17 +77,39 @@ struct Geometry
   std::vector<BitField<ColumnProperties>> columnProperties;
 };
 
-using ScanColumn = std::vector<Beam>;
-
+/**
+ * @brief Flat data structure for MultiScan200 scan data (Structure-of-Arrays layout).
+ *
+ * All echo data is stored in contiguous flat vectors for good cache locality while writing and reading.
+ * Index into arrays with: echoIndex * (numberOfRows * numberOfColumns) + columnIndex * numberOfRows + rowIndex
+ */
 struct SDK_EXPORT MultiScan200Data
 {
   TelegramHeaderWithSenderSerialNumber telegramHeader;
   SegmentMetaData segmentMetaData;
   std::vector<AmbientLightColumn> ambientLightData;
   Geometry geometry;
-  std::vector<ScanColumn> scanData;
 
-  std::uint32_t checksum {0};
+  std::vector<Distance> distances;                      ///< Flat array of all distances
+  std::vector<float> intensities;                       ///< Flat array of all intensities (empty if not present)
+  std::vector<BitField<EchoProperties>> echoProperties; ///< Flat array of all echo properties (empty if not present)
+  std::vector<Duration> pulseWidths;                    ///< Flat array of all pulse widths (empty if not present)
+
+  /**
+   * @brief Compute the flat index for a given echo, column, and row.
+   * @param echoIndex The echo index (0 to numberOfEchoes-1).
+   * @param columnIndex The column index (0 to numberOfColumnsInSegment-1).
+   * @param rowIndex The row index (0 to numberOfRows-1).
+   * @return The flat index into the data arrays.
+   */
+  auto computeIndex(std::size_t echoIndex, std::size_t columnIndex, std::size_t rowIndex) const -> std::size_t
+  {
+    auto const numberOfRows    = static_cast<std::size_t>(segmentMetaData.numberOfRows);
+    auto const numberOfColumns = static_cast<std::size_t>(segmentMetaData.numberOfColumnsInSegment);
+    return echoIndex * (numberOfRows * numberOfColumns) + columnIndex * numberOfRows + rowIndex;
+  }
 };
+
+// NOLINTEND(misc-non-private-member-variables-in-classes)
 
 } // namespace sick::compact::multiscan200

@@ -10,7 +10,6 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 #include <string>
 
 namespace sick::multiScan200::v0_9_0::api::rest {
@@ -18,7 +17,7 @@ namespace sick::multiScan200::v0_9_0::api::rest {
 /**
  * @brief Payloads for endpoint /DeviceType.
 */
-struct SDK_EXPORT DeviceType
+struct DeviceType
 {
 
   constexpr static const char* variableName = "DeviceType";
@@ -27,9 +26,9 @@ struct SDK_EXPORT DeviceType
   /**
    * @brief Returns the device type.
    */
-  struct SDK_EXPORT Get
+  struct Get
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
       Response() = default;
 

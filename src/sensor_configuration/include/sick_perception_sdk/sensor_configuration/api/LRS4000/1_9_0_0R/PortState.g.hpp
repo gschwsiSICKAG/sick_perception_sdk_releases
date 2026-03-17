@@ -10,7 +10,6 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 #include <sick_perception_sdk/sensor_configuration/api/NumericRange.hpp>
 
 namespace sick::LRS4000::v1_9_0_0R::api::rest {
@@ -18,7 +17,7 @@ namespace sick::LRS4000::v1_9_0_0R::api::rest {
 /**
  * @brief Payloads for endpoint /PortState.
 */
-struct SDK_EXPORT PortState
+struct PortState
 {
 
   constexpr static const char* variableName = "PortState";
@@ -27,11 +26,11 @@ struct SDK_EXPORT PortState
   /**
    * @brief Returns the state of the ports. PortState is preferred over OutputState.
    */
-  struct SDK_EXPORT Get
+  struct Get
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
-      struct SDK_EXPORT aInternalPortsItem
+      struct aInternalPortsItem
       {
         enum class ePortState
         {
@@ -52,7 +51,7 @@ struct SDK_EXPORT PortState
         int _PortCounter;
       };
 
-      struct SDK_EXPORT aExternalPortsItem
+      struct aExternalPortsItem
       {
         enum class ePortState
         {
@@ -73,7 +72,7 @@ struct SDK_EXPORT PortState
         int _PortCounter;
       };
 
-      struct SDK_EXPORT aTimeBlockItem
+      struct aTimeBlockItem
       {
         aTimeBlockItem() = default;
 

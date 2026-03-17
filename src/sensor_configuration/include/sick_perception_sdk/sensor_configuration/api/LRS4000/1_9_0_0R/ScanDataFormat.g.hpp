@@ -10,14 +10,13 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 
 namespace sick::LRS4000::v1_9_0_0R::api::rest {
 
 /**
  * @brief Payloads for endpoint /ScanDataFormat.
 */
-struct SDK_EXPORT ScanDataFormat
+struct ScanDataFormat
 {
 
   constexpr static const char* variableName = "ScanDataFormat";
@@ -26,9 +25,9 @@ struct SDK_EXPORT ScanDataFormat
   /**
    * @brief Returns/sets the scan data format (e.g. Compact format) or disable scan data transmission.
    */
-  struct SDK_EXPORT Get
+  struct Get
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
       enum class ScanDataFormat
       {
@@ -53,9 +52,9 @@ struct SDK_EXPORT ScanDataFormat
 
  This function requires at least user level: Authorized Client.
    */
-  struct SDK_EXPORT Post
+  struct Post
   {
-    struct SDK_EXPORT Request
+    struct Request
     {
       enum class ScanDataFormat
       {

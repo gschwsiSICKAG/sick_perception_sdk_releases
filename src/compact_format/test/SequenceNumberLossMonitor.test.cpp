@@ -82,7 +82,9 @@ TYPED_TEST(SequenceNumberLossMonitorTest, check_returns_losses_if_sequence_does_
 
 TYPED_TEST(SequenceNumberLossMonitorTest, check_returns_losses_if_sequence_decrements)
 {
-  runLossTest<TypeParam>(2, {7, 6}, {1});
+  // We don't consider decrementing sequence numbers as losses because that may happen
+  // when the respective counter resets.
+  runLossTest<TypeParam>(2, {7, 6}, {0});
 }
 
 TYPED_TEST(SequenceNumberLossMonitorTest, check_returns_no_losses_with_max_range_values)

@@ -12,7 +12,6 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 #include <string>
 
 namespace sick::picoScan120::v2_2_1::api::rest {
@@ -20,7 +19,7 @@ namespace sick::picoScan120::v2_2_1::api::rest {
 /**
  * @brief Payloads for endpoint /RestoreParameterBackup.
 */
-struct SDK_EXPORT RestoreParameterBackup
+struct RestoreParameterBackup
 {
 
   constexpr static const char* methodName = "RestoreParameterBackup";
@@ -31,9 +30,9 @@ struct SDK_EXPORT RestoreParameterBackup
 
  This function requires at least user level: Service.
    */
-  struct SDK_EXPORT Post
+  struct Post
   {
-    struct SDK_EXPORT Request
+    struct Request
     {
       Request() = default;
 
@@ -44,7 +43,7 @@ struct SDK_EXPORT RestoreParameterBackup
       std::string _Passphrase;
     };
 
-    struct SDK_EXPORT Response
+    struct Response
     {
       Response() = default;
 

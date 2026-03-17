@@ -10,7 +10,6 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 #include <sick_perception_sdk/sensor_configuration/api/NumericRange.hpp>
 
 namespace sick::multiScan100::v2_4_1::api::rest {
@@ -18,7 +17,7 @@ namespace sick::multiScan100::v2_4_1::api::rest {
 /**
  * @brief Payloads for endpoint /perpendicularDistanceResult.
 */
-struct SDK_EXPORT perpendicularDistanceResult
+struct perpendicularDistanceResult
 {
 
   constexpr static const char* variableName = "perpendicularDistanceResult";
@@ -27,13 +26,13 @@ struct SDK_EXPORT perpendicularDistanceResult
   /**
    * @brief Returs the perpendicular distance within a field.
    */
-  struct SDK_EXPORT Get
+  struct Get
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
-      struct SDK_EXPORT evaluationsItem
+      struct evaluationsItem
       {
-        struct SDK_EXPORT minimumDistancePosition
+        struct minimumDistancePosition
         {
           minimumDistancePosition() = default;
 
@@ -46,7 +45,7 @@ struct SDK_EXPORT perpendicularDistanceResult
           NumericRange<-500000, 500000, 0> _z;
         };
 
-        struct SDK_EXPORT maximumDistancePosition
+        struct maximumDistancePosition
         {
           maximumDistancePosition() = default;
 

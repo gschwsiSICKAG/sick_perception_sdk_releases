@@ -10,28 +10,32 @@ SPDX-License-Identifier: MIT
 
 #if defined(USE_MULTISCAN100)
 #  include <sick_perception_sdk/drivers/multiScan100/Driver.hpp>
-#  include <sick_perception_sdk/sensor_configuration/api/multiScan100/multiScan100.g.hpp>
+#  include <sick_perception_sdk/sensor_configuration/api/multiScan100/2_4_1/FREchoFilter.nlohmann_json.g.hpp>
+#  include <sick_perception_sdk/sensor_configuration/api/multiScan100/2_4_1/OpHours.nlohmann_json.g.hpp>
 #  include <sick_perception_sdk/sensor_configuration/multiScan100/Configurator.hpp>
 using ConfiguratorT = sick::multiScan100::v2_4_1::Configurator;
-namespace srt       = sick::multiScan100::v2_4_1::api::rest;
+namespace api       = sick::multiScan100::v2_4_1::api::rest;
 #elif defined(USE_MULTISCAN200)
 #  include <sick_perception_sdk/drivers/multiScan200/Driver.hpp>
-#  include <sick_perception_sdk/sensor_configuration/api/multiScan200/multiScan200.g.hpp>
+#  include <sick_perception_sdk/sensor_configuration/api/multiScan200/0_9_0/FREchoFilter.nlohmann_json.g.hpp>
+#  include <sick_perception_sdk/sensor_configuration/api/multiScan200/0_9_0/OpHours.nlohmann_json.g.hpp>
 #  include <sick_perception_sdk/sensor_configuration/multiScan200/Configurator.hpp>
 using ConfiguratorT = sick::multiScan200::v0_9_0::Configurator;
-namespace srt       = sick::multiScan200::v0_9_0::api::rest;
+namespace api       = sick::multiScan200::v0_9_0::api::rest;
 #elif defined(USE_LRS4000)
 #  include <sick_perception_sdk/drivers/LRS4000/Driver.hpp>
 #  include <sick_perception_sdk/sensor_configuration/LRS4000/Configurator.hpp>
-#  include <sick_perception_sdk/sensor_configuration/api/LRS4000/LRS4000.g.hpp>
+#  include <sick_perception_sdk/sensor_configuration/api/LRS4000/1_9_0_0R/FREchoFilter.nlohmann_json.g.hpp>
+#  include <sick_perception_sdk/sensor_configuration/api/LRS4000/1_9_0_0R/OpHours.nlohmann_json.g.hpp>
 using ConfiguratorT = sick::LRS4000::v1_9_0_0R::Configurator;
-namespace srt       = sick::LRS4000::v1_9_0_0R::api::rest;
+namespace api       = sick::LRS4000::v1_9_0_0R::api::rest;
 #else // Default to picoScan100
 #  include <sick_perception_sdk/drivers/picoScan100/Driver.hpp>
-#  include <sick_perception_sdk/sensor_configuration/api/picoScan100/picoScan150.g.hpp>
+#  include <sick_perception_sdk/sensor_configuration/api/picoScan100/picoScan150/2_2_1/FREchoFilter.nlohmann_json.g.hpp>
+#  include <sick_perception_sdk/sensor_configuration/api/picoScan100/picoScan150/2_2_1/OpHours.nlohmann_json.g.hpp>
 #  include <sick_perception_sdk/sensor_configuration/picoScan150/Configurator.hpp>
 using ConfiguratorT = sick::picoScan150::v2_2_1::Configurator;
-namespace srt       = sick::picoScan150::v2_2_1::api::rest;
+namespace api       = sick::picoScan150::v2_2_1::api::rest;
 #endif
 
 #include <cstdint>
@@ -64,15 +68,15 @@ int main(int argc, char* argv[])
     std::cout << "IpAddress:       " << configurator.sensorIPAddress.get().toString() << '\n';
 
     std::cout << "Reading object without convenience function...\n";
-    std::cout << "OpHours:         " << configurator.readVariable<srt::OpHours>()._OpHours << '\n';
+    std::cout << "OpHours:         " << configurator.readVariable<api::OpHours>()._OpHours << '\n';
 
     std::cout << "Setting echo filter with convenience function...\n";
     configurator.echoFilter.set(ConfiguratorT::EchoFilterSetting::LastEcho);
 
     std::cout << "Setting echo filter without convenience function...\n";
-    srt::FREchoFilter::Post::Request settings;
-    settings._FREchoFilter = srt::FREchoFilter::Post::Request::FREchoFilter::FirstEcho;
-    configurator.writeVariable<srt::FREchoFilter>(settings);
+    api::FREchoFilter::Post::Request settings;
+    settings._FREchoFilter = api::FREchoFilter::Post::Request::FREchoFilter::FirstEcho;
+    configurator.writeVariable<api::FREchoFilter>(settings);
 
     std::cout << "Configuring compact streaming...\n";
 #if defined(USE_LRS4000) || defined(USE_MULTISCAN200)

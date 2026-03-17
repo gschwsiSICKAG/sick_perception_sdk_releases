@@ -12,14 +12,13 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 
 namespace sick::picoScan150::v2_2_1::api::rest {
 
 /**
  * @brief Payloads for endpoint /SetWebserverEnabled.
 */
-struct SDK_EXPORT SetWebserverEnabled
+struct SetWebserverEnabled
 {
 
   constexpr static const char* methodName = "SetWebserverEnabled";
@@ -30,9 +29,9 @@ struct SDK_EXPORT SetWebserverEnabled
 
  This function requires at least user level: Authorized Client.
    */
-  struct SDK_EXPORT Post
+  struct Post
   {
-    struct SDK_EXPORT Request
+    struct Request
     {
       Request() = default;
 

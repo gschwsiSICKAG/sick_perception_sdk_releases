@@ -10,14 +10,13 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 
 namespace sick::picoScan150::v2_2_1::api::rest {
 
 /**
  * @brief Payloads for endpoint /FieldEvaluationResult.
 */
-struct SDK_EXPORT FieldEvaluationResult
+struct FieldEvaluationResult
 {
 
   constexpr static const char* variableName = "FieldEvaluationResult";
@@ -26,13 +25,13 @@ struct SDK_EXPORT FieldEvaluationResult
   /**
    * @brief Returns the state of all possible fields.
    */
-  struct SDK_EXPORT Get
+  struct Get
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
-      struct SDK_EXPORT FieldEvaluationResult
+      struct FieldEvaluationResult
       {
-        struct SDK_EXPORT EvaluationResultListItem
+        struct EvaluationResultListItem
         {
           enum class State
           {
@@ -44,7 +43,7 @@ struct SDK_EXPORT FieldEvaluationResult
             DetectingFree = 5,
           };
 
-          struct SDK_EXPORT PositionsItem
+          struct PositionsItem
           {
             PositionsItem() = default;
 

@@ -12,7 +12,6 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 #include <sick_perception_sdk/sensor_configuration/api/NumericRange.hpp>
 
 namespace sick::picoScan150::v2_2_1::api::rest {
@@ -20,7 +19,7 @@ namespace sick::picoScan150::v2_2_1::api::rest {
 /**
  * @brief Payloads for endpoint /ActivateEvaluationGroup.
 */
-struct SDK_EXPORT ActivateEvaluationGroup
+struct ActivateEvaluationGroup
 {
 
   constexpr static const char* methodName = "ActivateEvaluationGroup";
@@ -29,11 +28,11 @@ struct SDK_EXPORT ActivateEvaluationGroup
   /**
    * @brief Sets the activation condition for all existing evaluation groups (not configured, active, or inactive).
    */
-  struct SDK_EXPORT Post
+  struct Post
   {
-    struct SDK_EXPORT Request
+    struct Request
     {
-      struct SDK_EXPORT ListItem
+      struct ListItem
       {
         ListItem() = default;
 
@@ -54,7 +53,7 @@ struct SDK_EXPORT ActivateEvaluationGroup
       std::vector<ListItem> _List;
     };
 
-    struct SDK_EXPORT Response
+    struct Response
     {
       Response() = default;
 

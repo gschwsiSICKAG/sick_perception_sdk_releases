@@ -7,12 +7,9 @@ SPDX-License-Identifier: MIT
 
 #include <sick_perception_sdk/common/IpV4Address.hpp>
 #include <sick_perception_sdk/common/version.hpp>
-#include <sick_perception_sdk/compact_format/PointCloud/MultiEchoPointCloud.hpp>
-#include <sick_perception_sdk/compact_format/PointCloud/PointCloudToPCDConverter.hpp>
 
 #include <cstdint>
 #include <exception>
-#include <fstream>
 #include <iostream>
 #include <optional>
 #include <utility>
@@ -67,20 +64,6 @@ auto getTwoDeviceAddresses(int argc, char* argv[]) -> std::pair<IpV4Address, IpV
     return {sick::IpV4Address(argv[1]), sick::IpV4Address(argv[2])};
   }
   return {sick::IpV4Address("192.168.0.1"), sick::IpV4Address("192.168.0.2")};
-}
-
-inline void writePointCloudToPCDFile(sick::MultiEchoPointCloud const& pointCloud, std::string const& filename)
-{
-  // open in binary mode to prevent the compiler from converting \n to \r\n on windows
-  std::ofstream file(filename, std::ios_base::binary);
-  if (!file.is_open())
-  {
-    std::cout << "Could not open file " << filename << " for writing.\n";
-    return;
-  }
-  sick::PointCloudToPCDConverter::convertToPCDASCII(pointCloud, file);
-  std::cout << "Wrote point cloud with " << pointCloud.numberOfPoints() << " points to " << filename << "\n";
-  file.close();
 }
 
 } // namespace sick::examples

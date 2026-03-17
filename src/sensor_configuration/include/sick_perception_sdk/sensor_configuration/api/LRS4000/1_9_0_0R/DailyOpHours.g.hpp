@@ -10,14 +10,13 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 
 namespace sick::LRS4000::v1_9_0_0R::api::rest {
 
 /**
  * @brief Payloads for endpoint /DailyOpHours.
 */
-struct SDK_EXPORT DailyOpHours
+struct DailyOpHours
 {
 
   constexpr static const char* variableName = "DailyOpHours";
@@ -26,9 +25,9 @@ struct SDK_EXPORT DailyOpHours
   /**
    * @brief Returns the runtime duration since the last power on (non-persistent).
    */
-  struct SDK_EXPORT Get
+  struct Get
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
       Response() = default;
 

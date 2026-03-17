@@ -12,7 +12,6 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 #include <string>
 
 namespace sick::picoScan150::v2_2_1::api::rest {
@@ -20,7 +19,7 @@ namespace sick::picoScan150::v2_2_1::api::rest {
 /**
  * @brief Payloads for endpoint /setCertificateBundle.
 */
-struct SDK_EXPORT setCertificateBundle
+struct setCertificateBundle
 {
 
   constexpr static const char* methodName = "setCertificateBundle";
@@ -31,9 +30,9 @@ struct SDK_EXPORT setCertificateBundle
 
  This function requires at least user level: Service.
    */
-  struct SDK_EXPORT Post
+  struct Post
   {
-    struct SDK_EXPORT Request
+    struct Request
     {
       Request() = default;
 
@@ -45,9 +44,9 @@ struct SDK_EXPORT setCertificateBundle
       std::string _contentPrivateKey;
     };
 
-    struct SDK_EXPORT Response
+    struct Response
     {
-      struct SDK_EXPORT errorCode
+      struct errorCode
       {
         errorCode() = default;
 

@@ -10,14 +10,13 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 
 namespace sick::picoScan120::v2_2_1::api::rest {
 
 /**
  * @brief Payloads for endpoint /EtherIPMask.
 */
-struct SDK_EXPORT EtherIPMask
+struct EtherIPMask
 {
 
   constexpr static const char* variableName = "EtherIPMask";
@@ -26,9 +25,9 @@ struct SDK_EXPORT EtherIPMask
   /**
    * @brief Returns/sets the subnet mask.
    */
-  struct SDK_EXPORT Get
+  struct Get
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
       Response() = default;
 
@@ -46,9 +45,9 @@ struct SDK_EXPORT EtherIPMask
 
  This function requires at least user level: Authorized Client.
    */
-  struct SDK_EXPORT Post
+  struct Post
   {
-    struct SDK_EXPORT Request
+    struct Request
     {
       Request() = default;
 

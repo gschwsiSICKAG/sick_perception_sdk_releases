@@ -12,7 +12,6 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 #include <string>
 
 namespace sick::multiScan100::v2_4_1::api::rest {
@@ -20,7 +19,7 @@ namespace sick::multiScan100::v2_4_1::api::rest {
 /**
  * @brief Payloads for endpoint /DoDiagnosisDump.
 */
-struct SDK_EXPORT DoDiagnosisDump
+struct DoDiagnosisDump
 {
 
   constexpr static const char* methodName = "DoDiagnosisDump";
@@ -31,9 +30,9 @@ struct SDK_EXPORT DoDiagnosisDump
 
  This function requires at least user level: Service.
    */
-  struct SDK_EXPORT Post
+  struct Post
   {
-    struct SDK_EXPORT Request
+    struct Request
     {
       Request() = default;
 
@@ -45,7 +44,7 @@ struct SDK_EXPORT DoDiagnosisDump
       std::string _Output;
     };
 
-    struct SDK_EXPORT Response
+    struct Response
     {
       Response() = default;
 

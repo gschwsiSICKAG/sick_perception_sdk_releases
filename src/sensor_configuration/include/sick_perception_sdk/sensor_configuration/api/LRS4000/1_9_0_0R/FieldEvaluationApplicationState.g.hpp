@@ -10,14 +10,13 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 
 namespace sick::LRS4000::v1_9_0_0R::api::rest {
 
 /**
  * @brief Payloads for endpoint /FieldEvaluationApplicationState.
 */
-struct SDK_EXPORT FieldEvaluationApplicationState
+struct FieldEvaluationApplicationState
 {
 
   constexpr static const char* variableName = "FieldEvaluationApplicationState";
@@ -26,9 +25,9 @@ struct SDK_EXPORT FieldEvaluationApplicationState
   /**
    * @brief Get the field evaluation application state. It returns the information whether the field evaluation application is active, configuring or deactivated. 0 - Deactivated - no evaluation is set up. 1 - Activated - at least one active evaluation (group activation has no influence on that). 2 - Configuring - new calculation of the e.g. field geometries.
    */
-  struct SDK_EXPORT Get
+  struct Get
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
       enum class FieldEvaluationApplicationState
       {

@@ -72,7 +72,6 @@ def generate_code(endpoints: List[EndpointDescription], metadata: DeviceMetadata
         _generate_file_header(f, file_name, metadata, endpoint)
 
         includes = set()
-        includes.add("#include <sick_perception_sdk/common/export.hpp>")
         for method in endpoint.get, endpoint.post:
             if method is not None:
                 if method.request_payload is not None:
@@ -89,7 +88,7 @@ def generate_code(endpoints: List[EndpointDescription], metadata: DeviceMetadata
         f.write(f"/**\n")
         f.write(f" * @brief Payloads for endpoint {endpoint.path}.\n")
         f.write(f"*/\n")
-        f.write(f"struct SDK_EXPORT {endpoint.class_name}\n{{\n\n")
+        f.write(f"struct {endpoint.class_name}\n{{\n\n")
         f.write(f'  constexpr static const char* {name_of_name_member} = "{endpoint.class_name}";\n')
         f.write(f"  constexpr static const bool isSopasMethod = {str(endpoint.is_sopas_method).lower()};\n\n")
         _generate_objects_for_endpoint_method(f, endpoint.get)
@@ -113,7 +112,7 @@ def _generate_objects_for_endpoint_method(f: TextIOWrapper, method: Optional[End
         f.write(f"   * @brief {method.description}\n")
         f.write(f"   */\n")
 
-    f.write(f"  struct SDK_EXPORT {method.method}\n  {{\n")
+    f.write(f"  struct {method.method}\n  {{\n")
 
     _generate_object_for_payload(f, method.request_payload)
     _generate_object_for_payload(f, method.response_payload)
@@ -129,37 +128,96 @@ def _generate_object_for_payload(f: TextIOWrapper, payload: Optional[ObjectDescr
     f.write("\n")
 
 
-def _generate_json(endpoints: List[EndpointDescription], metadata: DeviceMetadata):
-    """Generate JSON serialization header for a specific device/version."""
+def _get_json_include_prefix(metadata: DeviceMetadata) -> str:
+    """
+    Get the include path prefix for generated JSON headers.
+
+    For families WITH variants: sick_perception_sdk/sensor_configuration/api/{family}/{variant}/{version}
+    For families WITHOUT variants: sick_perception_sdk/sensor_configuration/api/{family}/{version}
+    """
     version_dir = metadata.version.replace(".", "_")
     if _is_variant(metadata):
-        out_dir = os.path.abspath(os.path.join(DATA_OBJECT_OUT_DIR, "json", metadata.family, metadata.device_type))
+        return f"sick_perception_sdk/sensor_configuration/api/{metadata.family}/{metadata.device_type}/{version_dir}"
     else:
-        out_dir = os.path.abspath(os.path.join(DATA_OBJECT_OUT_DIR, "json", metadata.family))
+        return f"sick_perception_sdk/sensor_configuration/api/{metadata.family}/{version_dir}"
 
+
+def _get_json_output_dir(metadata: DeviceMetadata) -> str:
+    """
+    Get the output directory for individual endpoint JSON headers.
+
+    For families WITH variants: api/{family}/{variant}/{version}/
+    For families WITHOUT variants: api/{family}/{version}/
+    """
+    version_dir = metadata.version.replace(".", "_")
+    if _is_variant(metadata):
+        return os.path.abspath(os.path.join(DATA_OBJECT_OUT_DIR, metadata.family, metadata.device_type, version_dir))
+    else:
+        return os.path.abspath(os.path.join(DATA_OBJECT_OUT_DIR, metadata.family, version_dir))
+
+
+def _generate_json_for_endpoint(endpoint: EndpointDescription, metadata: DeviceMetadata):
+    """Generate individual JSON serialization header for a single endpoint."""
+    out_dir = _get_json_output_dir(metadata)
     if not os.path.exists(out_dir):
         os.makedirs(out_dir)
 
-    file_name = f"{version_dir}.g.hpp"
+    class_name = endpoint.path.replace("/", "")
+    file_name = f"{class_name}.nlohmann_json.g.hpp"
     full_file_name = os.path.join(out_dir, file_name)
-    print(f"ℹ️  Generating JSON output in '{file_name}'...")
-    f = open(full_file_name, "w")
-    _generate_file_header(f, file_name, metadata, None)
 
-    # Include the version aggregate header
+    f = open(full_file_name, "w")
+    _generate_file_header(f, file_name, metadata, endpoint)
+
+    # Include the corresponding endpoint struct header
     include_prefix = _get_include_prefix(metadata)
-    f.write(f"#include <{include_prefix}.g.hpp>\n")
+    f.write(f"#include <{include_prefix}/{class_name}.g.hpp>\n")
     f.write(f"#include <nlohmann/json.hpp>\n")
     f.write(f"\n")
 
     _generate_namespaces_start(f, metadata)
 
-    for endpoint in endpoints:
-        class_name = endpoint.path.replace("/", "")
-        _generate_json_for_endpoint_method(f, endpoint, endpoint.get, class_name)
-        _generate_json_for_endpoint_method(f, endpoint, endpoint.post, class_name)
+    _generate_json_for_endpoint_method(f, endpoint, endpoint.get, class_name)
+    _generate_json_for_endpoint_method(f, endpoint, endpoint.post, class_name)
 
     _generate_namespaces_end(f, metadata)
+
+    f.close()
+
+
+def _generate_json(endpoints: List[EndpointDescription], metadata: DeviceMetadata):
+    """Generate JSON serialization headers for a specific device/version.
+
+    This generates:
+    1. Individual JSON headers per endpoint in api/json/{device}/{version}/{endpoint}.g.hpp
+    2. An aggregate header that includes all individual headers in api/json/{device}/{version}.g.hpp
+    """
+    # Generate individual JSON headers per endpoint
+    for endpoint in endpoints:
+        _generate_json_for_endpoint(endpoint, metadata)
+
+    # Generate aggregate JSON header that includes all individual endpoint JSON headers
+    version_dir = metadata.version.replace(".", "_")
+    if _is_variant(metadata):
+        out_dir = os.path.abspath(os.path.join(DATA_OBJECT_OUT_DIR, metadata.family, metadata.device_type))
+    else:
+        out_dir = os.path.abspath(os.path.join(DATA_OBJECT_OUT_DIR, metadata.family))
+
+    if not os.path.exists(out_dir):
+        os.makedirs(out_dir)
+
+    file_name = f"{version_dir}.nlohmann_json.g.hpp"
+    full_file_name = os.path.join(out_dir, file_name)
+    print(f"ℹ️  Generating JSON aggregate header '{file_name}'...")
+    f = open(full_file_name, "w")
+    _generate_file_header(f, file_name, metadata, None)
+
+    # Include all individual endpoint JSON headers
+    json_include_prefix = _get_json_include_prefix(metadata)
+    for endpoint in endpoints:
+        class_name = endpoint.path.replace("/", "")
+        f.write(f"#include <{json_include_prefix}/{class_name}.nlohmann_json.g.hpp>\n")
+    f.write(f"\n")
 
     f.close()
 
@@ -335,7 +393,7 @@ def _generate_object(f: TextIOWrapper, obj: ObjectDescription, indent: int):
             prefix = ""
         f.write(f"{indent_str} */\n")
 
-    f.write(f"{indent_str}struct SDK_EXPORT {obj.class_name}\n")
+    f.write(f"{indent_str}struct {obj.class_name}\n")
     f.write(f"{indent_str}{{\n")
 
     for enum in obj.enums:
@@ -447,11 +505,11 @@ def _generate_aggregate_json_headers(all_endpoints: List[Tuple[List[EndpointDesc
 
         # Determine output path
         if _is_variant(latest_metadata):
-            out_dir = os.path.abspath(os.path.join(DATA_OBJECT_OUT_DIR, "json", latest_metadata.family))
-            file_name = f"{latest_metadata.device_type}.g.hpp"
+            out_dir = os.path.abspath(os.path.join(DATA_OBJECT_OUT_DIR, latest_metadata.family))
+            file_name = f"{latest_metadata.device_type}.nlohmann_json.g.hpp"
         else:
-            out_dir = os.path.abspath(os.path.join(DATA_OBJECT_OUT_DIR, "json", latest_metadata.family))
-            file_name = f"{latest_metadata.family}.g.hpp"
+            out_dir = os.path.abspath(os.path.join(DATA_OBJECT_OUT_DIR, latest_metadata.family))
+            file_name = f"{latest_metadata.family}.nlohmann_json.g.hpp"
 
         if not os.path.exists(out_dir):
             os.makedirs(out_dir)
@@ -476,9 +534,9 @@ def _generate_aggregate_json_headers(all_endpoints: List[Tuple[List[EndpointDesc
             for metadata in sorted_metadata:
                 version_dir = metadata.version.replace(".", "_")
                 if _is_variant(metadata):
-                    include_path = f"sick_perception_sdk/sensor_configuration/api/json/{metadata.family}/{metadata.device_type}/{version_dir}.g.hpp"
+                    include_path = f"sick_perception_sdk/sensor_configuration/api/{metadata.family}/{metadata.device_type}/{version_dir}.nlohmann_json.g.hpp"
                 else:
-                    include_path = f"sick_perception_sdk/sensor_configuration/api/json/{metadata.family}/{version_dir}.g.hpp"
+                    include_path = f"sick_perception_sdk/sensor_configuration/api/{metadata.family}/{version_dir}.nlohmann_json.g.hpp"
                 f.write(f"#include <{include_path}>\n")
 
             f.write(f"\n")

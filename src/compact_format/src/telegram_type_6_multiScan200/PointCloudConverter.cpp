@@ -16,6 +16,7 @@ SPDX-License-Identifier: MIT
 #include <algorithm>
 #include <cstddef>
 #include <cstdint>
+#include <functional>
 #include <iterator>
 #include <limits>
 #include <numeric>
@@ -34,6 +35,75 @@ struct FilterIndices
   std::vector<std::size_t> rowIndicesToCopy;
   std::vector<std::size_t> columnIndexesToCopy;
 };
+
+struct AccessFunctions
+{
+  std::function<float(MultiScan200Data const&, std::size_t)> getIntensityOrNan = [](MultiScan200Data const&, std::size_t) -> float {
+    return std::numeric_limits<float>::quiet_NaN();
+  };
+  std::function<float(MultiScan200Data const&, std::size_t)> getPulseWidthOrNan = [](MultiScan200Data const&, std::size_t) -> float {
+    return std::numeric_limits<float>::quiet_NaN();
+  };
+  std::function<BitField<EchoProperties>(MultiScan200Data const&, std::size_t)> getEchoPropertiesOrReserved =
+    [](MultiScan200Data const&, std::size_t) -> BitField<EchoProperties> {
+    return BitField<EchoProperties> {EchoProperties::Reserved};
+  };
+  std::function<bool(MultiScan200Data const&, std::size_t)> isFilteredOutDueToReflector = [](MultiScan200Data const&, std::size_t) -> bool {
+    return false;
+  };
+  std::function<bool(MultiScan200Data const&, std::size_t)> isFilteredOutDueToBlooming = [](MultiScan200Data const&, std::size_t) -> bool {
+    return false;
+  };
+};
+
+auto getAccessFunctions(PointCloudConfiguration const& configuration, MultiScan200Data const& data) -> AccessFunctions
+{
+  AccessFunctions accessFunctions;
+
+  // Intensity access
+  if (!data.intensities.empty())
+  {
+    accessFunctions.getIntensityOrNan = [](MultiScan200Data const& data, std::size_t index) -> float {
+      return data.intensities[index];
+    };
+  }
+
+  // Pulse width access
+  if (!data.pulseWidths.empty())
+  {
+    accessFunctions.getPulseWidthOrNan = [](MultiScan200Data const& data, std::size_t index) -> float {
+      return data.pulseWidths[index].nanoseconds();
+    };
+  }
+
+  // Properties access
+  if (!data.echoProperties.empty())
+  {
+    accessFunctions.getEchoPropertiesOrReserved = [](MultiScan200Data const& data, std::size_t index) -> BitField<EchoProperties> {
+      return data.echoProperties[index];
+    };
+  }
+
+  // Reflector flag filter
+  if (configuration.filters.requiredReflectorFlag.has_value() && !data.echoProperties.empty())
+  {
+    accessFunctions.isFilteredOutDueToReflector = [configuration](MultiScan200Data const& data, std::size_t index) -> bool {
+      auto const isFlagSet = data.echoProperties[index].isSet(EchoProperties::IsReflector);
+      return configuration.filters.requiredReflectorFlag.value() != isFlagSet;
+    };
+  }
+
+  // Blooming flag filter
+  if (configuration.filters.requiredBloomingFlag.has_value() && !data.echoProperties.empty())
+  {
+    accessFunctions.isFilteredOutDueToBlooming = [configuration](MultiScan200Data const& data, std::size_t index) -> bool {
+      auto const isFlagSet = data.echoProperties[index].isSet(EchoProperties::IsBlooming);
+      return configuration.filters.requiredBloomingFlag.value() != isFlagSet;
+    };
+  }
+
+  return accessFunctions;
+}
 
 auto computeFilterIndices(PointCloudConfiguration const& configuration, MultiScan200Data const& data) -> FilterIndices
 {
@@ -148,18 +218,46 @@ auto convertSpecific(PointCloudConfiguration const& configuration, MultiScan200D
     throw std::runtime_error("Input data geometry size is smaller than expected based on segment metadata");
   }
 
-  auto const filterIndices  = computeFilterIndices(configuration, data);
-  auto const numberOfEchoes = static_cast<std::size_t>(data.segmentMetaData.numberOfEchoes);
-
   // Handle empty point cloud case early (before accessing geometry)
-  auto const isEmpty = data.segmentMetaData.numberOfColumnsInSegment == 0 //
-                       || data.segmentMetaData.numberOfRows == 0          //
-                       || data.segmentMetaData.numberOfEchoes == 0;
-  if (isEmpty)
+  auto const pointCloudIsEmpty =
+    data.segmentMetaData.numberOfColumnsInSegment == 0 //
+    || data.segmentMetaData.numberOfRows == 0          //
+    || data.segmentMetaData.numberOfEchoes == 0;
+  if (pointCloudIsEmpty)
   {
     auto builder = createBuilder<BuilderT>(configuration, Timestamp::fromMicrosecondsSinceEpoch(0), data);
     return builder.build();
   }
+
+  // Make sure all data vectors are large enough
+  auto const numberOfEchoes         = static_cast<std::size_t>(data.segmentMetaData.numberOfEchoes);
+  auto const numberOfRows           = static_cast<std::size_t>(data.segmentMetaData.numberOfRows);
+  auto const numberOfColumns        = static_cast<std::size_t>(data.segmentMetaData.numberOfColumnsInSegment);
+  auto const expectedNumberOfPoints = numberOfEchoes * numberOfRows * numberOfColumns;
+  if (data.distances.size() < expectedNumberOfPoints)
+  {
+    throw std::runtime_error("Too few distance values in input data");
+  }
+
+  if (data.echoProperties.size() > 0 && data.echoProperties.size() < expectedNumberOfPoints)
+  {
+    throw std::runtime_error("Too few echo property values in input data");
+  }
+
+  if (data.intensities.size() > 0 && data.intensities.size() < expectedNumberOfPoints)
+  {
+    throw std::runtime_error("Too few intensity values in input data");
+  }
+
+  if (data.pulseWidths.size() > 0 && data.pulseWidths.size() < expectedNumberOfPoints)
+  {
+    throw std::runtime_error("Too few pulse width values in input data");
+  }
+
+  auto const accessFunctions = getAccessFunctions(configuration, data);
+
+  // Compute the filter indices. They will be used to select the points according to their echo, row, and column index.
+  auto const filterIndices = computeFilterIndices(configuration, data);
 
   // Calculate timestamp (safe now that we know we have data)
   auto const firstDelta = data.geometry.relativeTimeStamps[0];
@@ -192,30 +290,23 @@ auto convertSpecific(PointCloudConfiguration const& configuration, MultiScan200D
       auto const sinAzimuth       = sin(azimuth);
       auto const cosAzimuth       = cos(azimuth);
       auto const columnTimeOffset = segmentColumnTimeOffsets[columnIndex];
-      auto const& scanColumn      = data.scanData[columnIndex];
 
       for (auto echoIndex : filterIndices.echoIndicesToCopy)
       {
-        auto const& beam = scanColumn[rowIndex];
+        auto const dataIndex = data.computeIndex(echoIndex, columnIndex, rowIndex);
+        auto const distance  = data.distances[dataIndex];
+        auto const intensity = accessFunctions.getIntensityOrNan(data, dataIndex);
 
-        // Handle beams with fewer echoes than expected (e.g., corrupted data)
-        if (echoIndex >= beam.echoes.size())
-        {
-          if constexpr (std::is_same_v<BuilderT, OrganizedPointCloudBuilder>)
-          {
-            builder.writeInvalidPoint();
-          }
-          continue;
-        }
+        // If the interval is empty all values including nan will be considered inside the interval.
+        // If the interval is not empty, nan values will be considered outside the interval, i.e. all values where no measurement exists
+        // will be filtered out if there is an active filter setting.
+        bool const isFilteredOut =
+          !configuration.filters.range.contains(distance)                 //
+          || !configuration.filters.intensity.contains(intensity)         //
+          || accessFunctions.isFilteredOutDueToReflector(data, dataIndex) //
+          || accessFunctions.isFilteredOutDueToBlooming(data, dataIndex);
 
-        auto const& echo = beam.echoes[echoIndex];
-
-        bool const isFiltered = !configuration.filters.range.contains(echo.distance) ||
-                                (echo.intensity.has_value() && !configuration.filters.intensity.contains(echo.intensity.value()));
-
-        // FIXME Apply filtering for blooming and reflector flags once we have the mapping.
-
-        if (isFiltered)
+        if (isFilteredOut)
         {
           if constexpr (std::is_same_v<BuilderT, OrganizedPointCloudBuilder>)
           {
@@ -226,17 +317,17 @@ auto convertSpecific(PointCloudConfiguration const& configuration, MultiScan200D
 
         builder.beginPoint();
 
-        float const distanceScaled = echo.distance.meters() * configuration.distanceScalingFactor;
+        float const distanceScaled = distance.meters() * configuration.distanceScalingFactor;
 
         if (configuration.fields.enableCartesian)
         {
-          float const x = cosElevation * cosAzimuth * distanceScaled; // NOLINT(readability-identifier-length)
-          float const y = cosElevation * sinAzimuth * distanceScaled; // NOLINT(readability-identifier-length)
-          float const z = -sinElevation * distanceScaled;             // NOLINT(readability-identifier-length)
+          float const xDistance = cosElevation * cosAzimuth * distanceScaled;
+          float const yDistance = cosElevation * sinAzimuth * distanceScaled;
+          float const zDistance = -sinElevation * distanceScaled;
 
-          builder.write(x);
-          builder.write(y);
-          builder.write(z);
+          builder.write(xDistance);
+          builder.write(yDistance);
+          builder.write(zDistance);
         }
 
         if (configuration.fields.enableSpherical)
@@ -248,7 +339,7 @@ auto convertSpecific(PointCloudConfiguration const& configuration, MultiScan200D
 
         if (configuration.fields.enableIntensity)
         {
-          builder.write(echo.intensity.has_value() ? echo.intensity.value() : std::numeric_limits<float>::quiet_NaN());
+          builder.write(intensity);
         }
 
         if (configuration.fields.enableTimeOffset)
@@ -276,19 +367,21 @@ auto convertSpecific(PointCloudConfiguration const& configuration, MultiScan200D
 
         if (configuration.fields.enableIsReflector)
         {
-          std::uint8_t const isReflector = 0; // FIXME We don't have the properties mapping yet;
+          auto const echoProperties      = accessFunctions.getEchoPropertiesOrReserved(data, dataIndex);
+          std::uint8_t const isReflector = echoProperties.isSet(EchoProperties::IsReflector) ? 1 : 0;
           builder.write(isReflector);
         }
 
         if (configuration.fields.enableHasBlooming)
         {
-          std::uint8_t const hasBlooming = 0; // FIXME We don't have the properties mapping yet;
+          auto const echoProperties      = accessFunctions.getEchoPropertiesOrReserved(data, dataIndex);
+          std::uint8_t const hasBlooming = echoProperties.isSet(EchoProperties::IsBlooming) ? 1 : 0;
           builder.write(hasBlooming);
         }
 
         if (configuration.fields.enablePulseWidth)
         {
-          float const pulseWidth = echo.pulseWidth.has_value() ? static_cast<float>(echo.pulseWidth->nanoseconds()) : std::numeric_limits<float>::quiet_NaN();
+          auto const pulseWidth = accessFunctions.getPulseWidthOrNan(data, dataIndex);
           builder.write(pulseWidth);
         }
       }

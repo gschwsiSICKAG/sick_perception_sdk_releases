@@ -12,7 +12,6 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 #include <sick_perception_sdk/sensor_configuration/api/NumericRange.hpp>
 
 namespace sick::picoScan150::v2_2_1::api::rest {
@@ -20,7 +19,7 @@ namespace sick::picoScan150::v2_2_1::api::rest {
 /**
  * @brief Payloads for endpoint /EnableLegacyUserLevel.
 */
-struct SDK_EXPORT EnableLegacyUserLevel
+struct EnableLegacyUserLevel
 {
 
   constexpr static const char* methodName = "EnableLegacyUserLevel";
@@ -31,9 +30,9 @@ struct SDK_EXPORT EnableLegacyUserLevel
 
  This function requires at least user level: Service.
    */
-  struct SDK_EXPORT Post
+  struct Post
   {
-    struct SDK_EXPORT Request
+    struct Request
     {
       Request() = default;
 
@@ -45,7 +44,7 @@ struct SDK_EXPORT EnableLegacyUserLevel
       bool _isEnabled;
     };
 
-    struct SDK_EXPORT Response
+    struct Response
     {
       Response() = default;
 

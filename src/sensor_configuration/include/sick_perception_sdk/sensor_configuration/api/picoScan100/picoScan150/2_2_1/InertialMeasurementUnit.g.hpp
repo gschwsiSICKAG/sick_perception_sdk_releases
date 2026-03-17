@@ -10,14 +10,13 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 
 namespace sick::picoScan150::v2_2_1::api::rest {
 
 /**
  * @brief Payloads for endpoint /InertialMeasurementUnit.
 */
-struct SDK_EXPORT InertialMeasurementUnit
+struct InertialMeasurementUnit
 {
 
   constexpr static const char* variableName = "InertialMeasurementUnit";
@@ -26,9 +25,9 @@ struct SDK_EXPORT InertialMeasurementUnit
   /**
    * @brief Returns the current IMU data (e.g. Acceleration, Orientation, ... ). The data is given in the following coordinate system which is based on the DIN70000 system. The x-axis lies on the 90-degree-beam of the 0-degree-layer. The y-axis is perpendicular to the x-axis and lies in the 0-degree-layer. The y-values are rising in the counterclockwise rotation direction (right-handed system). The z-axis is perpendicular to the x-y-plane and the scanner top points to rising z-values.
    */
-  struct SDK_EXPORT Get
+  struct Get
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
       Response() = default;
 

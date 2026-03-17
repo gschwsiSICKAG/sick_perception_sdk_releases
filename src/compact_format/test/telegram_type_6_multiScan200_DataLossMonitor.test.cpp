@@ -7,6 +7,7 @@ SPDX-License-Identifier: MIT
 #include <sick_perception_sdk/compact_format/telegram_type_6_multiScan200/DataLossMonitor.hpp>
 #include <sick_perception_sdk/compact_format/telegram_type_6_multiScan200/MultiScan200Data.hpp>
 
+using namespace sick;
 using namespace sick::compact;
 using namespace sick::compact::multiscan200;
 
@@ -22,12 +23,14 @@ auto makeData(uint64_t telegramCounter, uint64_t frameNumber, uint64_t segmentIn
   metaData.segmentIndex        = segmentIndex;
 
   return MultiScan200Data {
-    header,                            //
-    metaData,                          //
-    std::vector<AmbientLightColumn>(), //
-    Geometry {},                       //
-    std::vector<ScanColumn>(),         //
-    0                                  // checksum
+    header,                                  //
+    metaData,                                //
+    std::vector<AmbientLightColumn>(),       //
+    Geometry {},                             //
+    std::vector<Distance>(),                 // distances
+    std::vector<float>(),                    // intensities
+    std::vector<BitField<EchoProperties>>(), // echoProperties
+    std::vector<Duration>()                  // pulseWidths,
   };
 }
 

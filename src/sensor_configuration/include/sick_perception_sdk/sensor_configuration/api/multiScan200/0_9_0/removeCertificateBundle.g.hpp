@@ -12,7 +12,6 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 #include <string>
 
 namespace sick::multiScan200::v0_9_0::api::rest {
@@ -20,7 +19,7 @@ namespace sick::multiScan200::v0_9_0::api::rest {
 /**
  * @brief Payloads for endpoint /removeCertificateBundle.
 */
-struct SDK_EXPORT removeCertificateBundle
+struct removeCertificateBundle
 {
 
   constexpr static const char* methodName = "removeCertificateBundle";
@@ -31,11 +30,11 @@ struct SDK_EXPORT removeCertificateBundle
 
  This function requires at least user level: Service.
    */
-  struct SDK_EXPORT Post
+  struct Post
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
-      struct SDK_EXPORT errorCode
+      struct errorCode
       {
         errorCode() = default;
 

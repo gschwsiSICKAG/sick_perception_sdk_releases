@@ -12,14 +12,13 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 
 namespace sick::picoScan150::v2_2_1::api::rest {
 
 /**
  * @brief Payloads for endpoint /LoadApplicationDefaults.
 */
-struct SDK_EXPORT LoadApplicationDefaults
+struct LoadApplicationDefaults
 {
 
   constexpr static const char* methodName = "LoadApplicationDefaults";
@@ -30,7 +29,7 @@ struct SDK_EXPORT LoadApplicationDefaults
 
  This function requires at least user level: Authorized Client.
    */
-  struct SDK_EXPORT Post
+  struct Post
   {
   }; // struct Post
 

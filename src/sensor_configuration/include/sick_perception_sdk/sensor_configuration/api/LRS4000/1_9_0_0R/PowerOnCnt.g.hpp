@@ -10,14 +10,13 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 
 namespace sick::LRS4000::v1_9_0_0R::api::rest {
 
 /**
  * @brief Payloads for endpoint /PowerOnCnt.
 */
-struct SDK_EXPORT PowerOnCnt
+struct PowerOnCnt
 {
 
   constexpr static const char* variableName = "PowerOnCnt";
@@ -26,9 +25,9 @@ struct SDK_EXPORT PowerOnCnt
   /**
    * @brief Returns the number of power on cycles.
    */
-  struct SDK_EXPORT Get
+  struct Get
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
       Response() = default;
 

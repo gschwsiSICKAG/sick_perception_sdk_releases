@@ -10,14 +10,13 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 
 namespace sick::multiScan100::v2_4_1::api::rest {
 
 /**
  * @brief Payloads for endpoint /OpHours.
 */
-struct SDK_EXPORT OpHours
+struct OpHours
 {
 
   constexpr static const char* variableName = "OpHours";
@@ -26,9 +25,9 @@ struct SDK_EXPORT OpHours
   /**
    * @brief Returns the total number of operating hours during the lifetime of the device. The resolution is a 1/10 hour.
    */
-  struct SDK_EXPORT Get
+  struct Get
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
       Response() = default;
 

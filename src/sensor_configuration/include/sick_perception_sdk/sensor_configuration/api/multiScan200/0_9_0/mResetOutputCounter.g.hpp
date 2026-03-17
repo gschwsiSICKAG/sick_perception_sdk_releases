@@ -12,14 +12,13 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 
 namespace sick::multiScan200::v0_9_0::api::rest {
 
 /**
  * @brief Payloads for endpoint /mResetOutputCounter.
 */
-struct SDK_EXPORT mResetOutputCounter
+struct mResetOutputCounter
 {
 
   constexpr static const char* methodName = "mResetOutputCounter";
@@ -30,9 +29,9 @@ struct SDK_EXPORT mResetOutputCounter
 
  This function requires at least user level: Authorized Client.
    */
-  struct SDK_EXPORT Post
+  struct Post
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
       enum class ErrorCode
       {

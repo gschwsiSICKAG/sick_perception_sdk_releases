@@ -10,7 +10,6 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 #include <string>
 
 namespace sick::picoScan120::v2_2_1::api::rest {
@@ -18,7 +17,7 @@ namespace sick::picoScan120::v2_2_1::api::rest {
 /**
  * @brief Payloads for endpoint /LFTchecksum.
 */
-struct SDK_EXPORT LFTchecksum
+struct LFTchecksum
 {
 
   constexpr static const char* variableName = "LFTchecksum";
@@ -27,9 +26,9 @@ struct SDK_EXPORT LFTchecksum
   /**
    * @brief Returns a checksum over all software parts and configurations.
    */
-  struct SDK_EXPORT Get
+  struct Get
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
       Response() = default;
 

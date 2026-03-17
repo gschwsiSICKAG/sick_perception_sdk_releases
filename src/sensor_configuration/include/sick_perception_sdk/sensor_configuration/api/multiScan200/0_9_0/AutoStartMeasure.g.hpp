@@ -10,14 +10,13 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 
 namespace sick::multiScan200::v0_9_0::api::rest {
 
 /**
  * @brief Payloads for endpoint /AutoStartMeasure.
 */
-struct SDK_EXPORT AutoStartMeasure
+struct AutoStartMeasure
 {
 
   constexpr static const char* variableName = "AutoStartMeasure";
@@ -26,9 +25,9 @@ struct SDK_EXPORT AutoStartMeasure
   /**
    * @brief Returns/sets the mode for automatic start of measurement after boot-up.
    */
-  struct SDK_EXPORT Get
+  struct Get
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
       Response() = default;
 
@@ -44,9 +43,9 @@ struct SDK_EXPORT AutoStartMeasure
   /**
    * @brief Returns/sets the mode for automatic start of measurement after boot-up.
    */
-  struct SDK_EXPORT Post
+  struct Post
   {
-    struct SDK_EXPORT Request
+    struct Request
     {
       Request() = default;
 

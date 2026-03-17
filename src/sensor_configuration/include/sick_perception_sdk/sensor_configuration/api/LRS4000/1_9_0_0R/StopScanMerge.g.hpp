@@ -12,14 +12,13 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 
 namespace sick::LRS4000::v1_9_0_0R::api::rest {
 
 /**
  * @brief Payloads for endpoint /StopScanMerge.
 */
-struct SDK_EXPORT StopScanMerge
+struct StopScanMerge
 {
 
   constexpr static const char* methodName = "StopScanMerge";
@@ -30,7 +29,7 @@ struct SDK_EXPORT StopScanMerge
 
  This function requires at least user level: Authorized Client.
    */
-  struct SDK_EXPORT Post
+  struct Post
   {
   }; // struct Post
 

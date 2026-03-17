@@ -10,7 +10,6 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 #include <string>
 
 namespace sick::picoScan150::v2_2_1::api::rest {
@@ -18,7 +17,7 @@ namespace sick::picoScan150::v2_2_1::api::rest {
 /**
  * @brief Payloads for endpoint /rosNamespace.
 */
-struct SDK_EXPORT rosNamespace
+struct rosNamespace
 {
 
   constexpr static const char* variableName = "rosNamespace";
@@ -27,9 +26,9 @@ struct SDK_EXPORT rosNamespace
   /**
    * @brief Returns/sets the namespace of the published topics.
    */
-  struct SDK_EXPORT Get
+  struct Get
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
       Response() = default;
 
@@ -47,9 +46,9 @@ struct SDK_EXPORT rosNamespace
 
  This function requires at least user level: Authorized Client.
    */
-  struct SDK_EXPORT Post
+  struct Post
   {
-    struct SDK_EXPORT Request
+    struct Request
     {
       Request() = default;
 

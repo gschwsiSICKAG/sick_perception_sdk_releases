@@ -72,7 +72,7 @@ auto Parser::validateAndParse(ByteView data, bool validateChecksum) -> AmbientLi
   }
 
   Payload payload;
-  readPosition += readPayload(data.subview(readPosition), payload);
+  readPayload(data.subview(readPosition), payload);
 
   return {telegramHeader, payload};
 }

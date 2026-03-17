@@ -12,14 +12,13 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 
 namespace sick::picoScan150::v2_2_1::api::rest {
 
 /**
  * @brief Payloads for endpoint /mStopMeasure.
 */
-struct SDK_EXPORT mStopMeasure
+struct mStopMeasure
 {
 
   constexpr static const char* methodName = "mStopMeasure";
@@ -30,9 +29,9 @@ struct SDK_EXPORT mStopMeasure
 
  This function requires at least user level: Authorized Client.
    */
-  struct SDK_EXPORT Post
+  struct Post
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
       enum class ErrorCode
       {

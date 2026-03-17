@@ -12,7 +12,6 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 #include <string>
 
 namespace sick::multiScan200::v0_9_0::api::rest {
@@ -20,7 +19,7 @@ namespace sick::multiScan200::v0_9_0::api::rest {
 /**
  * @brief Payloads for endpoint /CreateParameterBackup.
 */
-struct SDK_EXPORT CreateParameterBackup
+struct CreateParameterBackup
 {
 
   constexpr static const char* methodName = "CreateParameterBackup";
@@ -31,9 +30,9 @@ struct SDK_EXPORT CreateParameterBackup
 
  This function requires at least user level: Service.
    */
-  struct SDK_EXPORT Post
+  struct Post
   {
-    struct SDK_EXPORT Request
+    struct Request
     {
       Request() = default;
 
@@ -44,7 +43,7 @@ struct SDK_EXPORT CreateParameterBackup
       std::string _Passphrase;
     };
 
-    struct SDK_EXPORT Response
+    struct Response
     {
       Response() = default;
 

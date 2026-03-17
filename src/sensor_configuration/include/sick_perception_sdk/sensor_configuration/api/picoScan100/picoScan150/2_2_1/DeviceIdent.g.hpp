@@ -10,7 +10,6 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 #include <string>
 
 namespace sick::picoScan150::v2_2_1::api::rest {
@@ -18,7 +17,7 @@ namespace sick::picoScan150::v2_2_1::api::rest {
 /**
  * @brief Payloads for endpoint /DeviceIdent.
 */
-struct SDK_EXPORT DeviceIdent
+struct DeviceIdent
 {
 
   constexpr static const char* variableName = "DeviceIdent";
@@ -27,9 +26,9 @@ struct SDK_EXPORT DeviceIdent
   /**
    * @brief Returns the device name and the firmware version.
    */
-  struct SDK_EXPORT Get
+  struct Get
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
       Response() = default;
 

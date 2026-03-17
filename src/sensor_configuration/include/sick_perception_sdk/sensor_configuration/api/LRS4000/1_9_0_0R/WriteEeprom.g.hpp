@@ -12,14 +12,13 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 
 namespace sick::LRS4000::v1_9_0_0R::api::rest {
 
 /**
  * @brief Payloads for endpoint /WriteEeprom.
 */
-struct SDK_EXPORT WriteEeprom
+struct WriteEeprom
 {
 
   constexpr static const char* methodName = "WriteEeprom";
@@ -30,9 +29,9 @@ struct SDK_EXPORT WriteEeprom
 
  This function requires at least user level: Authorized Client.
    */
-  struct SDK_EXPORT Post
+  struct Post
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
       Response() = default;
 

@@ -10,14 +10,13 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 
 namespace sick::multiScan200::v0_9_0::api::rest {
 
 /**
  * @brief Payloads for endpoint /TSCTCSrvAddr.
 */
-struct SDK_EXPORT TSCTCSrvAddr
+struct TSCTCSrvAddr
 {
 
   constexpr static const char* variableName = "TSCTCSrvAddr";
@@ -26,9 +25,9 @@ struct SDK_EXPORT TSCTCSrvAddr
   /**
    * @brief Returns/sets the IP address of the time server.
    */
-  struct SDK_EXPORT Get
+  struct Get
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
       Response() = default;
 
@@ -46,9 +45,9 @@ struct SDK_EXPORT TSCTCSrvAddr
 
  This function requires at least user level: Authorized Client.
    */
-  struct SDK_EXPORT Post
+  struct Post
   {
-    struct SDK_EXPORT Request
+    struct Request
     {
       Request() = default;
 

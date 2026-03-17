@@ -12,7 +12,6 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 #include <sick_perception_sdk/sensor_configuration/api/NumericRange.hpp>
 
 namespace sick::LRS4000::v1_9_0_0R::api::rest {
@@ -20,7 +19,7 @@ namespace sick::LRS4000::v1_9_0_0R::api::rest {
 /**
  * @brief Payloads for endpoint /EncoderTranslation.
 */
-struct SDK_EXPORT EncoderTranslation
+struct EncoderTranslation
 {
 
   constexpr static const char* methodName = "EncoderTranslation";
@@ -31,9 +30,9 @@ struct SDK_EXPORT EncoderTranslation
 
  This function requires at least user level: Authorized Client.
    */
-  struct SDK_EXPORT Post
+  struct Post
   {
-    struct SDK_EXPORT Request
+    struct Request
     {
       Request() = default;
 

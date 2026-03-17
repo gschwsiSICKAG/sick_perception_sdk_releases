@@ -10,7 +10,6 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 #include <sick_perception_sdk/sensor_configuration/api/NumericRange.hpp>
 
 namespace sick::LRS4000::v1_9_0_0R::api::rest {
@@ -18,7 +17,7 @@ namespace sick::LRS4000::v1_9_0_0R::api::rest {
 /**
  * @brief Payloads for endpoint /TSCTCupdatetime.
 */
-struct SDK_EXPORT TSCTCupdatetime
+struct TSCTCupdatetime
 {
 
   constexpr static const char* variableName = "TSCTCupdatetime";
@@ -27,9 +26,9 @@ struct SDK_EXPORT TSCTCupdatetime
   /**
    * @brief Returns/sets the NTP update time.
    */
-  struct SDK_EXPORT Get
+  struct Get
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
       Response() = default;
 
@@ -47,9 +46,9 @@ struct SDK_EXPORT TSCTCupdatetime
 
  This function requires at least user level: Authorized Client.
    */
-  struct SDK_EXPORT Post
+  struct Post
   {
-    struct SDK_EXPORT Request
+    struct Request
     {
       Request() = default;
 

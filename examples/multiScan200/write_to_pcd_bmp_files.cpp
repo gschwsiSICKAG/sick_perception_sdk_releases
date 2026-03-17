@@ -8,7 +8,7 @@ SPDX-License-Identifier: MIT
 #include "../examples_helper.hpp"
 #include <sick_perception_sdk/common/BitmapEncoder.hpp>
 #include <sick_perception_sdk/compact_format/PointCloud/MultiEchoPointCloud.hpp>
-#include <sick_perception_sdk/compact_format/PointCloud/PointCloudToPCDConverter.hpp>
+#include <sick_perception_sdk/compact_format/PointCloud/PointCloudToPcdConverter.hpp>
 #include <sick_perception_sdk/compact_format/telegram_type_6_multiScan200/MultiScan200Data.hpp>
 #include <sick_perception_sdk/drivers/multiScan200/Driver.hpp>
 #include <sick_perception_sdk/sensor_configuration/HttpClient/httplib_client/HttpClient.hpp>
@@ -54,13 +54,11 @@ void writeAmbientLightToBitmap(sick::compact::multiscan200::MultiScan200Data con
   file.close();
 }
 
-void writePointCloudToPCDFile(sick::MultiEchoPointCloud const& pointCloud, std::string const& filename)
+void writePointCloudToPCDFile(sick::MultiEchoPointCloud const& pointCloud, std::string const& filePath)
 {
   // open in binary mode to prevent the compiler from converting \n to \r\n on windows
-  std::ofstream file(filename, std::ios_base::binary);
-  sick::PointCloudToPCDConverter::convertToPCDASCII(pointCloud, file);
-  std::cout << "Wrote point cloud with " << pointCloud.numberOfPoints() << " points to " << filename << "\n";
-  file.close();
+  sick::pcd::writeToAsciiFile(pointCloud, filePath);
+  std::cout << "Wrote point cloud with " << pointCloud.numberOfPoints() << " points to " << filePath << "\n";
 }
 
 int main(int argc, char* argv[])

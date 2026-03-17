@@ -12,7 +12,6 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 #include <string>
 
 namespace sick::multiScan100::v2_4_1::api::rest {
@@ -20,7 +19,7 @@ namespace sick::multiScan100::v2_4_1::api::rest {
 /**
  * @brief Payloads for endpoint /changePassword.
 */
-struct SDK_EXPORT changePassword
+struct changePassword
 {
 
   constexpr static const char* methodName = "changePassword";
@@ -29,9 +28,9 @@ struct SDK_EXPORT changePassword
   /**
    * @brief Sets the password for the REST interface. For more details see https://github.com/SICKAG/sick_scan_rest_client.
    */
-  struct SDK_EXPORT Post
+  struct Post
   {
-    struct SDK_EXPORT Request
+    struct Request
     {
       Request() = default;
 
@@ -43,7 +42,7 @@ struct SDK_EXPORT changePassword
       std::string _userLevel;
     };
 
-    struct SDK_EXPORT Response
+    struct Response
     {
       enum class result
       {

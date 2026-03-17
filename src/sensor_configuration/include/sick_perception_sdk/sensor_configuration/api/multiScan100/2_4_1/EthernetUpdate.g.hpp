@@ -12,14 +12,13 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 
 namespace sick::multiScan100::v2_4_1::api::rest {
 
 /**
  * @brief Payloads for endpoint /EthernetUpdate.
 */
-struct SDK_EXPORT EthernetUpdate
+struct EthernetUpdate
 {
 
   constexpr static const char* methodName = "EthernetUpdate";
@@ -30,7 +29,7 @@ struct SDK_EXPORT EthernetUpdate
 
  This function requires at least user level: Authorized Client.
    */
-  struct SDK_EXPORT Post
+  struct Post
   {
   }; // struct Post
 

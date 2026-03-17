@@ -10,14 +10,13 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 
 namespace sick::multiScan100::v2_4_1::api::rest {
 
 /**
  * @brief Payloads for endpoint /EvaluationConfigState.
 */
-struct SDK_EXPORT EvaluationConfigState
+struct EvaluationConfigState
 {
 
   constexpr static const char* variableName = "EvaluationConfigState";
@@ -26,9 +25,9 @@ struct SDK_EXPORT EvaluationConfigState
   /**
    * @brief Returns the performance state (OK, WWANING, EXEEDED) of an evaluation config.
    */
-  struct SDK_EXPORT Get
+  struct Get
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
       enum class ActiveBeamsLimit
       {

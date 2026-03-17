@@ -15,8 +15,10 @@ SPDX-License-Identifier: MIT
 #include <sick_perception_sdk/sensor_configuration/SensorConfigurator.hpp>
 #include <sick_perception_sdk/sensor_configuration/api/FieldEvaluationContour.hpp>
 #include <sick_perception_sdk/sensor_configuration/api/UserLevel.hpp>
-#include <sick_perception_sdk/sensor_configuration/api/json/picoScan100/picoScan150.g.hpp>
-#include <sick_perception_sdk/sensor_configuration/api/picoScan100/picoScan150.g.hpp>
+#include <sick_perception_sdk/sensor_configuration/api/picoScan100/picoScan150/2_2_1/DeviceStatus.g.hpp>
+#include <sick_perception_sdk/sensor_configuration/api/picoScan100/picoScan150/2_2_1/FieldEvaluationResult.g.hpp>
+#include <sick_perception_sdk/sensor_configuration/api/picoScan100/picoScan150/2_2_1/LSPsetdatetime.g.hpp>
+#include <sick_perception_sdk/sensor_configuration/api/picoScan100/picoScan150/2_2_1/TSCTCtimezone.g.hpp>
 
 #include <chrono>
 #include <cstddef>

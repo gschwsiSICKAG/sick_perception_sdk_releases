@@ -10,14 +10,13 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 
 namespace sick::multiScan100::v2_4_1::api::rest {
 
 /**
  * @brief Payloads for endpoint /groundFilterType.
 */
-struct SDK_EXPORT groundFilterType
+struct groundFilterType
 {
 
   constexpr static const char* variableName = "groundFilterType";
@@ -26,9 +25,9 @@ struct SDK_EXPORT groundFilterType
   /**
    * @brief Returns the ground filter type. Currently, the ground filter only works on plain measurement data (P3D-algorythm). The option IMU is currently not available.
    */
-  struct SDK_EXPORT Get
+  struct Get
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
       enum class groundFilterType
       {

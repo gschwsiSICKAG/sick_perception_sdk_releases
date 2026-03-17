@@ -10,14 +10,13 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 
 namespace sick::picoScan150::v2_2_1::api::rest {
 
 /**
  * @brief Payloads for endpoint /EncSetting.
 */
-struct SDK_EXPORT EncSetting
+struct EncSetting
 {
 
   constexpr static const char* variableName = "EncSetting";
@@ -26,9 +25,9 @@ struct SDK_EXPORT EncSetting
   /**
    * @brief Returns/sets the encoder mode (e.g. phase mode).
    */
-  struct SDK_EXPORT Get
+  struct Get
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
       enum class EncSetting
       {
@@ -55,9 +54,9 @@ struct SDK_EXPORT EncSetting
 
  This function requires at least user level: Authorized Client.
    */
-  struct SDK_EXPORT Post
+  struct Post
   {
-    struct SDK_EXPORT Request
+    struct Request
     {
       enum class EncSetting
       {

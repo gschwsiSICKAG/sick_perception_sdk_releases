@@ -10,7 +10,6 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 #include <sick_perception_sdk/sensor_configuration/api/NumericRange.hpp>
 #include <string>
 
@@ -19,7 +18,7 @@ namespace sick::LRS4000::v1_9_0_0R::api::rest {
 /**
  * @brief Payloads for endpoint /PortConfiguration.
 */
-struct SDK_EXPORT PortConfiguration
+struct PortConfiguration
 {
 
   constexpr static const char* variableName = "PortConfiguration";
@@ -28,11 +27,11 @@ struct SDK_EXPORT PortConfiguration
   /**
    * @brief Returns/sets the port configuration of all I/Os.
    */
-  struct SDK_EXPORT Get
+  struct Get
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
-      struct SDK_EXPORT PortConfigurationItem
+      struct PortConfigurationItem
       {
         enum class PortType
         {
@@ -40,7 +39,7 @@ struct SDK_EXPORT PortConfiguration
           Output = 1,
         };
 
-        struct SDK_EXPORT InputSettings
+        struct InputSettings
         {
           enum class Logic
           {
@@ -67,7 +66,7 @@ struct SDK_EXPORT PortConfiguration
           int _Reserved2;
         };
 
-        struct SDK_EXPORT OutputSettings
+        struct OutputSettings
         {
           enum class Logic
           {
@@ -96,7 +95,7 @@ struct SDK_EXPORT PortConfiguration
             Xor = 2,
           };
 
-          struct SDK_EXPORT SourcesItem
+          struct SourcesItem
           {
             SourcesItem() = default;
 
@@ -159,11 +158,11 @@ struct SDK_EXPORT PortConfiguration
 
  This function requires at least user level: Authorized Client.
    */
-  struct SDK_EXPORT Post
+  struct Post
   {
-    struct SDK_EXPORT Request
+    struct Request
     {
-      struct SDK_EXPORT PortConfigurationItem
+      struct PortConfigurationItem
       {
         enum class PortType
         {
@@ -171,7 +170,7 @@ struct SDK_EXPORT PortConfiguration
           Output = 1,
         };
 
-        struct SDK_EXPORT InputSettings
+        struct InputSettings
         {
           enum class Logic
           {
@@ -198,7 +197,7 @@ struct SDK_EXPORT PortConfiguration
           int _Reserved2;
         };
 
-        struct SDK_EXPORT OutputSettings
+        struct OutputSettings
         {
           enum class Logic
           {
@@ -227,7 +226,7 @@ struct SDK_EXPORT PortConfiguration
             Xor = 2,
           };
 
-          struct SDK_EXPORT SourcesItem
+          struct SourcesItem
           {
             SourcesItem() = default;
 

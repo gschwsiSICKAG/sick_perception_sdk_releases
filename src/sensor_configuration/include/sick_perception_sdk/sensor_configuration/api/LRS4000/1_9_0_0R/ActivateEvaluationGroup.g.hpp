@@ -12,7 +12,6 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 #include <sick_perception_sdk/sensor_configuration/api/NumericRange.hpp>
 
 namespace sick::LRS4000::v1_9_0_0R::api::rest {
@@ -20,7 +19,7 @@ namespace sick::LRS4000::v1_9_0_0R::api::rest {
 /**
  * @brief Payloads for endpoint /ActivateEvaluationGroup.
 */
-struct SDK_EXPORT ActivateEvaluationGroup
+struct ActivateEvaluationGroup
 {
 
   constexpr static const char* methodName = "ActivateEvaluationGroup";
@@ -29,11 +28,11 @@ struct SDK_EXPORT ActivateEvaluationGroup
   /**
    * @brief Sets the activation condition for all existing evaluation groups, when activation is set to Telegram..
    */
-  struct SDK_EXPORT Post
+  struct Post
   {
-    struct SDK_EXPORT Request
+    struct Request
     {
-      struct SDK_EXPORT ListItem
+      struct ListItem
       {
         ListItem() = default;
 
@@ -54,7 +53,7 @@ struct SDK_EXPORT ActivateEvaluationGroup
       std::vector<ListItem> _List;
     };
 
-    struct SDK_EXPORT Response
+    struct Response
     {
       Response() = default;
 

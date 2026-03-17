@@ -10,7 +10,6 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 #include <string>
 
 namespace sick::LRS4000::v1_9_0_0R::api::rest {
@@ -18,7 +17,7 @@ namespace sick::LRS4000::v1_9_0_0R::api::rest {
 /**
  * @brief Payloads for endpoint /LocationName.
 */
-struct SDK_EXPORT LocationName
+struct LocationName
 {
 
   constexpr static const char* variableName = "LocationName";
@@ -27,9 +26,9 @@ struct SDK_EXPORT LocationName
   /**
    * @brief Returns/sets the device name.
    */
-  struct SDK_EXPORT Get
+  struct Get
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
       Response() = default;
 
@@ -47,9 +46,9 @@ struct SDK_EXPORT LocationName
 
  This function requires at least user level: Authorized Client.
    */
-  struct SDK_EXPORT Post
+  struct Post
   {
-    struct SDK_EXPORT Request
+    struct Request
     {
       Request() = default;
 

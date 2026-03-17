@@ -13,9 +13,11 @@ SPDX-License-Identifier: MIT
 #include <sick_perception_sdk/sensor_configuration/HttpClient/IHttpClient.hpp>
 #include <sick_perception_sdk/sensor_configuration/SensorConfigurator.hpp>
 #include <sick_perception_sdk/sensor_configuration/api/FieldEvaluationContour.hpp>
-#include <sick_perception_sdk/sensor_configuration/api/LRS4000/LRS4000.g.hpp>
+#include <sick_perception_sdk/sensor_configuration/api/LRS4000/1_9_0_0R/DeviceStatus.g.hpp>
+#include <sick_perception_sdk/sensor_configuration/api/LRS4000/1_9_0_0R/FieldEvaluationResult.g.hpp>
+#include <sick_perception_sdk/sensor_configuration/api/LRS4000/1_9_0_0R/TSCTCtimezone.g.hpp>
+#include <sick_perception_sdk/sensor_configuration/api/LRS4000/1_9_0_0R/mSetDateTime.g.hpp>
 #include <sick_perception_sdk/sensor_configuration/api/UserLevel.hpp>
-#include <sick_perception_sdk/sensor_configuration/api/json/LRS4000/LRS4000.g.hpp>
 
 #include <chrono>
 #include <cstddef>

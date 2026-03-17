@@ -10,14 +10,13 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 
 namespace sick::LRS4000::v1_9_0_0R::api::rest {
 
 /**
  * @brief Payloads for endpoint /ContaminationActiveSectors.
 */
-struct SDK_EXPORT ContaminationActiveSectors
+struct ContaminationActiveSectors
 {
 
   constexpr static const char* variableName = "ContaminationActiveSectors";
@@ -26,9 +25,9 @@ struct SDK_EXPORT ContaminationActiveSectors
   /**
    * @brief Returns the active contamination sectors. Starts with right backside of the sensor when looking to the device on topside view and continues counterclockwise.
    */
-  struct SDK_EXPORT Get
+  struct Get
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
       Response() = default;
 

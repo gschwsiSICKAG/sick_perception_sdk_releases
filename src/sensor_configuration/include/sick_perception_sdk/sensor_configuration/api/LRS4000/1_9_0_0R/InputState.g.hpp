@@ -10,7 +10,6 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 #include <sick_perception_sdk/sensor_configuration/api/NumericRange.hpp>
 
 namespace sick::LRS4000::v1_9_0_0R::api::rest {
@@ -18,7 +17,7 @@ namespace sick::LRS4000::v1_9_0_0R::api::rest {
 /**
  * @brief Payloads for endpoint /InputState.
 */
-struct SDK_EXPORT InputState
+struct InputState
 {
 
   constexpr static const char* variableName = "InputState";
@@ -27,13 +26,13 @@ struct SDK_EXPORT InputState
   /**
    * @brief Returns the state of all inputs.
    */
-  struct SDK_EXPORT Get
+  struct Get
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
-      struct SDK_EXPORT aDigitalInItem
+      struct aDigitalInItem
       {
-        struct SDK_EXPORT IOState
+        struct IOState
         {
           enum class eIOState
           {
@@ -60,7 +59,7 @@ struct SDK_EXPORT InputState
         IOState _IOState;
       };
 
-      struct SDK_EXPORT aTimeBlockItem
+      struct aTimeBlockItem
       {
         aTimeBlockItem() = default;
 

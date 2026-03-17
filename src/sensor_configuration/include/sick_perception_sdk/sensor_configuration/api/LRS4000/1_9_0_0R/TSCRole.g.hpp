@@ -10,14 +10,13 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 
 namespace sick::LRS4000::v1_9_0_0R::api::rest {
 
 /**
  * @brief Payloads for endpoint /TSCRole.
 */
-struct SDK_EXPORT TSCRole
+struct TSCRole
 {
 
   constexpr static const char* variableName = "TSCRole";
@@ -26,9 +25,9 @@ struct SDK_EXPORT TSCRole
   /**
    * @brief Returns/sets the time synchronization role (none = 0 , NTP = 1 or PTP = 3).
    */
-  struct SDK_EXPORT Get
+  struct Get
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
       enum class TSCRole
       {
@@ -54,9 +53,9 @@ struct SDK_EXPORT TSCRole
 
  This function requires at least user level: Authorized Client.
    */
-  struct SDK_EXPORT Post
+  struct Post
   {
-    struct SDK_EXPORT Request
+    struct Request
     {
       enum class TSCRole
       {

@@ -5,8 +5,7 @@ SPDX-License-Identifier: MIT
 
 #pragma once
 
-// NOLINTBEGIN(misc-non-private-member-variables-in-classes)
-
+#include <sick_perception_sdk/common/Interval.hpp>
 #include <sick_perception_sdk/common/export.hpp>
 #include <sick_perception_sdk/common/quantities/Angle.hpp>
 #include <sick_perception_sdk/common/quantities/Distance.hpp>
@@ -19,53 +18,7 @@ SPDX-License-Identifier: MIT
 
 namespace sick {
 
-/**
- * @brief A class that represents an interval. A value can be checked if it is in the interval with isInRange().
- */
-template <typename T>
-struct Interval
-{
-  Interval()
-    : min(std::nullopt)
-    , max(std::nullopt)
-  { }
-
-  std::optional<T> min;
-  std::optional<T> max;
-  bool invert {false};
-
-  /**
-   * @brief Checks if a value is in the range [min, max]. If min or max is not set, that side is unbounded.
-   * If invert is true, the result is inverted.
-   */
-  auto contains(T value) const -> bool
-  {
-    bool const inRange = (min.has_value() ? value >= min.value() : true) && (max.has_value() ? value <= max.value() : true);
-    return invert ? !inRange : inRange;
-  }
-
-  /**
-   * @brief Checks if the range is empty, i.e. there is a value that can be in the range.
-   * 
-   * If the range is not configured (both min and max are not set), it is considered empty.
-   */
-  auto isEmpty() const -> bool
-  {
-    if (min.has_value() && max.has_value())
-    {
-      return min.value() > max.value();
-    }
-    return true;
-  }
-
-  auto toString() const -> std::string
-  {
-    std::string result = (invert ? "not " : "") + std::string("[");
-    result += (min.has_value() ? std::to_string(*min) : "-inf") + ", ";
-    result += (max.has_value() ? std::to_string(*max) : "inf") + "]";
-    return result;
-  }
-};
+// NOLINTBEGIN(misc-non-private-member-variables-in-classes)
 
 struct SDK_EXPORT PointCloudConfiguration
 {

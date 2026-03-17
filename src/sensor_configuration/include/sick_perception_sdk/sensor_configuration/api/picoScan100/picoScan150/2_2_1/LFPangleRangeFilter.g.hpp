@@ -10,7 +10,6 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 #include <sick_perception_sdk/sensor_configuration/api/NumericRange.hpp>
 
 namespace sick::picoScan150::v2_2_1::api::rest {
@@ -18,7 +17,7 @@ namespace sick::picoScan150::v2_2_1::api::rest {
 /**
  * @brief Payloads for endpoint /LFPangleRangeFilter.
 */
-struct SDK_EXPORT LFPangleRangeFilter
+struct LFPangleRangeFilter
 {
 
   constexpr static const char* variableName = "LFPangleRangeFilter";
@@ -27,9 +26,9 @@ struct SDK_EXPORT LFPangleRangeFilter
   /**
    * @brief Returns/sets the angle range filter settings. The filter restricts the output scan to a specified angle range. Filtered measurement values are set to 0. If the content of a complete data segment is set to 0, this segment is not output anymore.
    */
-  struct SDK_EXPORT Get
+  struct Get
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
       Response() = default;
 
@@ -52,9 +51,9 @@ struct SDK_EXPORT LFPangleRangeFilter
 
  This function requires at least user level: Authorized Client.
    */
-  struct SDK_EXPORT Post
+  struct Post
   {
-    struct SDK_EXPORT Request
+    struct Request
     {
       Request() = default;
 

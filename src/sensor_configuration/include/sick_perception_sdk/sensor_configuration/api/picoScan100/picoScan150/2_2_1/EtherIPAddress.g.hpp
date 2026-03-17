@@ -10,14 +10,13 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 
 namespace sick::picoScan150::v2_2_1::api::rest {
 
 /**
  * @brief Payloads for endpoint /EtherIPAddress.
 */
-struct SDK_EXPORT EtherIPAddress
+struct EtherIPAddress
 {
 
   constexpr static const char* variableName = "EtherIPAddress";
@@ -26,9 +25,9 @@ struct SDK_EXPORT EtherIPAddress
   /**
    * @brief Returns/sets the used static IP address.
    */
-  struct SDK_EXPORT Get
+  struct Get
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
       Response() = default;
 
@@ -46,9 +45,9 @@ struct SDK_EXPORT EtherIPAddress
 
  This function requires at least user level: Authorized Client.
    */
-  struct SDK_EXPORT Post
+  struct Post
   {
-    struct SDK_EXPORT Request
+    struct Request
     {
       Request() = default;
 

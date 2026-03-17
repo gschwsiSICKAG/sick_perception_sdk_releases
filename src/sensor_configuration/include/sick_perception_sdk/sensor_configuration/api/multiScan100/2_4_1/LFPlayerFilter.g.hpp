@@ -10,14 +10,13 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 
 namespace sick::multiScan100::v2_4_1::api::rest {
 
 /**
  * @brief Payloads for endpoint /LFPlayerFilter.
 */
-struct SDK_EXPORT LFPlayerFilter
+struct LFPlayerFilter
 {
 
   constexpr static const char* variableName = "LFPlayerFilter";
@@ -26,9 +25,9 @@ struct SDK_EXPORT LFPlayerFilter
   /**
    * @brief Filter complete layers in the output data.
    */
-  struct SDK_EXPORT Get
+  struct Get
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
       Response() = default;
 
@@ -47,9 +46,9 @@ struct SDK_EXPORT LFPlayerFilter
 
  This function requires at least user level: Authorized Client.
    */
-  struct SDK_EXPORT Post
+  struct Post
   {
-    struct SDK_EXPORT Request
+    struct Request
     {
       Request() = default;
 

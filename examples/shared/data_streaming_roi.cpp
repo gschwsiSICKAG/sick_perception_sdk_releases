@@ -92,10 +92,8 @@ int main(int argc, char* argv[])
   config.fields.enableIntensity = true;
   config.fields.enableEcho      = true;
   // only output data in this ROI
-  config.filters.azimuth.min   = -1_deg;
-  config.filters.azimuth.max   = 1_deg;
-  config.filters.elevation.min = -1_deg;
-  config.filters.elevation.max = 1_deg;
+  config.filters.azimuth   = sick::Interval {-1_deg, 1_deg, false};
+  config.filters.elevation = sick::Interval {-1_deg, 1_deg, false};
 
 #if defined(USE_LRS4000) || defined(USE_MULTISCAN200)
   DriverT driver(deviceAddress, sick::examples::printExceptionMessage);

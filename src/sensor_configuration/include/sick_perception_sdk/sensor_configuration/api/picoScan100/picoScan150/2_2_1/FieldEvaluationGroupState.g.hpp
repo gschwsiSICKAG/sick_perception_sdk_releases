@@ -10,14 +10,13 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 
 namespace sick::picoScan150::v2_2_1::api::rest {
 
 /**
  * @brief Payloads for endpoint /FieldEvaluationGroupState.
 */
-struct SDK_EXPORT FieldEvaluationGroupState
+struct FieldEvaluationGroupState
 {
 
   constexpr static const char* variableName = "FieldEvaluationGroupState";
@@ -26,9 +25,9 @@ struct SDK_EXPORT FieldEvaluationGroupState
   /**
    * @brief Returns the activation condition for all existing evaluation groups (not configured, active, or inactive).
    */
-  struct SDK_EXPORT Get
+  struct Get
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
       Response() = default;
 

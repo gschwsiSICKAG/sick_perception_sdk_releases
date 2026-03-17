@@ -10,7 +10,6 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 #include <sick_perception_sdk/sensor_configuration/api/NumericRange.hpp>
 
 namespace sick::LRS4000::v1_9_0_0R::api::rest {
@@ -18,7 +17,7 @@ namespace sick::LRS4000::v1_9_0_0R::api::rest {
 /**
  * @brief Payloads for endpoint /MeanFilter.
 */
-struct SDK_EXPORT MeanFilter
+struct MeanFilter
 {
 
   constexpr static const char* variableName = "MeanFilter";
@@ -27,9 +26,9 @@ struct SDK_EXPORT MeanFilter
   /**
    * @brief Returns/sets the mean filter settings. This filter smooths the distance value by calculating the arithmetic mean from the configured number of scans.
    */
-  struct SDK_EXPORT Get
+  struct Get
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
       enum class eFilterMethod
       {
@@ -54,9 +53,9 @@ struct SDK_EXPORT MeanFilter
 
  This function requires at least user level: Authorized Client.
    */
-  struct SDK_EXPORT Post
+  struct Post
   {
-    struct SDK_EXPORT Request
+    struct Request
     {
       enum class eFilterMethod
       {

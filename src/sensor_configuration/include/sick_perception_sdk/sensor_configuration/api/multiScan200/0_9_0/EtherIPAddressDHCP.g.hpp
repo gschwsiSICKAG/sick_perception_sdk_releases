@@ -10,14 +10,13 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 
 namespace sick::multiScan200::v0_9_0::api::rest {
 
 /**
  * @brief Payloads for endpoint /EtherIPAddressDHCP.
 */
-struct SDK_EXPORT EtherIPAddressDHCP
+struct EtherIPAddressDHCP
 {
 
   constexpr static const char* variableName = "EtherIPAddressDHCP";
@@ -26,9 +25,9 @@ struct SDK_EXPORT EtherIPAddressDHCP
   /**
    * @brief Returns the assigned DHCP IP address.
    */
-  struct SDK_EXPORT Get
+  struct Get
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
       Response() = default;
 

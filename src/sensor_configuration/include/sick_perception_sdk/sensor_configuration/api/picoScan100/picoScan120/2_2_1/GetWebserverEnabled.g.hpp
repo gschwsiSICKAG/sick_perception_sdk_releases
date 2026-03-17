@@ -12,14 +12,13 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 
 namespace sick::picoScan120::v2_2_1::api::rest {
 
 /**
  * @brief Payloads for endpoint /GetWebserverEnabled.
 */
-struct SDK_EXPORT GetWebserverEnabled
+struct GetWebserverEnabled
 {
 
   constexpr static const char* methodName = "GetWebserverEnabled";
@@ -28,9 +27,9 @@ struct SDK_EXPORT GetWebserverEnabled
   /**
    * @brief Returns the availability of the web server.
    */
-  struct SDK_EXPORT Post
+  struct Post
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
       Response() = default;
 

@@ -10,14 +10,13 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 
 namespace sick::picoScan150::v2_2_1::api::rest {
 
 /**
  * @brief Payloads for endpoint /ImuDataEthSettings.
 */
-struct SDK_EXPORT ImuDataEthSettings
+struct ImuDataEthSettings
 {
 
   constexpr static const char* variableName = "ImuDataEthSettings";
@@ -26,9 +25,9 @@ struct SDK_EXPORT ImuDataEthSettings
   /**
    * @brief Returns/sets the destination IP address settings for IMU data streaming (UDP).
    */
-  struct SDK_EXPORT Get
+  struct Get
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
       enum class Protocol
       {
@@ -54,9 +53,9 @@ struct SDK_EXPORT ImuDataEthSettings
 
  This function requires at least user level: Authorized Client.
    */
-  struct SDK_EXPORT Post
+  struct Post
   {
-    struct SDK_EXPORT Request
+    struct Request
     {
       enum class Protocol
       {

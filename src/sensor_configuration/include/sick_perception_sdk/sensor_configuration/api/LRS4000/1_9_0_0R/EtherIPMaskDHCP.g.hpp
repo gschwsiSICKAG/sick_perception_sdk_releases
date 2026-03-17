@@ -10,14 +10,13 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 
 namespace sick::LRS4000::v1_9_0_0R::api::rest {
 
 /**
  * @brief Payloads for endpoint /EtherIPMaskDHCP.
 */
-struct SDK_EXPORT EtherIPMaskDHCP
+struct EtherIPMaskDHCP
 {
 
   constexpr static const char* variableName = "EtherIPMaskDHCP";
@@ -26,9 +25,9 @@ struct SDK_EXPORT EtherIPMaskDHCP
   /**
    * @brief Returns the assigned DHCP subnet mask.
    */
-  struct SDK_EXPORT Get
+  struct Get
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
       Response() = default;
 

@@ -12,14 +12,13 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 
 namespace sick::picoScan120::v2_2_1::api::rest {
 
 /**
  * @brief Payloads for endpoint /checkCredentials.
 */
-struct SDK_EXPORT checkCredentials
+struct checkCredentials
 {
 
   constexpr static const char* methodName = "checkCredentials";
@@ -28,7 +27,7 @@ struct SDK_EXPORT checkCredentials
   /**
    * @brief Returns authentication success. For more details see https://github.com/SICKAG/sick_scan_rest_client.
    */
-  struct SDK_EXPORT Post
+  struct Post
   {
   }; // struct Post
 

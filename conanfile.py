@@ -6,7 +6,7 @@ required_conan_version = ">=2.13"
 
 class SickPerceptionSDK(ConanFile):
     name = "sick_perception_sdk"
-    version = "0.0.0"
+    version = "0.5.0-c.2"
     description = "This packages contains SDK components for interacting with SICK sensors."
     license = "Copyright SICK AG"
     settings = "os", "compiler", "build_type", "arch"

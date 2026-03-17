@@ -10,14 +10,13 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 
 namespace sick::picoScan150::v2_2_1::api::rest {
 
 /**
  * @brief Payloads for endpoint /EncoderDataEnable.
 */
-struct SDK_EXPORT EncoderDataEnable
+struct EncoderDataEnable
 {
 
   constexpr static const char* variableName = "EncoderDataEnable";
@@ -26,9 +25,9 @@ struct SDK_EXPORT EncoderDataEnable
   /**
    * @brief Enables/disables the encoder data streaming. The encoder data itself is sent via a UDP-based SICK-specific format.
    */
-  struct SDK_EXPORT Get
+  struct Get
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
       Response() = default;
 
@@ -46,9 +45,9 @@ struct SDK_EXPORT EncoderDataEnable
 
  This function requires at least user level: Authorized Client.
    */
-  struct SDK_EXPORT Post
+  struct Post
   {
-    struct SDK_EXPORT Request
+    struct Request
     {
       Request() = default;
 

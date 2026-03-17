@@ -9,6 +9,17 @@ SPDX-License-Identifier: MIT
 #include <sick_perception_sdk/sensor_configuration/HttpClient/httplib_client/HttpClient.hpp>
 #include <sick_perception_sdk/sensor_configuration/picoScan150/Configurator.hpp>
 
+#include <sick_perception_sdk/sensor_configuration/api/LRS4000/LRS4000.g.hpp>
+#include <sick_perception_sdk/sensor_configuration/api/LRS4000/LRS4000.nlohmann_json.g.hpp>
+#include <sick_perception_sdk/sensor_configuration/api/multiScan100/multiScan100.g.hpp>
+#include <sick_perception_sdk/sensor_configuration/api/multiScan100/multiScan100.nlohmann_json.g.hpp>
+#include <sick_perception_sdk/sensor_configuration/api/multiScan200/multiScan200.g.hpp>
+#include <sick_perception_sdk/sensor_configuration/api/multiScan200/multiScan200.nlohmann_json.g.hpp>
+#include <sick_perception_sdk/sensor_configuration/api/picoScan100/picoScan120.g.hpp>
+#include <sick_perception_sdk/sensor_configuration/api/picoScan100/picoScan120.nlohmann_json.g.hpp>
+#include <sick_perception_sdk/sensor_configuration/api/picoScan100/picoScan150.g.hpp>
+#include <sick_perception_sdk/sensor_configuration/api/picoScan100/picoScan150.nlohmann_json.g.hpp>
+
 #include <iostream>
 
 int main(int argc, char* argv[])

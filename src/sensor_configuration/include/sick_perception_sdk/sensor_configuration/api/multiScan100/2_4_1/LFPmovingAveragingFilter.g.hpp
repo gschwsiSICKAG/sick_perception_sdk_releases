@@ -10,7 +10,6 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 #include <sick_perception_sdk/sensor_configuration/api/NumericRange.hpp>
 
 namespace sick::multiScan100::v2_4_1::api::rest {
@@ -18,7 +17,7 @@ namespace sick::multiScan100::v2_4_1::api::rest {
 /**
  * @brief Payloads for endpoint /LFPmovingAveragingFilter.
 */
-struct SDK_EXPORT LFPmovingAveragingFilter
+struct LFPmovingAveragingFilter
 {
 
   constexpr static const char* variableName = "LFPmovingAveragingFilter";
@@ -27,9 +26,9 @@ struct SDK_EXPORT LFPmovingAveragingFilter
   /**
    * @brief Returns/sets the mean filter settings. This filter smooths the distance value by calculating the arithmetic mean from the configured number of scans (2..4 scans). Points with zero distance are treated as missing values and are not taken into account for averaging. If all distances considered for averaging have the value 0, the result will be 0 as well.
    */
-  struct SDK_EXPORT Get
+  struct Get
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
       Response() = default;
 
@@ -48,9 +47,9 @@ struct SDK_EXPORT LFPmovingAveragingFilter
 
  This function requires at least user level: Authorized Client.
    */
-  struct SDK_EXPORT Post
+  struct Post
   {
-    struct SDK_EXPORT Request
+    struct Request
     {
       Request() = default;
 

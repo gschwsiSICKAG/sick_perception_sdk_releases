@@ -10,14 +10,13 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 
 namespace sick::multiScan100::v2_4_1::api::rest {
 
 /**
  * @brief Payloads for endpoint /FREchoFilter.
 */
-struct SDK_EXPORT FREchoFilter
+struct FREchoFilter
 {
 
   constexpr static const char* variableName = "FREchoFilter";
@@ -26,9 +25,9 @@ struct SDK_EXPORT FREchoFilter
   /**
    * @brief Returns/sets the multi-echo filter settings. Depending on the environment the sensor receives several measurement points on the same angular step (multi-echo). The filter can out the first echo, the last echo or all echos.
    */
-  struct SDK_EXPORT Get
+  struct Get
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
       enum class FREchoFilter
       {
@@ -53,9 +52,9 @@ struct SDK_EXPORT FREchoFilter
 
  This function requires at least user level: Authorized Client.
    */
-  struct SDK_EXPORT Post
+  struct Post
   {
-    struct SDK_EXPORT Request
+    struct Request
     {
       enum class FREchoFilter
       {

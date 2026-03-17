@@ -10,7 +10,6 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 #include <sick_perception_sdk/sensor_configuration/api/NumericRange.hpp>
 
 namespace sick::LRS4000::v1_9_0_0R::api::rest {
@@ -18,7 +17,7 @@ namespace sick::LRS4000::v1_9_0_0R::api::rest {
 /**
  * @brief Payloads for endpoint /DateTime.
 */
-struct SDK_EXPORT DateTime
+struct DateTime
 {
 
   constexpr static const char* variableName = "DateTime";
@@ -27,11 +26,11 @@ struct SDK_EXPORT DateTime
   /**
    * @brief Returns the current time of the device (years, months, days, hours, minutes, seconds, microseconds).
    */
-  struct SDK_EXPORT Get
+  struct Get
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
-      struct SDK_EXPORT DateTime
+      struct DateTime
       {
         DateTime() = default;
 

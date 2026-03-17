@@ -12,14 +12,13 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 
 namespace sick::picoScan120::v2_2_1::api::rest {
 
 /**
  * @brief Payloads for endpoint /EnableUserLevel.
 */
-struct SDK_EXPORT EnableUserLevel
+struct EnableUserLevel
 {
 
   constexpr static const char* methodName = "EnableUserLevel";
@@ -30,9 +29,9 @@ struct SDK_EXPORT EnableUserLevel
 
  This function requires at least user level: Service.
    */
-  struct SDK_EXPORT Post
+  struct Post
   {
-    struct SDK_EXPORT Request
+    struct Request
     {
       Request() = default;
 
@@ -44,7 +43,7 @@ struct SDK_EXPORT EnableUserLevel
       bool _isEnabled;
     };
 
-    struct SDK_EXPORT Response
+    struct Response
     {
       enum class result
       {

@@ -10,14 +10,13 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 
 namespace sick::picoScan150::v2_2_1::api::rest {
 
 /**
  * @brief Payloads for endpoint /temperatureAlarmStatus.
 */
-struct SDK_EXPORT temperatureAlarmStatus
+struct temperatureAlarmStatus
 {
 
   constexpr static const char* variableName = "temperatureAlarmStatus";
@@ -26,9 +25,9 @@ struct SDK_EXPORT temperatureAlarmStatus
   /**
    * @brief Returns the current temperature alarm status.
    */
-  struct SDK_EXPORT Get
+  struct Get
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
       Response() = default;
 

@@ -10,7 +10,6 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 #include <string>
 
 namespace sick::picoScan150::v2_2_1::api::rest {
@@ -18,7 +17,7 @@ namespace sick::picoScan150::v2_2_1::api::rest {
 /**
  * @brief Payloads for endpoint /LastParaTime.
 */
-struct SDK_EXPORT LastParaTime
+struct LastParaTime
 {
 
   constexpr static const char* variableName = "LastParaTime";
@@ -27,9 +26,9 @@ struct SDK_EXPORT LastParaTime
   /**
    * @brief Returns the last time (e.g. 13:24) when a permanent parameter save was executed.
    */
-  struct SDK_EXPORT Get
+  struct Get
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
       Response() = default;
 

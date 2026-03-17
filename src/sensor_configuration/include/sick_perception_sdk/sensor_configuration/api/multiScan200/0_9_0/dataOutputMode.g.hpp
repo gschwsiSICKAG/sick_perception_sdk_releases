@@ -10,14 +10,13 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 
 namespace sick::multiScan200::v0_9_0::api::rest {
 
 /**
  * @brief Payloads for endpoint /dataOutputMode.
 */
-struct SDK_EXPORT dataOutputMode
+struct dataOutputMode
 {
 
   constexpr static const char* variableName = "dataOutputMode";
@@ -26,9 +25,9 @@ struct SDK_EXPORT dataOutputMode
   /**
    * @brief Returns/sets the data output mode (e.g. Compact format) or disables scan data transmission.
    */
-  struct SDK_EXPORT Get
+  struct Get
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
       enum class dataOutputMode
       {
@@ -53,9 +52,9 @@ struct SDK_EXPORT dataOutputMode
 
  This function requires at least user level: Authorized Client.
    */
-  struct SDK_EXPORT Post
+  struct Post
   {
-    struct SDK_EXPORT Request
+    struct Request
     {
       enum class dataOutputMode
       {

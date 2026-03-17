@@ -12,14 +12,13 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 
 namespace sick::multiScan100::v2_4_1::api::rest {
 
 /**
  * @brief Payloads for endpoint /EnableDetectionHistory.
 */
-struct SDK_EXPORT EnableDetectionHistory
+struct EnableDetectionHistory
 {
 
   constexpr static const char* methodName = "EnableDetectionHistory";
@@ -30,9 +29,9 @@ struct SDK_EXPORT EnableDetectionHistory
 
  This function requires at least user level: Authorized Client.
    */
-  struct SDK_EXPORT Post
+  struct Post
   {
-    struct SDK_EXPORT Request
+    struct Request
     {
       Request() = default;
 

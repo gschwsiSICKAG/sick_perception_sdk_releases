@@ -10,14 +10,13 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 
 namespace sick::multiScan100::v2_4_1::api::rest {
 
 /**
  * @brief Payloads for endpoint /ContaminationResult.
 */
-struct SDK_EXPORT ContaminationResult
+struct ContaminationResult
 {
 
   constexpr static const char* variableName = "ContaminationResult";
@@ -26,9 +25,9 @@ struct SDK_EXPORT ContaminationResult
   /**
    * @brief Returns the contamination indication state of the device.
    */
-  struct SDK_EXPORT Get
+  struct Get
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
       Response() = default;
 

@@ -10,7 +10,6 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 #include <string>
 
 namespace sick::picoScan120::v2_2_1::api::rest {
@@ -18,7 +17,7 @@ namespace sick::picoScan120::v2_2_1::api::rest {
 /**
  * @brief Payloads for endpoint /rosFrameId.
 */
-struct SDK_EXPORT rosFrameId
+struct rosFrameId
 {
 
   constexpr static const char* variableName = "rosFrameId";
@@ -27,9 +26,9 @@ struct SDK_EXPORT rosFrameId
   /**
    * @brief Returns/sets the frame ID of the published topics.
    */
-  struct SDK_EXPORT Get
+  struct Get
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
       Response() = default;
 
@@ -47,9 +46,9 @@ struct SDK_EXPORT rosFrameId
 
  This function requires at least user level: Authorized Client.
    */
-  struct SDK_EXPORT Post
+  struct Post
   {
-    struct SDK_EXPORT Request
+    struct Request
     {
       Request() = default;
 

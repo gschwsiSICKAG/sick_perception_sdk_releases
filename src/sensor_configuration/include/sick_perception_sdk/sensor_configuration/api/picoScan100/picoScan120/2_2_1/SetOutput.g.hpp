@@ -12,14 +12,13 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 
 namespace sick::picoScan120::v2_2_1::api::rest {
 
 /**
  * @brief Payloads for endpoint /SetOutput.
 */
-struct SDK_EXPORT SetOutput
+struct SetOutput
 {
 
   constexpr static const char* methodName = "SetOutput";
@@ -28,9 +27,9 @@ struct SDK_EXPORT SetOutput
   /**
    * @brief Sets the output state for an individual output. Precondition is to set the output source to "SOPAS command".
    */
-  struct SDK_EXPORT Post
+  struct Post
   {
-    struct SDK_EXPORT Request
+    struct Request
     {
       Request() = default;
 
@@ -42,7 +41,7 @@ struct SDK_EXPORT SetOutput
       int _Value;
     };
 
-    struct SDK_EXPORT Response
+    struct Response
     {
       Response() = default;
 

@@ -12,7 +12,6 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 #include <sick_perception_sdk/sensor_configuration/api/NumericRange.hpp>
 
 namespace sick::LRS4000::v1_9_0_0R::api::rest {
@@ -20,7 +19,7 @@ namespace sick::LRS4000::v1_9_0_0R::api::rest {
 /**
  * @brief Payloads for endpoint /SetFieldEvaluationContour.
 */
-struct SDK_EXPORT SetFieldEvaluationContour
+struct SetFieldEvaluationContour
 {
 
   constexpr static const char* methodName = "SetFieldEvaluationContour";
@@ -31,11 +30,11 @@ struct SDK_EXPORT SetFieldEvaluationContour
 
  This function requires at least user level: Authorized Client.
    */
-  struct SDK_EXPORT Post
+  struct Post
   {
-    struct SDK_EXPORT Request
+    struct Request
     {
-      struct SDK_EXPORT PointsItem
+      struct PointsItem
       {
         PointsItem() = default;
 
@@ -59,7 +58,7 @@ struct SDK_EXPORT SetFieldEvaluationContour
       NumericRange<-100000, 100000, 0> _UpperZLimit;
     };
 
-    struct SDK_EXPORT Response
+    struct Response
     {
       enum class ErrorCode
       {

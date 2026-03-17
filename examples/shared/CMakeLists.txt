@@ -95,7 +95,7 @@ if(USE_PICOSCAN100 OR USE_MULTISCAN100 OR USE_MULTISCAN200)
   add_example(
     FAMILY ${BUILD_EXAMPLES_DEVICE_TYPE}
     TARGET download_and_import_config
-    DEPENDENCIES sick_perception_sdk::compact_format sick_perception_sdk::sensor_configuration
+    DEPENDENCIES sick_perception_sdk::sensor_configuration
   )
 endif()
 

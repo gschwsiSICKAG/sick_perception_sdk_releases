@@ -12,14 +12,13 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 
 namespace sick::picoScan150::v2_2_1::api::rest {
 
 /**
  * @brief Payloads for endpoint /GetDiagnosisDumpInfo.
 */
-struct SDK_EXPORT GetDiagnosisDumpInfo
+struct GetDiagnosisDumpInfo
 {
 
   constexpr static const char* methodName = "GetDiagnosisDumpInfo";
@@ -28,9 +27,9 @@ struct SDK_EXPORT GetDiagnosisDumpInfo
   /**
    * @brief Returns additional meta-information about the diagnostic file.
    */
-  struct SDK_EXPORT Post
+  struct Post
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
       Response() = default;
 

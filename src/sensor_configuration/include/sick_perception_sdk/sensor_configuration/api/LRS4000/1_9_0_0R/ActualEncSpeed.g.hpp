@@ -10,14 +10,13 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 
 namespace sick::LRS4000::v1_9_0_0R::api::rest {
 
 /**
  * @brief Payloads for endpoint /ActualEncSpeed.
 */
-struct SDK_EXPORT ActualEncSpeed
+struct ActualEncSpeed
 {
 
   constexpr static const char* variableName = "ActualEncSpeed";
@@ -26,9 +25,9 @@ struct SDK_EXPORT ActualEncSpeed
   /**
    * @brief Read encoder speed in m/s.
    */
-  struct SDK_EXPORT Get
+  struct Get
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
       Response() = default;
 

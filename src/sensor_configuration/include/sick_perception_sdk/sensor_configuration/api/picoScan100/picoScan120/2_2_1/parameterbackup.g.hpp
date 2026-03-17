@@ -10,14 +10,13 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 
 namespace sick::picoScan120::v2_2_1::api::rest {
 
 /**
  * @brief Payloads for endpoint /parameterbackup.
 */
-struct SDK_EXPORT parameterbackup
+struct parameterbackup
 {
 
   constexpr static const char* variableName = "parameterbackup";

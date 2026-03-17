@@ -13,8 +13,10 @@ SPDX-License-Identifier: MIT
 #include <sick_perception_sdk/sensor_configuration/HttpClient/IHttpClient.hpp>
 #include <sick_perception_sdk/sensor_configuration/SensorConfigurator.hpp>
 #include <sick_perception_sdk/sensor_configuration/api/UserLevel.hpp>
-#include <sick_perception_sdk/sensor_configuration/api/json/multiScan200/multiScan200.g.hpp>
-#include <sick_perception_sdk/sensor_configuration/api/multiScan200/multiScan200.g.hpp>
+#include <sick_perception_sdk/sensor_configuration/api/multiScan200/0_9_0/DeviceStatus.g.hpp>
+#include <sick_perception_sdk/sensor_configuration/api/multiScan200/0_9_0/LSPsetdatetime.g.hpp>
+#include <sick_perception_sdk/sensor_configuration/api/multiScan200/0_9_0/TSCTCtimezone.g.hpp>
+#include <sick_perception_sdk/sensor_configuration/api/multiScan200/0_9_0/verticalAngleRangeFilter.g.hpp>
 
 #include <chrono>
 #include <cstdint>

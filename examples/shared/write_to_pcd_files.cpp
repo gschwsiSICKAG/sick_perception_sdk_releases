@@ -7,7 +7,7 @@ SPDX-License-Identifier: MIT
 
 #include "../examples_helper.hpp"
 #include <sick_perception_sdk/compact_format/PointCloud/MultiEchoPointCloud.hpp>
-#include <sick_perception_sdk/compact_format/PointCloud/PointCloudToPCDConverter.hpp>
+#include <sick_perception_sdk/compact_format/PointCloud/PointCloudToPcdConverter.hpp>
 #include <sick_perception_sdk/sensor_configuration/HttpClient/httplib_client/HttpClient.hpp>
 
 #if defined(USE_MULTISCAN100)
@@ -69,8 +69,8 @@ int main(int argc, char* argv[])
   driver.scanDataReceiver().setup();
   driver.scanDataReceiver().setOnNewFrameCallback(
     [basePath](sick::MultiEchoPointCloud const& framePointCloud) {
-      auto const filename = basePath / (std::string(kDeviceName) + "_" + std::to_string(framePointCloud.timestamp().microsecondsSinceEpoch()) + ".pcd");
-      sick::examples::writePointCloudToPCDFile(framePointCloud, filename.string());
+      auto const filePath = basePath / (std::string(kDeviceName) + "_" + std::to_string(framePointCloud.timestamp().microsecondsSinceEpoch()) + ".pcd");
+      sick::pcd::writeToAsciiFile(framePointCloud, filePath.string());
     },
     config
   );

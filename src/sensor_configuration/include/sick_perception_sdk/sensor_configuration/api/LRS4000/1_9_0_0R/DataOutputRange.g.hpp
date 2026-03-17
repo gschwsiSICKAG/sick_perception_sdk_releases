@@ -10,7 +10,6 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 #include <sick_perception_sdk/sensor_configuration/api/NumericRange.hpp>
 
 namespace sick::LRS4000::v1_9_0_0R::api::rest {
@@ -18,7 +17,7 @@ namespace sick::LRS4000::v1_9_0_0R::api::rest {
 /**
  * @brief Payloads for endpoint /DataOutputRange.
 */
-struct SDK_EXPORT DataOutputRange
+struct DataOutputRange
 {
 
   constexpr static const char* variableName = "DataOutputRange";
@@ -27,11 +26,11 @@ struct SDK_EXPORT DataOutputRange
   /**
    * @brief Select the start and stop angle of the measurement data output for the currently active configuration. Once a valid configuration is set, the device will transmit valid distance values between the selected start and stop angle and for all other angles zero values. The amount of transmitted data will not be reduced by using this function.
    */
-  struct SDK_EXPORT Get
+  struct Get
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
-      struct SDK_EXPORT aRangeItem
+      struct aRangeItem
       {
         aRangeItem() = default;
 
@@ -61,11 +60,11 @@ struct SDK_EXPORT DataOutputRange
 
  This function requires at least user level: Authorized Client.
    */
-  struct SDK_EXPORT Post
+  struct Post
   {
-    struct SDK_EXPORT Request
+    struct Request
     {
-      struct SDK_EXPORT aRangeItem
+      struct aRangeItem
       {
         aRangeItem() = default;
 

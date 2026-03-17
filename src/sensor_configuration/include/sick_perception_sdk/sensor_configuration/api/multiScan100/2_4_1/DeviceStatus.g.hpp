@@ -10,14 +10,13 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 
 namespace sick::multiScan100::v2_4_1::api::rest {
 
 /**
  * @brief Payloads for endpoint /DeviceStatus.
 */
-struct SDK_EXPORT DeviceStatus
+struct DeviceStatus
 {
 
   constexpr static const char* variableName = "DeviceStatus";
@@ -26,9 +25,9 @@ struct SDK_EXPORT DeviceStatus
   /**
    * @brief Returns the device state.
    */
-  struct SDK_EXPORT Get
+  struct Get
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
       enum class DeviceStatus
       {

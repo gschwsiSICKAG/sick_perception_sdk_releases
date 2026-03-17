@@ -38,7 +38,7 @@ set(LIB_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/src/PointCloud/OrganizedPointCloudBuilder.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/PointCloud/PointCloudBuilder.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/PointCloud/PointCloudConfiguration.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/PointCloud/PointCloudToPCDConverter.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/PointCloud/PointCloudToPcdConverter.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/PointCloud/UnorganizedPointCloudBuilder.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/telegram_type_1_scan_data/DataLossMonitor.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/telegram_type_1_scan_data/PointCloudCollector.cpp

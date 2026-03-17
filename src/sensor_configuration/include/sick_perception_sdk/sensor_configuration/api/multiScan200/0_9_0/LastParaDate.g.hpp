@@ -10,7 +10,6 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 #include <string>
 
 namespace sick::multiScan200::v0_9_0::api::rest {
@@ -18,7 +17,7 @@ namespace sick::multiScan200::v0_9_0::api::rest {
 /**
  * @brief Payloads for endpoint /LastParaDate.
 */
-struct SDK_EXPORT LastParaDate
+struct LastParaDate
 {
 
   constexpr static const char* variableName = "LastParaDate";
@@ -27,9 +26,9 @@ struct SDK_EXPORT LastParaDate
   /**
    * @brief Returns the last date (e.g. 12.11.2024) when a permanent parameter save was executed.
    */
-  struct SDK_EXPORT Get
+  struct Get
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
       Response() = default;
 

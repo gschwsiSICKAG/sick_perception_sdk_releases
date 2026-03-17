@@ -10,14 +10,13 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 
 namespace sick::picoScan150::v2_2_1::api::rest {
 
 /**
  * @brief Payloads for endpoint /EncResolution.
 */
-struct SDK_EXPORT EncResolution
+struct EncResolution
 {
 
   constexpr static const char* variableName = "EncResolution";
@@ -26,9 +25,9 @@ struct SDK_EXPORT EncResolution
   /**
    * @brief Enables/disables the use of the 2nd reference signal (Port4).
    */
-  struct SDK_EXPORT Get
+  struct Get
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
       Response() = default;
 
@@ -46,9 +45,9 @@ struct SDK_EXPORT EncResolution
 
  This function requires at least user level: Authorized Client.
    */
-  struct SDK_EXPORT Post
+  struct Post
   {
-    struct SDK_EXPORT Request
+    struct Request
     {
       Request() = default;
 

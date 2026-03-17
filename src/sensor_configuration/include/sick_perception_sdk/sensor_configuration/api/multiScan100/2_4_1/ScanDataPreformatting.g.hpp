@@ -10,14 +10,13 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 
 namespace sick::multiScan100::v2_4_1::api::rest {
 
 /**
  * @brief Payloads for endpoint /ScanDataPreformatting.
 */
-struct SDK_EXPORT ScanDataPreformatting
+struct ScanDataPreformatting
 {
 
   constexpr static const char* variableName = "ScanDataPreformatting";
@@ -26,9 +25,9 @@ struct SDK_EXPORT ScanDataPreformatting
   /**
    * @brief Reordering of the different layers in azimuth. In Raw mode no reordering is performed, in Rectified mode the layers are reordered such that the azimuth angle range of the different layers match as good.
    */
-  struct SDK_EXPORT Get
+  struct Get
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
       enum class ScanDataPreformatting
       {
@@ -52,9 +51,9 @@ struct SDK_EXPORT ScanDataPreformatting
 
  This function requires at least user level: Authorized Client.
    */
-  struct SDK_EXPORT Post
+  struct Post
   {
-    struct SDK_EXPORT Request
+    struct Request
     {
       enum class ScanDataPreformatting
       {

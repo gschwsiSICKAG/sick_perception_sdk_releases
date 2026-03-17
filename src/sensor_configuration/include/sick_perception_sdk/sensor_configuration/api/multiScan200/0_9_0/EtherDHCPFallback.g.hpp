@@ -10,14 +10,13 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 
 namespace sick::multiScan200::v0_9_0::api::rest {
 
 /**
  * @brief Payloads for endpoint /EtherDHCPFallback.
 */
-struct SDK_EXPORT EtherDHCPFallback
+struct EtherDHCPFallback
 {
 
   constexpr static const char* variableName = "EtherDHCPFallback";
@@ -26,9 +25,9 @@ struct SDK_EXPORT EtherDHCPFallback
   /**
    * @brief Returns/sets the mode for the DHCP fallback (retry or static).
    */
-  struct SDK_EXPORT Get
+  struct Get
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
       enum class EtherDHCPFallback
       {
@@ -52,9 +51,9 @@ struct SDK_EXPORT EtherDHCPFallback
 
  This function requires at least user level: Authorized Client.
    */
-  struct SDK_EXPORT Post
+  struct Post
   {
-    struct SDK_EXPORT Request
+    struct Request
     {
       enum class EtherDHCPFallback
       {

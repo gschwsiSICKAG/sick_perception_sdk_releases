@@ -12,7 +12,6 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 #include <sick_perception_sdk/sensor_configuration/api/NumericRange.hpp>
 
 namespace sick::LRS4000::v1_9_0_0R::api::rest {
@@ -20,7 +19,7 @@ namespace sick::LRS4000::v1_9_0_0R::api::rest {
 /**
  * @brief Payloads for endpoint /mSetDateTime.
 */
-struct SDK_EXPORT mSetDateTime
+struct mSetDateTime
 {
 
   constexpr static const char* methodName = "mSetDateTime";
@@ -31,11 +30,11 @@ struct SDK_EXPORT mSetDateTime
 
  This function requires at least user level: Authorized Client.
    */
-  struct SDK_EXPORT Post
+  struct Post
   {
-    struct SDK_EXPORT Request
+    struct Request
     {
-      struct SDK_EXPORT DateTime
+      struct DateTime
       {
         DateTime() = default;
 
@@ -61,7 +60,7 @@ struct SDK_EXPORT mSetDateTime
       DateTime _DateTime;
     };
 
-    struct SDK_EXPORT Response
+    struct Response
     {
       enum class ErrorCode
       {

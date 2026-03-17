@@ -10,14 +10,13 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 
 namespace sick::multiScan200::v0_9_0::api::rest {
 
 /**
  * @brief Payloads for endpoint /ContaminationActiveSectors.
 */
-struct SDK_EXPORT ContaminationActiveSectors
+struct ContaminationActiveSectors
 {
 
   constexpr static const char* variableName = "ContaminationActiveSectors";
@@ -26,9 +25,9 @@ struct SDK_EXPORT ContaminationActiveSectors
   /**
    * @brief Element i is true, if the sector result i is included in the computation of the contamination results and false otherwise.
    */
-  struct SDK_EXPORT Get
+  struct Get
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
       Response() = default;
 

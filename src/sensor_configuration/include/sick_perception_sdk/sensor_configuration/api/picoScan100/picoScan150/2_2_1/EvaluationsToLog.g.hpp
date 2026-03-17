@@ -10,14 +10,13 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 
 namespace sick::picoScan150::v2_2_1::api::rest {
 
 /**
  * @brief Payloads for endpoint /EvaluationsToLog.
 */
-struct SDK_EXPORT EvaluationsToLog
+struct EvaluationsToLog
 {
 
   constexpr static const char* variableName = "EvaluationsToLog";
@@ -26,9 +25,9 @@ struct SDK_EXPORT EvaluationsToLog
   /**
    * @brief Returns/sets the evaluations which are logged (if they are in use).
    */
-  struct SDK_EXPORT Get
+  struct Get
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
       Response() = default;
 
@@ -46,9 +45,9 @@ struct SDK_EXPORT EvaluationsToLog
 
  This function requires at least user level: Authorized Client.
    */
-  struct SDK_EXPORT Post
+  struct Post
   {
-    struct SDK_EXPORT Request
+    struct Request
     {
       Request() = default;
 

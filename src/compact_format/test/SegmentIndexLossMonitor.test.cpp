@@ -69,7 +69,7 @@ INSTANTIATE_TEST_SUITE_P(
                   {{     1,       1,         0        },
                    {     1,       2,         0        }  // segment index 1 -> 2: 0 packets lost
                }},
-    TestParams {"losses_for_gap_",
+    TestParams {"losses_for_gap_in_segment_index",
                   {{     1,       0,         0        },
                    {     1,       2,         1        }  // segment index 0 -> 2: 1 packet lost
                }},
@@ -77,13 +77,20 @@ INSTANTIATE_TEST_SUITE_P(
                   {{     1,       0,         0        },
                    {     1,       0,         1        }  // segment index 0 -> 0: no increment
                }},
+    // We don't consider decrementing sequence numbers as losses 
+    // because that may happen when the respective counter resets.
     TestParams {"losses_for_segment_index_decrementing",
                   {{     1,       1,         0        },
-                   {     1,       0,         1        }  // segment index 1 -> 0: decrement
+                   {     1,       0,         0        }  // segment index 1 -> 0: no loss
+               }},
+    TestParams {"losses_for_segment_index_decrementing_continues",
+                  {{     1,       1,         0        },
+                   {     1,       0,         0        }, // segment index 1 -> 0: decrement
+                   {     1,       1,         0        }  // segment index 0 -> 1: increment must work as usual
                }},
     TestParams {"losses_for_frame_sequence_number_decrementing",
                   {{     2,       1,         0        },
-                   {     1,       1,         1        }  // frame sequence number 2 -> 1: no loss measured, just signal loss with 1
+                   {     1,       1,         0        }  // frame sequence number 2 -> 1: not considered as loss
                }},
     TestParams {"no_losses_across_segment_bounds",
                   {{     1,       2,         0        }, // segment index 2 = maximum of frame

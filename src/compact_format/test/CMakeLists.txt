@@ -13,7 +13,7 @@ set(TEST_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/MultiScan200Parser.test.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/OrganizedPointCloudBuilder.test.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/PointCloudCollector.test.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/PointCloudToPCDConverter.test.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/PointCloudToPcdConverter.test.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/ScanDataParser.test.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/SegmentIndexLossMonitor.test.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/SequenceNumberLossMonitor.test.cpp

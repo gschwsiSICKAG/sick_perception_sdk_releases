@@ -12,14 +12,13 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 
 namespace sick::multiScan200::v0_9_0::api::rest {
 
 /**
  * @brief Payloads for endpoint /RunFirmwareUpdate.
 */
-struct SDK_EXPORT RunFirmwareUpdate
+struct RunFirmwareUpdate
 {
 
   constexpr static const char* methodName = "RunFirmwareUpdate";
@@ -30,7 +29,7 @@ struct SDK_EXPORT RunFirmwareUpdate
 
  This function requires at least user level: Service.
    */
-  struct SDK_EXPORT Post
+  struct Post
   {
   }; // struct Post
 

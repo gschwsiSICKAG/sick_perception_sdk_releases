@@ -10,7 +10,6 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 #include <sick_perception_sdk/sensor_configuration/api/NumericRange.hpp>
 
 namespace sick::multiScan100::v2_4_1::api::rest {
@@ -18,7 +17,7 @@ namespace sick::multiScan100::v2_4_1::api::rest {
 /**
  * @brief Payloads for endpoint /groundFilterThresholds.
 */
-struct SDK_EXPORT groundFilterThresholds
+struct groundFilterThresholds
 {
 
   constexpr static const char* variableName = "groundFilterThresholds";
@@ -27,9 +26,9 @@ struct SDK_EXPORT groundFilterThresholds
   /**
    * @brief Returns/set the ground filter thresholds.
    */
-  struct SDK_EXPORT Get
+  struct Get
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
       Response() = default;
 
@@ -48,9 +47,9 @@ struct SDK_EXPORT groundFilterThresholds
 
  This function requires at least user level: Authorized Client.
    */
-  struct SDK_EXPORT Post
+  struct Post
   {
-    struct SDK_EXPORT Request
+    struct Request
     {
       Request() = default;
 

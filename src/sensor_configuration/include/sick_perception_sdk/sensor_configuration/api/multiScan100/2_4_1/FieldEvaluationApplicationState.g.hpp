@@ -10,14 +10,13 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 
 namespace sick::multiScan100::v2_4_1::api::rest {
 
 /**
  * @brief Payloads for endpoint /FieldEvaluationApplicationState.
 */
-struct SDK_EXPORT FieldEvaluationApplicationState
+struct FieldEvaluationApplicationState
 {
 
   constexpr static const char* variableName = "FieldEvaluationApplicationState";
@@ -26,9 +25,9 @@ struct SDK_EXPORT FieldEvaluationApplicationState
   /**
    * @brief Returns the state (DEACTIVATED, ACTIVE, CONFIGURING, ERROR) of the field evaluation.
    */
-  struct SDK_EXPORT Get
+  struct Get
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
       enum class FieldEvaluationApplicationState
       {

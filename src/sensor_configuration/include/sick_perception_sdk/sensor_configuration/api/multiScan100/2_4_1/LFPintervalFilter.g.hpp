@@ -10,7 +10,6 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 #include <sick_perception_sdk/sensor_configuration/api/NumericRange.hpp>
 
 namespace sick::multiScan100::v2_4_1::api::rest {
@@ -18,7 +17,7 @@ namespace sick::multiScan100::v2_4_1::api::rest {
 /**
  * @brief Payloads for endpoint /LFPintervalFilter.
 */
-struct SDK_EXPORT LFPintervalFilter
+struct LFPintervalFilter
 {
 
   constexpr static const char* variableName = "LFPintervalFilter";
@@ -27,9 +26,9 @@ struct SDK_EXPORT LFPintervalFilter
   /**
    * @brief Returns/sets the interval filter settings. The filter reduces the scan output rate by a given factor.
    */
-  struct SDK_EXPORT Get
+  struct Get
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
       Response() = default;
 
@@ -48,9 +47,9 @@ struct SDK_EXPORT LFPintervalFilter
 
  This function requires at least user level: Authorized Client.
    */
-  struct SDK_EXPORT Post
+  struct Post
   {
-    struct SDK_EXPORT Request
+    struct Request
     {
       Request() = default;
 

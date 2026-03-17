@@ -10,7 +10,6 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 #include <sick_perception_sdk/sensor_configuration/api/NumericRange.hpp>
 
 namespace sick::picoScan150::v2_2_1::api::rest {
@@ -18,7 +17,7 @@ namespace sick::picoScan150::v2_2_1::api::rest {
 /**
  * @brief Payloads for endpoint /LFPradialDistanceRangeFilter.
 */
-struct SDK_EXPORT LFPradialDistanceRangeFilter
+struct LFPradialDistanceRangeFilter
 {
 
   constexpr static const char* variableName = "LFPradialDistanceRangeFilter";
@@ -27,9 +26,9 @@ struct SDK_EXPORT LFPradialDistanceRangeFilter
   /**
    * @brief Returns/sets the scanning range filter settings. Restriction of the distance measurements to a specified distance range. Measurement distances outside of the specified range are assigned the distance and RSSI value 0.
    */
-  struct SDK_EXPORT Get
+  struct Get
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
       Response() = default;
 
@@ -49,9 +48,9 @@ struct SDK_EXPORT LFPradialDistanceRangeFilter
 
  This function requires at least user level: Authorized Client.
    */
-  struct SDK_EXPORT Post
+  struct Post
   {
-    struct SDK_EXPORT Request
+    struct Request
     {
       Request() = default;
 

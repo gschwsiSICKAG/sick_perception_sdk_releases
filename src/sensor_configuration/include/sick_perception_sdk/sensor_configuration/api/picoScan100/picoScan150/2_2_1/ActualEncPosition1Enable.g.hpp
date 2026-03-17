@@ -10,14 +10,13 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 
 namespace sick::picoScan150::v2_2_1::api::rest {
 
 /**
  * @brief Payloads for endpoint /ActualEncPosition1Enable.
 */
-struct SDK_EXPORT ActualEncPosition1Enable
+struct ActualEncPosition1Enable
 {
 
   constexpr static const char* variableName = "ActualEncPosition1Enable";
@@ -26,9 +25,9 @@ struct SDK_EXPORT ActualEncPosition1Enable
   /**
    * @brief Enables/disables the use of the 1st reference signal (port 3).
    */
-  struct SDK_EXPORT Get
+  struct Get
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
       Response() = default;
 
@@ -46,9 +45,9 @@ struct SDK_EXPORT ActualEncPosition1Enable
 
  This function requires at least user level: Authorized Client.
    */
-  struct SDK_EXPORT Post
+  struct Post
   {
-    struct SDK_EXPORT Request
+    struct Request
     {
       Request() = default;
 

@@ -10,14 +10,13 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 
 namespace sick::multiScan200::v0_9_0::api::rest {
 
 /**
  * @brief Payloads for endpoint /compactSerializationContent.
 */
-struct SDK_EXPORT compactSerializationContent
+struct compactSerializationContent
 {
 
   constexpr static const char* variableName = "compactSerializationContent";
@@ -26,9 +25,9 @@ struct SDK_EXPORT compactSerializationContent
   /**
    * @brief Return/sets the optional channels in the compact telegram type 1 (deprecated).
    */
-  struct SDK_EXPORT Get
+  struct Get
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
       Response() = default;
 
@@ -47,9 +46,9 @@ struct SDK_EXPORT compactSerializationContent
 
  This function requires at least user level: Authorized Client.
    */
-  struct SDK_EXPORT Post
+  struct Post
   {
-    struct SDK_EXPORT Request
+    struct Request
     {
       Request() = default;
 

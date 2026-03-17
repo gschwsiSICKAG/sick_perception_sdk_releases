@@ -10,14 +10,13 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 
 namespace sick::multiScan200::v0_9_0::api::rest {
 
 /**
  * @brief Payloads for endpoint /bloomingFilter.
 */
-struct SDK_EXPORT bloomingFilter
+struct bloomingFilter
 {
 
   constexpr static const char* variableName = "bloomingFilter";
@@ -26,9 +25,9 @@ struct SDK_EXPORT bloomingFilter
   /**
    * @brief Returns/sets the blooming filter.
    */
-  struct SDK_EXPORT Get
+  struct Get
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
       enum class strength
       {
@@ -54,9 +53,9 @@ struct SDK_EXPORT bloomingFilter
 
  This function requires at least user level: Authorized Client.
    */
-  struct SDK_EXPORT Post
+  struct Post
   {
-    struct SDK_EXPORT Request
+    struct Request
     {
       enum class strength
       {

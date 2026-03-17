@@ -27,6 +27,14 @@ public:
     int numberOfLostTelegrams = 0;
     int numberOfLostFrames    = 0;
     int numberOfLostSegments  = 0;
+
+    auto operator+=(LossCounts const& other) -> LossCounts&
+    {
+      numberOfLostTelegrams += other.numberOfLostTelegrams;
+      numberOfLostFrames += other.numberOfLostFrames;
+      numberOfLostSegments += other.numberOfLostSegments;
+      return *this;
+    }
   };
 
   explicit DataLossMonitor(std::uint64_t expectedFrameSequenceNumberIncrement, std::uint64_t expectedNumberOfSegmentsPerFrame);

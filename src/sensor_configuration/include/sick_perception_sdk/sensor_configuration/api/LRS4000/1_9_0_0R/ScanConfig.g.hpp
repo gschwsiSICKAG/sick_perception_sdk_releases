@@ -10,7 +10,6 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 #include <sick_perception_sdk/sensor_configuration/api/NumericRange.hpp>
 
 namespace sick::LRS4000::v1_9_0_0R::api::rest {
@@ -18,7 +17,7 @@ namespace sick::LRS4000::v1_9_0_0R::api::rest {
 /**
  * @brief Payloads for endpoint /ScanConfig.
 */
-struct SDK_EXPORT ScanConfig
+struct ScanConfig
 {
 
   constexpr static const char* variableName = "ScanConfig";
@@ -27,13 +26,13 @@ struct SDK_EXPORT ScanConfig
   /**
    * @brief Configuration of angular resolution, scanning frequency, start- and stop angle.
    */
-  struct SDK_EXPORT Get
+  struct Get
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
-      struct SDK_EXPORT ScanRange
+      struct ScanRange
       {
-        struct SDK_EXPORT aRangeItem
+        struct aRangeItem
         {
           aRangeItem() = default;
 

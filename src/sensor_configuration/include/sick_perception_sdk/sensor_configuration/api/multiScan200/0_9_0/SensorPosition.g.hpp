@@ -10,7 +10,6 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 #include <sick_perception_sdk/sensor_configuration/api/NumericRange.hpp>
 
 namespace sick::multiScan200::v0_9_0::api::rest {
@@ -18,7 +17,7 @@ namespace sick::multiScan200::v0_9_0::api::rest {
 /**
  * @brief Payloads for endpoint /SensorPosition.
 */
-struct SDK_EXPORT SensorPosition
+struct SensorPosition
 {
 
   constexpr static const char* variableName = "SensorPosition";
@@ -27,9 +26,9 @@ struct SDK_EXPORT SensorPosition
   /**
    * @brief Returns/sets the mounting position.
    */
-  struct SDK_EXPORT Get
+  struct Get
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
       Response() = default;
 
@@ -52,9 +51,9 @@ struct SDK_EXPORT SensorPosition
 
  This function requires at least user level: Authorized Client.
    */
-  struct SDK_EXPORT Post
+  struct Post
   {
-    struct SDK_EXPORT Request
+    struct Request
     {
       Request() = default;
 

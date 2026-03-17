@@ -290,8 +290,7 @@ TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_layer_fi
 TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_range_filter_excludes_out_of_range_points)
 {
   sick::PointCloudConfiguration config;
-  config.filters.range.min = sick::Distance::fromMillimeters(1500.0);
-  config.filters.range.max = sick::Distance::fromMillimeters(2500.0);
+  config.filters.range = sick::Interval<sick::Distance> {sick::Distance::fromMillimeters(1500.0), sick::Distance::fromMillimeters(2500.0), false};
 
   sick::compact::multiscan200::PointCloudConverter converter(config);
 
@@ -311,9 +310,8 @@ TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_range_fi
 TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_inverted_range_filter)
 {
   sick::PointCloudConfiguration config;
-  config.filters.range.min    = sick::Distance::fromMillimeters(2000.0);
-  config.filters.range.max    = sick::Distance::fromMillimeters(3000.0);
-  config.filters.range.invert = true; // Exclude points in range [2000, 3000]
+  // Exclude points in range [2000, 3000]
+  config.filters.range = sick::Interval<sick::Distance> {sick::Distance::fromMillimeters(2000.0), sick::Distance::fromMillimeters(3000.0), true};
 
   sick::compact::multiscan200::PointCloudConverter converter(config);
 
@@ -332,8 +330,7 @@ TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_inverted
 TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_azimuth_filter)
 {
   sick::PointCloudConfiguration config;
-  config.filters.azimuth.min = sick::Angle::fromDegrees(4);
-  config.filters.azimuth.max = sick::Angle::fromDegrees(8);
+  config.filters.azimuth = sick::Interval<sick::Angle> {sick::Angle::fromDegrees(4), sick::Angle::fromDegrees(8), false};
 
   sick::compact::multiscan200::PointCloudConverter converter(config);
 
@@ -355,8 +352,7 @@ TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_azimuth_
 TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_elevation_filter)
 {
   sick::PointCloudConfiguration config;
-  config.filters.elevation.min = sick::Angle::fromDegrees(-5.0);
-  config.filters.elevation.max = sick::Angle::fromDegrees(5.0);
+  config.filters.elevation = sick::Interval<sick::Angle> {sick::Angle::fromDegrees(-5.0), sick::Angle::fromDegrees(5.0), false};
 
   sick::compact::multiscan200::PointCloudConverter converter(config);
 
@@ -376,8 +372,7 @@ TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_elevatio
 TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_intensity_filter_when_intensity_available)
 {
   sick::PointCloudConfiguration config;
-  config.filters.intensity.min = 105.0F;
-  config.filters.intensity.max = 115.0F;
+  config.filters.intensity = sick::Interval<float> {105.0F, 115.0F, false};
 
   sick::compact::multiscan200::PointCloudConverter converter(config);
 
@@ -400,8 +395,7 @@ TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_combined
   sick::PointCloudConfiguration config;
   config.filters.selectedEchos  = std::set<std::size_t> {0};
   config.filters.selectedLayers = std::set<std::uint32_t> {1, 2, 3};
-  config.filters.range.min      = sick::Distance::fromMillimeters(1000.0);
-  config.filters.range.max      = sick::Distance::fromMillimeters(5000.0);
+  config.filters.range          = sick::Interval<sick::Distance> {sick::Distance::fromMillimeters(1000.0), sick::Distance::fromMillimeters(5000.0), false};
 
   sick::compact::multiscan200::PointCloudConverter converter(config);
 
@@ -492,26 +486,6 @@ TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_mismatch
   EXPECT_THROW(converter.convert(data), std::runtime_error);
 }
 
-TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_empty_echo_list_in_beam)
-{
-  sick::PointCloudConfiguration config;
-  sick::compact::multiscan200::PointCloudConverter converter(config);
-
-  auto generator = sick::test::MultiScan200DataGenerator().withNumberOfRows(2).withNumberOfColumnsInSegment(2).withNumberOfEchoes(1);
-
-  auto data = generator.next();
-
-  // Corrupt data: remove echoes from a beam
-  if (!data.scanData.empty() && !data.scanData[0].empty())
-  {
-    data.scanData[0][0].echoes.clear();
-  }
-
-  auto const pc = converter.convert(data);
-  // Should handle missing echoes gracefully
-  EXPECT_LT(pc.numberOfPoints(), 4);
-}
-
 TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_nan_distance_values)
 {
   sick::PointCloudConfiguration config;
@@ -522,10 +496,7 @@ TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_nan_dist
   auto data = generator.next();
 
   // Set invalid distance
-  if (!data.scanData.empty() && !data.scanData[0].empty() && !data.scanData[0][0].echoes.empty())
-  {
-    data.scanData[0][0].echoes[0].distance = sick::Distance::fromMillimeters(std::numeric_limits<double>::quiet_NaN());
-  }
+  data.distances[0] = sick::Distance::fromMillimeters(std::numeric_limits<double>::quiet_NaN());
 
   auto const pc = converter.convert(data);
   // Should handle NaN values (may filter them out or include them)
@@ -542,10 +513,7 @@ TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_infinite
   auto data = generator.next();
 
   // Set invalid distance
-  if (!data.scanData.empty() && !data.scanData[0].empty() && !data.scanData[0][0].echoes.empty())
-  {
-    data.scanData[0][0].echoes[0].distance = sick::Distance::fromMillimeters(std::numeric_limits<double>::infinity());
-  }
+  data.distances[0] = sick::Distance::fromMillimeters(std::numeric_limits<double>::infinity());
 
   auto const pc = converter.convert(data);
   // Should handle infinite values
@@ -562,10 +530,7 @@ TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_negative
   auto data = generator.next();
 
   // Set negative distance
-  if (!data.scanData.empty() && !data.scanData[0].empty() && !data.scanData[0][0].echoes.empty())
-  {
-    data.scanData[0][0].echoes[0].distance = sick::Distance::fromMillimeters(-1000.0);
-  }
+  data.distances[0] = sick::Distance::fromMillimeters(-1000.0);
 
   auto const pc = converter.convert(data);
   // Should handle negative values
@@ -609,17 +574,8 @@ TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_intensit
 
   auto data = generator.next();
 
-  // Ensure intensity is not set
-  for (auto& column : data.scanData)
-  {
-    for (auto& beam : column)
-    {
-      for (auto& echo : beam.echoes)
-      {
-        echo.intensity = std::nullopt;
-      }
-    }
-  }
+  // Ensure intensities are not set
+  data.intensities.clear();
 
   auto const pc = converter.convert(data);
   // Should handle missing intensity gracefully
@@ -640,16 +596,7 @@ TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_properti
   auto data = generator.next();
 
   // Ensure properties are not set
-  for (auto& column : data.scanData)
-  {
-    for (auto& beam : column)
-    {
-      for (auto& echo : beam.echoes)
-      {
-        echo.properties = std::nullopt;
-      }
-    }
-  }
+  data.echoProperties.clear();
 
   auto const pc = converter.convert(data);
   // Should handle missing properties gracefully
@@ -716,8 +663,7 @@ TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_out_of_b
 TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_impossible_range_filter)
 {
   sick::PointCloudConfiguration config;
-  config.filters.range.min = sick::Distance::fromMillimeters(5000.0);
-  config.filters.range.max = sick::Distance::fromMillimeters(1000.0); // max < min
+  config.filters.range = sick::Interval<sick::Distance> {sick::Distance::fromMillimeters(5000.0), sick::Distance::fromMillimeters(1000.0), false};
 
   sick::compact::multiscan200::PointCloudConverter converter(config);
 
@@ -731,32 +677,6 @@ TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_impossib
 
   // Invalid range should exclude all points
   EXPECT_EQ(0, pc.numberOfPoints());
-}
-
-TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_max_values)
-{
-  sick::PointCloudConfiguration config;
-  sick::compact::multiscan200::PointCloudConverter converter(config);
-
-  auto generator =
-    sick::test::MultiScan200DataGenerator().withNumberOfRows(std::numeric_limits<std::uint16_t>::max()).withNumberOfColumnsInSegment(1).withNumberOfEchoes(1);
-
-  // This test checks if very large values are handled without overflow
-  // In practice, the data structure may not support such large values
-  // but the converter should handle them gracefully
-  auto data                         = generator.next();
-  data.segmentMetaData.numberOfRows = 100; // Use a reasonable value
-  data.geometry.elevations.resize(100);
-  for (std::uint16_t i = 0; i < 100; ++i)
-  {
-    data.geometry.elevations[i] = sick::Angle::fromDegrees(static_cast<double>(i));
-  }
-  data.scanData.resize(1);
-  data.scanData[0].resize(100);
-
-  // Should not crash
-  auto const pc = converter.convert(data);
-  EXPECT_GT(pc.numberOfPoints(), 0);
 }
 
 // Point Cloud Structure Tests

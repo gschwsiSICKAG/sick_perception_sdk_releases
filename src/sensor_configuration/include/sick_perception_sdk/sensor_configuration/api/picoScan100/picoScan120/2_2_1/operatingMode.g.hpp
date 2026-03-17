@@ -10,14 +10,13 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 
 namespace sick::picoScan120::v2_2_1::api::rest {
 
 /**
  * @brief Payloads for endpoint /operatingMode.
 */
-struct SDK_EXPORT operatingMode
+struct operatingMode
 {
 
   constexpr static const char* variableName = "operatingMode";
@@ -26,9 +25,9 @@ struct SDK_EXPORT operatingMode
   /**
    * @brief Returns/sets the operating mode of the receiver unit.
    */
-  struct SDK_EXPORT Get
+  struct Get
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
       enum class operatingMode
       {
@@ -52,9 +51,9 @@ struct SDK_EXPORT operatingMode
 
  This function requires at least user level: Authorized Client.
    */
-  struct SDK_EXPORT Post
+  struct Post
   {
-    struct SDK_EXPORT Request
+    struct Request
     {
       enum class operatingMode
       {

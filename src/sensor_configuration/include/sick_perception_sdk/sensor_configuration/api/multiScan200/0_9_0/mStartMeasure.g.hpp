@@ -12,14 +12,13 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 
 namespace sick::multiScan200::v0_9_0::api::rest {
 
 /**
  * @brief Payloads for endpoint /mStartMeasure.
 */
-struct SDK_EXPORT mStartMeasure
+struct mStartMeasure
 {
 
   constexpr static const char* methodName = "mStartMeasure";
@@ -30,9 +29,9 @@ struct SDK_EXPORT mStartMeasure
 
  This function requires at least user level: Authorized Client.
    */
-  struct SDK_EXPORT Post
+  struct Post
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
       enum class ErrorCode
       {

@@ -10,14 +10,13 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 
 namespace sick::multiScan100::v2_4_1::api::rest {
 
 /**
  * @brief Payloads for endpoint /parameterbackup.
 */
-struct SDK_EXPORT parameterbackup
+struct parameterbackup
 {
 
   constexpr static const char* variableName = "parameterbackup";
@@ -26,7 +25,7 @@ struct SDK_EXPORT parameterbackup
   /**
    * @brief Reads/transfers the backup file (.json) from/to the device.
    */
-  struct SDK_EXPORT Get
+  struct Get
   {
   }; // struct Get
 

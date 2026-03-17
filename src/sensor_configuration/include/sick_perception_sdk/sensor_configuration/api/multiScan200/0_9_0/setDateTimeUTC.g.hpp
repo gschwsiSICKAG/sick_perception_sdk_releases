@@ -12,7 +12,6 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 #include <sick_perception_sdk/sensor_configuration/api/NumericRange.hpp>
 
 namespace sick::multiScan200::v0_9_0::api::rest {
@@ -20,7 +19,7 @@ namespace sick::multiScan200::v0_9_0::api::rest {
 /**
  * @brief Payloads for endpoint /setDateTimeUTC.
 */
-struct SDK_EXPORT setDateTimeUTC
+struct setDateTimeUTC
 {
 
   constexpr static const char* methodName = "setDateTimeUTC";
@@ -31,11 +30,11 @@ struct SDK_EXPORT setDateTimeUTC
 
  This function requires at least user level: Authorized Client.
    */
-  struct SDK_EXPORT Post
+  struct Post
   {
-    struct SDK_EXPORT Request
+    struct Request
     {
-      struct SDK_EXPORT DateTime
+      struct DateTime
       {
         DateTime() = default;
 
@@ -61,7 +60,7 @@ struct SDK_EXPORT setDateTimeUTC
       DateTime _DateTime;
     };
 
-    struct SDK_EXPORT Response
+    struct Response
     {
       enum class ErrorCode
       {

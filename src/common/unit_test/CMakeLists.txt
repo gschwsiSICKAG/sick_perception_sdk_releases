@@ -10,6 +10,7 @@ set(TEST_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/ByteView.test.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/Distance.test.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/Duration.test.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/Interval.test.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/IpV4Address.test.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/Speed.test.cpp

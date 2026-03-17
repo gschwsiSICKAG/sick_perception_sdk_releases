@@ -10,7 +10,6 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 #include <string>
 
 namespace sick::picoScan120::v2_2_1::api::rest {
@@ -18,7 +17,7 @@ namespace sick::picoScan120::v2_2_1::api::rest {
 /**
  * @brief Payloads for endpoint /LEDState.
 */
-struct SDK_EXPORT LEDState
+struct LEDState
 {
 
   constexpr static const char* variableName = "LEDState";
@@ -27,11 +26,11 @@ struct SDK_EXPORT LEDState
   /**
    * @brief Returns the LED status.
    */
-  struct SDK_EXPORT Get
+  struct Get
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
-      struct SDK_EXPORT LEDStateItem
+      struct LEDStateItem
       {
         enum class Color
         {

@@ -48,6 +48,50 @@ auto convertSubByteArray(ByteView data, std::size_t numberOfSourceElements, std:
     std::memcpy(result.data(), data.data(), totalBytes);
     return totalBytes;
   }
+  else if constexpr (SourceTypeSizeInBits == 12)
+  {
+    // Specialized fast path for 12-bit values
+    // Pattern: every 3 bytes contain 2x 12-bit values
+    // byte0 byte1 byte2 → value0 = byte0 | (byte1 & 0x0F) << 8
+    //                     value1 = (byte1 >> 4) | byte2 << 4
+    std::size_t const totalBits                 = numberOfSourceElements * 12;
+    std::size_t const totalBytes                = (totalBits + bitsPerByte - 1) / bitsPerByte;
+    std::size_t const numberOfInputElementPairs = numberOfSourceElements / 2;
+    bool const hasOddElement                    = (numberOfSourceElements % 2) != 0;
+
+    if (data.size() < totalBytes)
+    {
+      throw std::invalid_argument("Not enough data to read all source elements");
+    }
+
+    result.resize(numberOfSourceElements);
+    auto* outputPtr      = result.data();
+    auto const* inputPtr = data.data();
+
+    // Process pairs of 12-bit values (3 bytes → 2 values)
+    for (std::size_t i = 0; i < numberOfInputElementPairs; ++i)
+    {
+      auto const byte0 = static_cast<std::uint16_t>(inputPtr[0]);
+      auto const byte1 = static_cast<std::uint16_t>(inputPtr[1]);
+      auto const byte2 = static_cast<std::uint16_t>(inputPtr[2]);
+
+      outputPtr[0] = static_cast<TargetT>(byte0 | ((byte1 & 0x0Fu) << 8u));
+      outputPtr[1] = static_cast<TargetT>((byte1 >> 4u) | (byte2 << 4u));
+
+      inputPtr += 3;
+      outputPtr += 2;
+    }
+
+    // Handle odd element if present
+    if (hasOddElement)
+    {
+      auto const byte0 = static_cast<std::uint16_t>(inputPtr[0]);
+      auto const byte1 = static_cast<std::uint16_t>(inputPtr[1]);
+      outputPtr[0]     = static_cast<TargetT>(byte0 | ((byte1 & 0x0Fu) << 8u));
+    }
+
+    return totalBytes;
+  }
 
   result.clear();
   result.reserve(numberOfSourceElements);

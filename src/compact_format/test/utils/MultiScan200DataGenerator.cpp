@@ -137,38 +137,42 @@ auto MultiScan200DataGenerator::next() -> sick::compact::multiscan200::MultiScan
   }
 
   // Fill scan data
-  data.scanData.resize(m_numberOfColumnsInSegment);
-  for (std::uint16_t col = 0; col < m_numberOfColumnsInSegment; ++col)
+  auto const numberOfSamples = static_cast<std::size_t>(m_numberOfEchoes) * m_numberOfRows * m_numberOfColumnsInSegment;
+  data.distances.reserve(numberOfSamples);
+  if (m_echoDataContent.isSet(sick::compact::multiscan200::EchoDataContent::Intensity))
   {
-    data.scanData[col].resize(m_numberOfRows);
-    for (std::uint16_t row = 0; row < m_numberOfRows; ++row)
-    {
-      sick::compact::multiscan200::Beam beam;
-      beam.azimuth   = data.geometry.azimuths[col];
-      beam.elevation = data.geometry.elevations[row];
+    data.intensities.reserve(numberOfSamples);
+  }
+  if (m_echoDataContent.isSet(sick::compact::multiscan200::EchoDataContent::Properties))
+  {
+    data.echoProperties.reserve(numberOfSamples);
+  }
+  if (m_echoDataContent.isSet(sick::compact::multiscan200::EchoDataContent::PulseWidth))
+  {
+    data.pulseWidths.reserve(numberOfSamples);
+  }
 
-      beam.echoes.resize(m_numberOfEchoes);
-      for (std::uint8_t echo = 0; echo < m_numberOfEchoes; ++echo)
+  for (std::size_t col = 0; col < m_numberOfColumnsInSegment; ++col)
+  {
+    for (std::size_t row = 0; row < m_numberOfRows; ++row)
+    {
+      for (std::size_t echo = 0; echo < m_numberOfEchoes; ++echo)
       {
         // Distance values from 1m to 10m depending on echo
-        beam.echoes[echo].distance = Distance::fromMillimeters(1000.0 + echo * 1000.0 + row * 100.0 + col * 10.0);
+        data.distances.push_back(Distance::fromMillimeters(1000.0 + echo * 1000.0 + row * 100.0 + col * 10.0));
 
         if (m_echoDataContent.isSet(sick::compact::multiscan200::EchoDataContent::Intensity))
         {
-          beam.echoes[echo].intensity = 100.0F + echo * 10.0F + row * 1.0F;
+          data.intensities.push_back(100.0F + echo * 10.0F + row * 1.0F);
         }
 
         if (m_echoDataContent.isSet(sick::compact::multiscan200::EchoDataContent::Properties))
         {
-          beam.echoes[echo].properties = sick::BitField<sick::compact::multiscan200::EchoProperties>(sick::compact::multiscan200::EchoProperties::IDK);
+          data.echoProperties.push_back(sick::BitField<sick::compact::multiscan200::EchoProperties>(sick::compact::multiscan200::EchoProperties::Reserved));
         }
       }
-
-      data.scanData[col][row] = beam;
     }
   }
-
-  data.checksum = 0xDEADBEEF;
 
   // Advance to next segment
   m_segmentIndex++;

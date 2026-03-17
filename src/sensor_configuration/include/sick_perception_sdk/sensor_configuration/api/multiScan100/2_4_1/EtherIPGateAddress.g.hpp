@@ -10,14 +10,13 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 
 namespace sick::multiScan100::v2_4_1::api::rest {
 
 /**
  * @brief Payloads for endpoint /EtherIPGateAddress.
 */
-struct SDK_EXPORT EtherIPGateAddress
+struct EtherIPGateAddress
 {
 
   constexpr static const char* variableName = "EtherIPGateAddress";
@@ -26,9 +25,9 @@ struct SDK_EXPORT EtherIPGateAddress
   /**
    * @brief Returns/sets default gateway address.
    */
-  struct SDK_EXPORT Get
+  struct Get
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
       Response() = default;
 
@@ -46,9 +45,9 @@ struct SDK_EXPORT EtherIPGateAddress
 
  This function requires at least user level: Authorized Client.
    */
-  struct SDK_EXPORT Post
+  struct Post
   {
-    struct SDK_EXPORT Request
+    struct Request
     {
       Request() = default;
 

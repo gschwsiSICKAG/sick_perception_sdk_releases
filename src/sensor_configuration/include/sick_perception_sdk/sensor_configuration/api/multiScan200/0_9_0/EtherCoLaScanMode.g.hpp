@@ -10,14 +10,13 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 
 namespace sick::multiScan200::v0_9_0::api::rest {
 
 /**
  * @brief Payloads for endpoint /EtherCoLaScanMode.
 */
-struct SDK_EXPORT EtherCoLaScanMode
+struct EtherCoLaScanMode
 {
 
   constexpr static const char* variableName = "EtherCoLaScanMode";
@@ -26,9 +25,9 @@ struct SDK_EXPORT EtherCoLaScanMode
   /**
    * @brief Configures the device search by SICK tools. If disabled, finding the device via device search and changing the IP address via SICK tools is not possible.
    */
-  struct SDK_EXPORT Get
+  struct Get
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
       enum class EtherCoLaScanMode
       {
@@ -54,9 +53,9 @@ struct SDK_EXPORT EtherCoLaScanMode
 
  This function requires at least user level: Authorized Client.
    */
-  struct SDK_EXPORT Post
+  struct Post
   {
-    struct SDK_EXPORT Request
+    struct Request
     {
       enum class EtherCoLaScanMode
       {

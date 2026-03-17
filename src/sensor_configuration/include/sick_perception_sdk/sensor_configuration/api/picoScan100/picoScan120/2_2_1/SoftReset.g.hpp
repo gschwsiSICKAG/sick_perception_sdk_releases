@@ -12,14 +12,13 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 
 namespace sick::picoScan120::v2_2_1::api::rest {
 
 /**
  * @brief Payloads for endpoint /SoftReset.
 */
-struct SDK_EXPORT SoftReset
+struct SoftReset
 {
 
   constexpr static const char* methodName = "SoftReset";
@@ -30,9 +29,9 @@ struct SDK_EXPORT SoftReset
 
  This function requires at least user level: Authorized Client.
    */
-  struct SDK_EXPORT Post
+  struct Post
   {
-    struct SDK_EXPORT Request
+    struct Request
     {
       Request() = default;
 

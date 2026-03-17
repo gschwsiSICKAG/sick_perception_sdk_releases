@@ -10,14 +10,13 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 
 namespace sick::multiScan200::v0_9_0::api::rest {
 
 /**
  * @brief Payloads for endpoint /PerformanceProfileNumber.
 */
-struct SDK_EXPORT PerformanceProfileNumber
+struct PerformanceProfileNumber
 {
 
   constexpr static const char* variableName = "PerformanceProfileNumber";
@@ -26,9 +25,9 @@ struct SDK_EXPORT PerformanceProfileNumber
   /**
    * @brief Returns/sets the scan configuration (scanning frequency and angular resolution).
    */
-  struct SDK_EXPORT Get
+  struct Get
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
       enum class PerformanceProfileNumber
       {
@@ -59,9 +58,9 @@ struct SDK_EXPORT PerformanceProfileNumber
 
  This function requires at least user level: Authorized Client.
    */
-  struct SDK_EXPORT Post
+  struct Post
   {
-    struct SDK_EXPORT Request
+    struct Request
     {
       enum class PerformanceProfileNumber
       {

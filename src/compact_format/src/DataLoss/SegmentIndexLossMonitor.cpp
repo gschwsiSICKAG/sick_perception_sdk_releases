@@ -34,19 +34,25 @@ auto SegmentIndexLossMonitor::computeNumberOfMissingElements(std::uint64_t frame
     return 0;
   }
 
-  auto const linearSegmentIndex = frameSequenceNumber * m_expectedNumberOfSegmentsPerFrame + segmentIndex;
+  auto const newLinearSegmentIndex = frameSequenceNumber * m_expectedNumberOfSegmentsPerFrame + segmentIndex;
+  auto const oldLinearSegmentIndex = m_lastLinearSegmentIndex.value();
+  m_lastLinearSegmentIndex         = newLinearSegmentIndex;
 
-  if (linearSegmentIndex <= m_lastLinearSegmentIndex)
+  // The weird case first: if the sequence number does not change at all we don't really know
+  // what's wrong so we'll assume that at least one element was lost.
+  if (newLinearSegmentIndex == oldLinearSegmentIndex)
   {
-    // This is a weird case. The segment index should always be increasing with the frame sequence number.
-    // We don't bother with the case that the segment index has wrapped around.
     return 1;
   }
 
-  auto const segmentIndexDiff = linearSegmentIndex - m_lastLinearSegmentIndex.value();
+  // If the sequence number has decreased the underlying counter was most probably reset.
+  // Therefore, we treat a decrement as no loss.
+  if (newLinearSegmentIndex < oldLinearSegmentIndex)
+  {
+    return 0;
+  }
 
-  m_lastLinearSegmentIndex = linearSegmentIndex;
-
+  auto const segmentIndexDiff = newLinearSegmentIndex - oldLinearSegmentIndex;
   return static_cast<int>(segmentIndexDiff) - 1;
 }
 

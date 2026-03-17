@@ -12,14 +12,13 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 
 namespace sick::picoScan150::v2_2_1::api::rest {
 
 /**
  * @brief Payloads for endpoint /SetPassword.
 */
-struct SDK_EXPORT SetPassword
+struct SetPassword
 {
 
   constexpr static const char* methodName = "SetPassword";
@@ -28,9 +27,9 @@ struct SDK_EXPORT SetPassword
   /**
    * @brief Sets the password for the CoLa A/B interface only. In this example the password for user level: Service (4) is set to - test - (integer value of the password hash - test -). For more details see  https://github.com/SICKAG/sick_scan_rest_client.
    */
-  struct SDK_EXPORT Post
+  struct Post
   {
-    struct SDK_EXPORT Request
+    struct Request
     {
       Request() = default;
 
@@ -42,7 +41,7 @@ struct SDK_EXPORT SetPassword
       int _udiNewPassword;
     };
 
-    struct SDK_EXPORT Response
+    struct Response
     {
       Response() = default;
 

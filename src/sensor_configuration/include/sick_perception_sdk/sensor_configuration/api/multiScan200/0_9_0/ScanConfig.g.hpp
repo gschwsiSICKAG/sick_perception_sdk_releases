@@ -10,7 +10,6 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 #include <sick_perception_sdk/sensor_configuration/api/NumericRange.hpp>
 
 namespace sick::multiScan200::v0_9_0::api::rest {
@@ -18,7 +17,7 @@ namespace sick::multiScan200::v0_9_0::api::rest {
 /**
  * @brief Payloads for endpoint /ScanConfig.
 */
-struct SDK_EXPORT ScanConfig
+struct ScanConfig
 {
 
   constexpr static const char* variableName = "ScanConfig";
@@ -27,13 +26,13 @@ struct SDK_EXPORT ScanConfig
   /**
    * @brief Returns the configuration of angular resolution, scanning frequency and start angle.
    */
-  struct SDK_EXPORT Get
+  struct Get
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
-      struct SDK_EXPORT ScanRange
+      struct ScanRange
       {
-        struct SDK_EXPORT aThetaAngleRangeItem
+        struct aThetaAngleRangeItem
         {
           aThetaAngleRangeItem() = default;
 
@@ -46,7 +45,7 @@ struct SDK_EXPORT ScanConfig
           NumericRange<-1800000, 1800000, 1380000> _diThetaStopAngle;
         };
 
-        struct SDK_EXPORT aPhiAngleRangeItem
+        struct aPhiAngleRangeItem
         {
           aPhiAngleRangeItem() = default;
 

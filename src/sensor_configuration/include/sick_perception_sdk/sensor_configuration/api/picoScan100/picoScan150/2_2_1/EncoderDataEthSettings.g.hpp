@@ -10,14 +10,13 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 
 namespace sick::picoScan150::v2_2_1::api::rest {
 
 /**
  * @brief Payloads for endpoint /EncoderDataEthSettings.
 */
-struct SDK_EXPORT EncoderDataEthSettings
+struct EncoderDataEthSettings
 {
 
   constexpr static const char* variableName = "EncoderDataEthSettings";
@@ -26,9 +25,9 @@ struct SDK_EXPORT EncoderDataEthSettings
   /**
    * @brief Returns/sets the destination IP address settings for encoder data streaming (UDP).
    */
-  struct SDK_EXPORT Get
+  struct Get
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
       enum class Protocol
       {
@@ -54,9 +53,9 @@ struct SDK_EXPORT EncoderDataEthSettings
 
  This function requires at least user level: Authorized Client.
    */
-  struct SDK_EXPORT Post
+  struct Post
   {
-    struct SDK_EXPORT Request
+    struct Request
     {
       enum class Protocol
       {

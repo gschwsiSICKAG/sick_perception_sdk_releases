@@ -9,7 +9,6 @@ SPDX-License-Identifier: MIT
 #include <sick_perception_sdk/compact_format/telegram_type_1_scan_data/DataLossMonitor.hpp>
 #include <sick_perception_sdk/drivers/picoScan100/Driver.hpp>
 #include <sick_perception_sdk/sensor_configuration/HttpClient/httplib_client/HttpClient.hpp>
-#include <sick_perception_sdk/sensor_configuration/api/picoScan100/picoScan150.g.hpp>
 #include <sick_perception_sdk/sensor_configuration/picoScan150/Configurator.hpp>
 
 #include <chrono>

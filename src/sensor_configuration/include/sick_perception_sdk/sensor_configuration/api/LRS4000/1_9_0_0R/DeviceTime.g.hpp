@@ -10,14 +10,13 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 
 namespace sick::LRS4000::v1_9_0_0R::api::rest {
 
 /**
  * @brief Payloads for endpoint /DeviceTime.
 */
-struct SDK_EXPORT DeviceTime
+struct DeviceTime
 {
 
   constexpr static const char* variableName = "DeviceTime";
@@ -26,9 +25,9 @@ struct SDK_EXPORT DeviceTime
   /**
    * @brief Returns the current time of the internal clock (ms). The timer is 32 bit counter with a resolution of 1 ms.
    */
-  struct SDK_EXPORT Get
+  struct Get
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
       Response() = default;
 

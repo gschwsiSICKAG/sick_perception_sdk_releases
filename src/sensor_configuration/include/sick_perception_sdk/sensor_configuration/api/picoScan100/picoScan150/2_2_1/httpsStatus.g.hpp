@@ -10,7 +10,6 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/common/export.hpp>
 #include <string>
 
 namespace sick::picoScan150::v2_2_1::api::rest {
@@ -18,7 +17,7 @@ namespace sick::picoScan150::v2_2_1::api::rest {
 /**
  * @brief Payloads for endpoint /httpsStatus.
 */
-struct SDK_EXPORT httpsStatus
+struct httpsStatus
 {
 
   constexpr static const char* variableName = "httpsStatus";
@@ -27,11 +26,11 @@ struct SDK_EXPORT httpsStatus
   /**
    * @brief Returns the status of the HTTPS interface.
    */
-  struct SDK_EXPORT Get
+  struct Get
   {
-    struct SDK_EXPORT Response
+    struct Response
     {
-      struct SDK_EXPORT errorCode
+      struct errorCode
       {
         errorCode() = default;
 

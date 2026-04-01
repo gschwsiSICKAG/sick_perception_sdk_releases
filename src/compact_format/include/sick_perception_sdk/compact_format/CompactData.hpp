@@ -19,12 +19,10 @@ namespace sick::compact {
  */
 enum class TelegramType : std::uint32_t
 {
-  Invalid      = 0,
-  ScanData     = 1,
-  Imu          = 2,
-  AmbientLight = 3,
-  Encoder      = 4,
-  MultiScan200 = 6,
+  Invalid  = 0,
+  ScanData = 1,
+  Imu      = 2,
+  Encoder  = 4,
 };
 
 #pragma pack(push, 1) // add pragma to prevent the compiler from adding padding bytes for alignment

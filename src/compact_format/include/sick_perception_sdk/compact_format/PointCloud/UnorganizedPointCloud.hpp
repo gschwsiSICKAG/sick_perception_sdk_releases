@@ -27,7 +27,6 @@ namespace sick::point_cloud {
  * into this point cloud structure.
  *
  * @see `sick::compact::scan_data::PointCloudConverter`
- * @see `sick::multiscan200::PointCloudConverter`
  * 
  * The order of fields in the raw data is defined by the order of `fields` in the point cloud.
  * The offset and datatype information for each field can be used to interpret the point data correctly.

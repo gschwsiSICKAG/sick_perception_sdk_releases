@@ -14,10 +14,6 @@ SPDX-License-Identifier: MIT
 #  include <sick_perception_sdk/drivers/multiScan100/MultiScan100Driver.hpp>
 #  include <sick_perception_sdk/sensor_configuration/multiScan100/MultiScan100Configurator.hpp>
 using ConfiguratorT = sick::multiScan100::v2_4_2_0R::Configurator;
-#elif defined(USE_MULTISCAN200)
-#  include <sick_perception_sdk/drivers/multiScan200/MultiScan200Driver.hpp>
-#  include <sick_perception_sdk/sensor_configuration/multiScan200/MultiScan200Configurator.hpp>
-using ConfiguratorT = sick::multiScan200::v0_9_0_2C::Configurator;
 #elif defined(USE_LRS4000)
 #  include <sick_perception_sdk/drivers/LRS4000/LRS4000Driver.hpp>
 #  include <sick_perception_sdk/sensor_configuration/LRS4000/LRS4000Configurator.hpp>
@@ -83,10 +79,10 @@ void changeAddress(sick::IpV4Address const& oldAddress, sick::IpV4Address const&
   // For production use, store passwords in a secure vault rather than in plain text.
   ConfiguratorT configurator(httpClient, sick::UserLevel::Service, "servicelevel");
 
-  std::cout << "ℹ️ Current IP Address: " << configurator.sensorIPAddress.get().toString() << '\n';
+  std::cout << "Current IP Address: " << configurator.sensorIPAddress.get().toString() << '\n';
 
   // Write new IP configuration
-  std::cout << "⚙️ Configuring new IP settings...\n";
+  std::cout << "Configuring new IP settings...\n";
   configurator.sensorIPAddressingMode.set(ConfiguratorT::IPAddressingMode::StaticIP);
   configurator.sensorIPAddress.set(newAddress);
   configurator.sensorIPMask.set(netMask);
@@ -94,14 +90,14 @@ void changeAddress(sick::IpV4Address const& oldAddress, sick::IpV4Address const&
 
   // Read back and print the new configuration
   auto const modeResponse = configurator.sensorIPAddressingMode.get();
-  std::cout << "ℹ️ New IP Configuration:\n";
+  std::cout << "New IP Configuration:\n";
   std::cout << "    - IP Mode: " << (modeResponse == ConfiguratorT::IPAddressingMode::StaticIP ? "Static" : "DHCP") << '\n';
   std::cout << "    - IP Address: " << configurator.sensorIPAddress.get().toString() << '\n';
   std::cout << "    - IP Mask: " << configurator.sensorIPMask.get().toString() << '\n';
   std::cout << "    - IP Gateway: " << configurator.sensorIPGateway.get().toString() << '\n';
 
   // Apply the changes
-  std::cout << "⚙️ Applying IP configuration changes...\n";
+  std::cout << "Applying IP configuration changes...\n";
 #if defined(USE_LRS4000)
   // The following call will log an error message.
   // This is expected behavior for LRS4000 sensors when changing the IP address
@@ -114,14 +110,14 @@ void changeAddress(sick::IpV4Address const& oldAddress, sick::IpV4Address const&
   httpClient->enableErrorLogging();
 #endif
 
-  std::cout << "⚙️ IP configuration updated. Waiting for sensor";
+  std::cout << "IP configuration updated. Waiting for sensor";
   waitForSensor(newAddress);
   std::cout << "\n";
 
   // Connect with new IP address
   auto const httpClientNew = std::make_shared<sick::httplib_client::HttpClient>(newAddress, 80);
   ConfiguratorT configuratorNew(httpClientNew, sick::UserLevel::Service, "servicelevel");
-  std::cout << "✅ Connected to sensor at new IP: " << configuratorNew.sensorIPAddress.get().toString() << '\n';
+  std::cout << "Connected to sensor at new IP: " << configuratorNew.sensorIPAddress.get().toString() << '\n';
 }
 
 int main(int argc, char* argv[])
@@ -131,11 +127,11 @@ int main(int argc, char* argv[])
 
   try
   {
-    std::cout << "⚙️ Changing address from " << oldAddress.toString() << " to " << newAddress.toString()
+    std::cout << "Changing address from " << oldAddress.toString() << " to " << newAddress.toString()
               << " and verify that the device is reachable at the new address.\n";
     changeAddress(oldAddress, newAddress);
 
-    std::cout << "\n⚙️ Changing address back to " << oldAddress.toString() << " so the sensor is available at the default address for other examples.\n";
+    std::cout << "\nChanging address back to " << oldAddress.toString() << " so the sensor is available at the default address for other examples.\n";
     changeAddress(newAddress, oldAddress);
   }
   catch (std::exception const& exception)

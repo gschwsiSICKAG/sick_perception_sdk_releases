@@ -15,13 +15,6 @@ SPDX-License-Identifier: MIT
 #  include <sick_perception_sdk/sensor_configuration/multiScan100/MultiScan100Configurator.hpp>
 using ConfiguratorT = sick::multiScan100::v2_4_2_0R::Configurator;
 namespace api       = sick::multiScan100::v2_4_2_0R::api::rest;
-#elif defined(USE_MULTISCAN200)
-#  include <sick_perception_sdk/drivers/multiScan200/MultiScan200Driver.hpp>
-#  include <sick_perception_sdk/sensor_configuration/api/multiScan200/0_9_0_2C/FREchoFilter.nlohmann_json.g.hpp>
-#  include <sick_perception_sdk/sensor_configuration/api/multiScan200/0_9_0_2C/OpHours.nlohmann_json.g.hpp>
-#  include <sick_perception_sdk/sensor_configuration/multiScan200/MultiScan200Configurator.hpp>
-using ConfiguratorT = sick::multiScan200::v0_9_0_2C::Configurator;
-namespace api       = sick::multiScan200::v0_9_0_2C::api::rest;
 #elif defined(USE_LRS4000)
 #  include <sick_perception_sdk/drivers/LRS4000/LRS4000Driver.hpp>
 #  include <sick_perception_sdk/sensor_configuration/LRS4000/LRS4000Configurator.hpp>
@@ -79,7 +72,7 @@ int main(int argc, char* argv[])
     configurator.writeVariable<api::FREchoFilter>(settings);
 
     std::cout << "Configuring compact streaming...\n";
-#if defined(USE_LRS4000) || defined(USE_MULTISCAN200)
+#if defined(USE_LRS4000)
     configurator.streaming.set(ConfiguratorT::StreamingMode::Compact);
 #else
     configurator.enableScanDataStreaming("192.168.0.100", 2115); // Enter your computer's IP address

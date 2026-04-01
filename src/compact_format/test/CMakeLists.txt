@@ -2,17 +2,14 @@ cmake_minimum_required(VERSION 3.22)
 
 set(TEST_NAME compact_format_unit_test)
 set(TEST_SOURCES
-  ${CMAKE_CURRENT_SOURCE_DIR}/utils/MultiScan200DataGenerator.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/utils/ScanDataGenerator.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/utils/test_utils.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/utils/TestParams.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/Crc32Utils.test.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/AmbientLightParser.test.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/EncoderParser.test.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/FrameSequenceNumberLossMonitor.test.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/ImuParser.test.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/MultiScan200Parser.test.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/OrganizedPointCloudBuilder.test.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/PointCloudCollector.test.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/PointCloudToPcdConverter.test.cpp
@@ -21,8 +18,6 @@ set(TEST_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/SequenceNumberLossMonitor.test.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/StreamExtractor.test.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/telegram_type_1_scanData_DataLossMonitor.test.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/telegram_type_6_multiScan200_DataLossMonitor.test.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/telegram_type_6_multiScan200_PointCloudConverter.test.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/UnorganizedPointCloud.test.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/UnorganizedPointCloudBuilder.test.cpp
 )
@@ -36,18 +31,6 @@ set(TEST_RESOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/data/multiScan136_scan-frame_0.bin
   ${CMAKE_CURRENT_SOURCE_DIR}/data/multiScan136_scan-frame_1.bin
   ${CMAKE_CURRENT_SOURCE_DIR}/data/multiScan136_scan-frame_2.bin
-  ${CMAKE_CURRENT_SOURCE_DIR}/data/multiScan270_0.9.0_ambient_light-frame_0.bin
-  ${CMAKE_CURRENT_SOURCE_DIR}/data/multiScan270_0.9.0_ambient_light-frame_1.bin
-  ${CMAKE_CURRENT_SOURCE_DIR}/data/multiScan270_0.9.0_ambient_light-frame_2.bin
-  ${CMAKE_CURRENT_SOURCE_DIR}/data/multiScan270_0.9.0_ms270_all_fields-frame_0.bin
-  ${CMAKE_CURRENT_SOURCE_DIR}/data/multiScan270_0.9.0_ms270_all_fields-frame_1.bin
-  ${CMAKE_CURRENT_SOURCE_DIR}/data/multiScan270_0.9.0_ms270_all_fields-frame_2.bin
-  ${CMAKE_CURRENT_SOURCE_DIR}/data/multiScan270_0.9.0_ms270_minimal_fields-frame_0.bin
-  ${CMAKE_CURRENT_SOURCE_DIR}/data/multiScan270_0.9.0_ms270_minimal_fields-frame_1.bin
-  ${CMAKE_CURRENT_SOURCE_DIR}/data/multiScan270_0.9.0_ms270_minimal_fields-frame_2.bin
-  ${CMAKE_CURRENT_SOURCE_DIR}/data/multiScan270_imu-frame_0.bin
-  ${CMAKE_CURRENT_SOURCE_DIR}/data/multiScan270_imu-frame_1.bin
-  ${CMAKE_CURRENT_SOURCE_DIR}/data/multiScan270_imu-frame_2.bin
   ${CMAKE_CURRENT_SOURCE_DIR}/data/picoScan150_encoder-frame_0.bin
   ${CMAKE_CURRENT_SOURCE_DIR}/data/picoScan150_encoder-frame_1.bin
   ${CMAKE_CURRENT_SOURCE_DIR}/data/picoScan150_encoder-frame_2.bin

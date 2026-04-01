@@ -36,8 +36,8 @@ add_example(
   DEPENDENCIES sick_perception_sdk::drivers sick_perception_sdk::sensor_configuration
 )
 
-# TCP streaming examples (LRS4000 and multiScan200 only)
-if(USE_LRS4000 OR USE_MULTISCAN200)
+# TCP streaming examples (LRS4000 only)
+if(USE_LRS4000)
   add_example(
     FAMILY ${BUILD_EXAMPLES_DEVICE_TYPE}
     TARGET data_streaming_tcp
@@ -90,8 +90,8 @@ add_example(
   DEPENDENCIES sick_perception_sdk::drivers sick_perception_sdk::sensor_configuration
 )
 
-# Download and import config examples (picoScan100, multiScan100 and multiScan200)
-if(USE_PICOSCAN100 OR USE_MULTISCAN100 OR USE_MULTISCAN200)
+# Download and import config examples (picoScan100, multiScan100)
+if(USE_PICOSCAN100 OR USE_MULTISCAN100)
   add_example(
     FAMILY ${BUILD_EXAMPLES_DEVICE_TYPE}
     TARGET download_and_import_config

@@ -2,16 +2,16 @@
 
 - [Configuration](#configuration)
 - [Data streaming UDP (picoScan100, multiScan100)](#data-streaming-udp-picoscan100-multiscan100)
-- [Data streaming TCP (LRS4000, multiScan200)](#data-streaming-tcp-lrs4000-multiscan200)
+- [Data streaming TCP (LRS4000)](#data-streaming-tcp-lrs4000)
 - [Data streaming ROI](#data-streaming-roi)
 - [Low-level streaming UDP (picoScan100, multiScan100)](#low-level-streaming-udp-picoscan100-multiscan100)
-- [Low-level streaming TCP (LRS4000, multiScan200)](#low-level-streaming-tcp-lrs4000-multiscan200)
+- [Low-level streaming TCP (LRS4000)](#low-level-streaming-tcp-lrs4000)
 - [Multiple devices (picoScan100, multiScan100)](#multiple-devices-picoscan100-multiscan100)
 - [Object detection (picoScan100, LRS4000, multiScan100)](#object-detection-picoscan100-lrs4000-multiscan100)
 - [Segmented data (picoScan100, multiScan100)](#segmented-data-picoscan100-multiscan100)
 - [Write to PCD files (picoScan100, multiScan100)](#write-to-pcd-files-picoscan100-multiscan100)
 - [Change IP address](#change-ip-address)
-- [Download and import configuration (picoScan100, multiScan100, multiScan200)](#download-and-import-configuration-picoscan100-multiscan100-multiscan200)
+- [Download and import configuration (picoScan100, multiScan100)](#download-and-import-configuration-picoscan100-multiscan100)
 - [More device configuration](#more-device-configuration)
 
 ## Configuration
@@ -37,7 +37,7 @@ This example [shared/data_streaming_udp.cpp](shared/data_streaming_udp.cpp)
 - Receives and prints metadata for frame point cloud data, IMU data, and encoder data
 - Expected device configuration: Factory defaults, licenses for used functions available
 
-## Data streaming TCP (LRS4000, multiScan200)
+## Data streaming TCP (LRS4000)
 
 This example [shared/data_streaming_tcp.cpp](shared/data_streaming_tcp.cpp)
 
@@ -67,7 +67,7 @@ This example [shared/low_level_streaming_udp.cpp](shared/low_level_streaming_udp
 - Demonstrates low-level handling of UDP streaming data without using high-level device configuration APIs
 - Expected device configuration: Device streaming Compact data on UDP port 2115
 
-## Low-level streaming TCP (LRS4000, multiScan200)
+## Low-level streaming TCP (LRS4000)
 
 This example [shared/low_level_streaming_tcp.cpp](shared/low_level_streaming_tcp.cpp)
 
@@ -135,7 +135,7 @@ This example [shared/change_ip_address.cpp](shared/change_ip_address.cpp)
 - Reconnects to the device using the new IP address (192.168.0.2)
 - Expected device configuration: Factory defaults
 
-## Download and import configuration (picoScan100, multiScan100, multiScan200)
+## Download and import configuration (picoScan100, multiScan100)
 
 This example [shared/download_and_import_config.cpp](shared/download_and_import_config.cpp)
 

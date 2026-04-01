@@ -16,11 +16,6 @@ SPDX-License-Identifier: MIT
 #  include <sick_perception_sdk/sensor_configuration/multiScan100/MultiScan100Configurator.hpp>
 using ConfiguratorT = sick::multiScan100::v2_4_2_0R::Configurator;
 using DriverT       = sick::multiScan100::Driver;
-#elif defined(USE_MULTISCAN200)
-#  include <sick_perception_sdk/drivers/multiScan200/MultiScan200Driver.hpp>
-#  include <sick_perception_sdk/sensor_configuration/multiScan200/MultiScan200Configurator.hpp>
-using ConfiguratorT = sick::multiScan200::v0_9_0_2C::Configurator;
-using DriverT       = sick::multiScan200::Driver;
 #elif defined(USE_LRS4000)
 #  include <sick_perception_sdk/compact_format/telegram_type_1_scan_data/PointCloudCollector.hpp>
 #  include <sick_perception_sdk/drivers/LRS4000/LRS4000Driver.hpp>
@@ -72,7 +67,7 @@ int main(int argc, char* argv[])
     ConfiguratorT configurator(httpClient, sick::UserLevel::Service, "servicelevel");
 
     std::cout << "Configuring scan data streaming...\n";
-#if defined(USE_LRS4000) || defined(USE_MULTISCAN200)
+#if defined(USE_LRS4000)
     configurator.streaming.set(ConfiguratorT::StreamingMode::Compact);
 #else
     configurator.enableScanDataStreaming("192.168.0.100", 2115); // Enter your computer's IP address
@@ -93,7 +88,7 @@ int main(int argc, char* argv[])
   config.filters.azimuth   = sick::Interval {-1_deg, 1_deg, false};
   config.filters.elevation = sick::Interval {-1_deg, 1_deg, false};
 
-#if defined(USE_LRS4000) || defined(USE_MULTISCAN200)
+#if defined(USE_LRS4000)
   DriverT driver(deviceAddress, sick::examples::printExceptionMessage);
 #else
   DriverT driver(sick::examples::printExceptionMessage);

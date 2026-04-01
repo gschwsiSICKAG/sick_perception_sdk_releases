@@ -22,7 +22,7 @@ class SickPerceptionSDK(ConanFile):
         "build_drivers": [True, False],
         "build_sensor_configuration": [True, False],
         "build_unit_tests": [True, False],
-        "build_examples_device_type": [None, "all", "picoScan100", "multiScan100", "multiScan200", "LRS4000"],
+        "build_examples_device_type": [None, "all", "picoScan100", "multiScan100", "LRS4000"],
     }
 
     default_options = {

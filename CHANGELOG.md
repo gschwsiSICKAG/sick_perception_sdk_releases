@@ -9,7 +9,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Support for multiScan200.
 - Added support for UDP multicast.
 - More examples.
 

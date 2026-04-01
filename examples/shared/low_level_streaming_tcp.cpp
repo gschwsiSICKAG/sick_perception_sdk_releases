@@ -10,11 +10,7 @@ SPDX-License-Identifier: MIT
 #include <sick_perception_sdk/common/socket/TcpClientSocket.hpp>
 #include <sick_perception_sdk/compact_format/StreamExtractor.hpp>
 
-#if defined(USE_MULTISCAN200)
-#  include <sick_perception_sdk/compact_format/telegram_type_6_multiScan200/MultiScan200Parser.hpp>
-#else // Default to LRS4000
-#  include <sick_perception_sdk/compact_format/telegram_type_1_scan_data/ScanDataParser.hpp>
-#endif
+#include <sick_perception_sdk/compact_format/telegram_type_1_scan_data/ScanDataParser.hpp>
 
 #include <chrono>
 #include <iostream>
@@ -58,13 +54,8 @@ int main(int argc, char* argv[])
     // Here we parse only the first telegram for demonstration purposes.
     try
     {
-#if defined(USE_MULTISCAN200)
-      auto const data = sick::compact::multiscan200::Parser::validateAndParse(telegrams[0], true);
-      std::cout << "Received data with size " << data.segmentMetaData.numberOfColumnsInSegment << " x " << data.segmentMetaData.numberOfRows << ".\n";
-#else // LRS4000
       auto const scanData = sick::compact::scan_data::Parser::validateAndParse(telegrams[0], true);
       std::cout << "Received scan data with " << scanData.modules.size() << " modules.\n";
-#endif
     }
     catch (std::exception const& exception)
     {

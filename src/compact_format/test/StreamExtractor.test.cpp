@@ -126,9 +126,6 @@ INSTANTIATE_TEST_SUITE_P(
     sick::test::TestParams {"LRS4000_scan", "LRS4581_scan"},
     sick::test::TestParams {"multiScan100_imu", "multiScan136_imu"},
     sick::test::TestParams {"multiScan100_scan", "multiScan136_scan"},
-    sick::test::TestParams {"multiScan200_ambient_light", "multiScan270_0.9.0_ambient_light"},
-    sick::test::TestParams {"multiScan200_imu", "multiScan270_imu"},
-    sick::test::TestParams {"multiScan200_ms270", "multiScan270_0.9.0_ms270_minimal_fields"},
     sick::test::TestParams {"picoScan100_encoder", "picoScan150_encoder"},
     sick::test::TestParams {"picoScan100_scan", "picoScan150_profile1_scan"}
   ),
@@ -146,14 +143,11 @@ TEST(StreamExtractorTest, valid_data_with_multiple_frames_of_different_type_can_
   };
   load("data/picoScan150_encoder-frame_0.bin");
   load("data/multiScan136_scan-frame_0.bin");
-  load("data/multiScan270_0.9.0_ambient_light-frame_0.bin");
-  load("data/multiScan270_imu-frame_0.bin");
-  load("data/multiScan270_0.9.0_ms270_all_fields-frame_0.bin");
 
   sick::compact::StreamExtractor extractor;
   auto const packets = extractor.extractTelegrams(data);
 
-  ASSERT_EQ(5, packets.size());
+  ASSERT_EQ(2, packets.size());
 }
 
 TEST(StreamExtractorTest, corrupted_start_of_frame_is_detected)

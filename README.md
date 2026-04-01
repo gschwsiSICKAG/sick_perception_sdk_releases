@@ -887,7 +887,6 @@ The sick_perception_sdk provides data structures for working with measurement da
 | picoScan100   |              1               |
 | multiScan100  |              1               |
 | LRS4000       |              1               |
-| multiScan200  |              6               |
 
 #### ScanData (Compact Format Telegram Type 1)
 
@@ -917,33 +916,6 @@ Which fields are populated depends on the sensor's streaming configuration and i
 >
 > **picoScan100 and multiScan100** stream scan data as **segments**. Each `ScanData` message covers only a portion of the full scan (identified by the `segmentIndex` field in the module metadata). Multiple consecutive segments form a complete frame, which is identified by a shared `frameSequenceNumber`. Applications that require full-frame data must collect and combine the individual segments themselves. The `scan_data::PointCloudCollector` class is provided for this purpose.
 
-#### MultiScan200Data (Compact Format Telegram Type 6)
-
-[`sick::multiscan200::MultiScan200Data`](src/compact_format/include/sick_perception_sdk/compact_format/telegram_type_6_multiScan200/MultiScan200Data.hpp) is the low-level data structure for the **multiScan200** that closely mirrors the **Compact format** (telegram type 6) streamed by the sensor. In contrast to the telegram type 1 format, it uses a flat **structure-of-arrays** layout for cache-efficient access to large datasets. It is organized as follows:
-
-```text
-MultiScan200Data
-├── TelegramHeader            # telegram sequence number, transmit timestamp, sender serial number, ...
-├── SegmentMetaData           # frame sequence number, frame timestamp, segment index,
-│                             # number of rows/columns/echoes, distance scaling factor,
-│                             # echo data content flags (intensity, pulse width, properties), ...
-├── AmbientLightColumn[]      # per-column: ambient light intensity values (one per row)
-├── Geometry
-│   ├── elevations[]          # elevation angle per row
-│   ├── azimuths[]            # azimuth angle per column
-│   ├── relativeTimeStamps[]  # relative timing offset per column
-│   └── columnProperties[]    # per-column metadata flags
-├── distances[]               # flat array: distance measurements (echo × column × row)
-├── intensities[]             # flat array: signal intensities (optional, based on echoDataContent)
-├── echoProperties[]          # flat array: echo flags (IsReflector, IsBlooming, IsParticle),
-│                             # (optional, based on echoDataContent)
-└── pulseWidths[]             # flat array: pulse widths (optional, based on echoDataContent)
-```
-
-Which fields are populated depends on the sensor's streaming configuration. All angles are represented as `sick::Angle` and distances as `sick::Distance` with explicit units.
-
-`MultiScan200Data` is produced by the `MultiScan200Parser` and is the input for the `multiscan200::PointCloudConverter`. It is delivered to the application via callbacks when using the receiver classes `TcpStreamReceiver` or the drivers.
-
 #### PointCloud
 
 The sick_perception_sdk provides a point cloud representation that converts the raw polar `ScanData` into a **Cartesian** (e.g. X, Y, Z, ...) format. Two variants are available, both defined under [`src/compact_format/include/sick_perception_sdk/compact_format/PointCloud/`](src/compact_format/include/sick_perception_sdk/compact_format/PointCloud/):
@@ -968,7 +940,7 @@ Following fields are configurable via `PointCloudConfiguration` before conversio
 
 > \* Depends on device variants.
 
-Point clouds are produced from `ScanData` using `PointCloudConverter` (for `UnorganizedPointCloud`) or the device-specific converters (e.g., `sick::multiscan200::PointCloudConverter` for `OrganizedPointCloud`). The fields depend the point cloud converter configuration and the sensor's streaming configuration.
+Point clouds are produced from `ScanData` using `PointCloudConverter` (for `UnorganizedPointCloud`) or the device-specific converters (e.g., `sick::compact::scan_data::PointCloudConverter` for `UnorganizedPointCloud`). The fields depend the point cloud converter configuration and the sensor's streaming configuration.
 
 ### Logging
 

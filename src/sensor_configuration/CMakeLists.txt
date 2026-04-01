@@ -14,7 +14,6 @@ set(LIB_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/src/SensorConfigurator/SensorConfigurator.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/SensorConfigurator/LRS4000/LRS4000Configurator.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/SensorConfigurator/multiScan100/MultiScan100Configurator.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/SensorConfigurator/multiScan200/MultiScan200Configurator.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/SensorConfigurator/picoScan150/PicoScan150Configurator.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/HttpClient/httplib_client/HttpClient.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/HttpClient/httplib_client/HttpsClient.cpp

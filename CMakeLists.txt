@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.22)
 file(READ "${CMAKE_CURRENT_SOURCE_DIR}/Version.txt" PROJECT_VERSION)
 string(STRIP "${PROJECT_VERSION}" PROJECT_VERSION)
 project(sick_perception_sdk VERSION ${PROJECT_VERSION} LANGUAGES CXX)
-set(PRE_RELEASE_VERSION "-dev")
+set(PRE_RELEASE_VERSION "-c.1")
 
 #===============================================================================
 # User configuration for the SDK package.
@@ -13,8 +13,8 @@ option(BUILD_SENSOR_CONFIGURATION "Add the library `sensor_configuration` to the
 option(BUILD_BENCHMARKS "Build benchmarks for the libraries" OFF)
 option(BUILD_UNIT_TESTS "Build unit tests for the libraries" OFF)
 set(BUILD_EXAMPLES_DEVICE_TYPE "" CACHE STRING "Set the device type for examples")
-set_property(CACHE BUILD_EXAMPLES_DEVICE_TYPE PROPERTY STRINGS "" "all" "LRS4000" "multiScan100" "multiScan200" "picoScan100")
-set(valid_device_types "" "all" "LRS4000" "multiScan100" "multiScan200" "picoScan100")
+set_property(CACHE BUILD_EXAMPLES_DEVICE_TYPE PROPERTY STRINGS "" "all" "LRS4000" "multiScan100" "picoScan100")
+set(valid_device_types "" "all" "LRS4000" "multiScan100" "picoScan100")
 list(FIND valid_device_types "${BUILD_EXAMPLES_DEVICE_TYPE}" idx)
 if(idx EQUAL -1)
     message(FATAL_ERROR "Invalid BUILD_EXAMPLES_DEVICE_TYPE: ${BUILD_EXAMPLES_DEVICE_TYPE}")

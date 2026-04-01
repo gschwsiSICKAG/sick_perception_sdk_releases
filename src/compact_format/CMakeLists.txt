@@ -44,11 +44,7 @@ set(LIB_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/src/telegram_type_1_scan_data/PointCloudConverter.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/telegram_type_1_scan_data/ScanDataParser.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/telegram_type_2_imu/ImuParser.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/telegram_type_3_ambient_light/AmbientLightParser.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/telegram_type_4_encoder/EncoderParser.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/telegram_type_6_multiScan200/DataLossMonitor.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/telegram_type_6_multiScan200/MultiScan200Parser.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/telegram_type_6_multiScan200/PointCloudConverter.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/CompactParser.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Crc32Utils.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Crc32UtilsImpl.cpp

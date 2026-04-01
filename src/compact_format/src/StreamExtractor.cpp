@@ -10,9 +10,7 @@ SPDX-License-Identifier: MIT
 #include <sick_perception_sdk/compact_format/CompactData.hpp>
 #include <sick_perception_sdk/compact_format/telegram_type_1_scan_data/ScanDataParser.hpp>
 #include <sick_perception_sdk/compact_format/telegram_type_2_imu/ImuParser.hpp>
-#include <sick_perception_sdk/compact_format/telegram_type_3_ambient_light/AmbientLightParser.hpp>
 #include <sick_perception_sdk/compact_format/telegram_type_4_encoder/EncoderParser.hpp>
-#include <sick_perception_sdk/compact_format/telegram_type_6_multiScan200/MultiScan200Parser.hpp>
 
 #include <algorithm>
 #include <array>
@@ -155,14 +153,6 @@ void StreamExtractor::readTelegramType()
   else if (telegramType == TelegramType::Encoder)
   {
     m_parser = std::make_unique<sick::compact::encoder::Parser>();
-  }
-  else if (telegramType == TelegramType::AmbientLight)
-  {
-    m_parser = std::make_unique<sick::compact::ambient_light::Parser>();
-  }
-  else if (telegramType == TelegramType::MultiScan200)
-  {
-    m_parser = std::make_unique<sick::compact::multiscan200::Parser>();
   }
   else
   {

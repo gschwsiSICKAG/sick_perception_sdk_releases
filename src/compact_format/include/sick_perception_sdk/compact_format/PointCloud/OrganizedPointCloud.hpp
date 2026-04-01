@@ -24,11 +24,6 @@ class OrganizedPointCloudBuilder;
  * @brief Data structure representing a multi-echo point cloud.
  *
  * This is a common transfer format for point clouds in the sick_perception_sdk.
- *
- * The sick_perception_sdk provides converters from Compact format representations that contain data convertible to point clouds
- * into this point cloud structure.
- *
- * @see `sick::multiscan200::PointCloudConverter`
  * 
  * The order of fields in the raw data is defined by the order of `fields` in the point cloud.
  * The offset and datatype information for each field can be used to interpret the point data correctly.

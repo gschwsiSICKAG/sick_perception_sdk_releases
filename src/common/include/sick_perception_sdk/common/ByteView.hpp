@@ -12,6 +12,8 @@ SPDX-License-Identifier: MIT
 
 namespace sick {
 
+// NOLINTBEGIN(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+
 /**
  * @brief A lightweight, non-owning view over contiguous byte data (header-only implementation).
  *
@@ -31,7 +33,7 @@ public:
   using size_type       = std::size_t;
   using difference_type = std::ptrdiff_t;
 
-  ByteView() = default;
+  ByteView() = delete;
 
   ByteView(std::uint8_t const* data, std::size_t size)
     : m_data(data)
@@ -59,15 +61,20 @@ public:
     return m_size == 0;
   }
 
-  // NOLINTBEGIN(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+  /**
+   * @brief Accesses the byte at the specified index without bounds checking.
+   * 
+   * @note Accessing an out-of-range index or if the internal data pointer is nullptr results in undefined behavior (similar to std::vector::operator[]).
+   */
   auto operator[](std::size_t index) const -> std::uint8_t
   {
+    // Axivion Next Line CertC++-EXP34 : nullptr dereference follows the same logic as std::vector::operator[].
     return m_data[index];
   }
 
   auto at(std::size_t index) const -> std::uint8_t
   {
-    if (index >= m_size)
+    if (m_data == nullptr || index >= m_size)
     {
       throw std::out_of_range("ByteView::at: index out of range");
     }
@@ -96,11 +103,19 @@ public:
 
   auto front() const -> std::uint8_t
   {
+    if (m_data == nullptr || m_size == 0)
+    {
+      throw std::out_of_range("ByteView::front: view is empty");
+    }
     return m_data[0];
   }
 
   auto back() const -> std::uint8_t
   {
+    if (m_data == nullptr || m_size == 0)
+    {
+      throw std::out_of_range("ByteView::back: view is empty");
+    }
     return m_data[m_size - 1];
   }
 
@@ -150,11 +165,11 @@ public:
     return std::vector<std::uint8_t>(m_data, m_data + m_size);
   }
 
-  // NOLINTEND(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-
 private:
   std::uint8_t const* m_data = nullptr;
   std::size_t m_size         = 0;
 };
+
+// NOLINTEND(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 
 } // namespace sick

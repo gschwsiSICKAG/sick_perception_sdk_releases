@@ -4,7 +4,8 @@ info:
  contact: 
   name: Python Examples GitHub
   url: https://github.com/SICKAG/sick_scan_rest_client
- version: 2.2.1
+ version: "2.2.1.0R"
+ x-sick-openapi-generator-version: 1.2.0-b.1
  title: "picoScan150 REST interface description"
 servers: 
 - url: http://{device}/api
@@ -128,7 +129,7 @@ paths:
         datei:
          type: string
          format: binary
-         description: Json-Datei
+         description: Json-File
    responses: 
     '200':
      description: successful operation
@@ -295,8 +296,10 @@ paths:
          properties: 
           siUserLevel:
            type: integer
+           format: int8
           udiNewPassword:
            type: integer
+           format: uint32
          example:
           siUserLevel: 4
           udiNewPassword: 3410122659
@@ -323,7 +326,7 @@ paths:
    - 1 - General
    summary: ""
    description: Returns a challenge for the challenge and response authentication method. For more details see https://github.com/SICKAG/sick_scan_rest_client
-   operationId: Psot
+   operationId: Post
    requestBody:
     description: successful operation
     required: true
@@ -391,6 +394,7 @@ paths:
            default: []
            items: 
             type: integer
+            format: uint8
           userLevel:
            $ref: '#/components/schemas/E_USER_LEVEL_TYPE'
    responses: 
@@ -446,6 +450,7 @@ paths:
          properties: 
           userLevel:
            type: integer
+           format: uint8
           isEnabled:
            type: boolean
            default: false
@@ -616,6 +621,7 @@ paths:
          properties: 
           ProcessorNbr:
            type: integer
+           format: uint16
    responses: 
     '200':
      description: successful operation
@@ -854,6 +860,7 @@ paths:
             default: False
            DiagDumpTimestamp:
             type: integer
+            format: uint32
           example:
            DiagDumpExists: true
            DiagDumpTimestamp: 247
@@ -880,9 +887,11 @@ paths:
           properties: 
            uiVersionNumber:
             type: integer
+            format: uint16
             default: 1
            udiSystCount:
             type: integer
+            format: uint32
            aDigitalIn:
             type: array
             maxItems: 8
@@ -922,9 +931,11 @@ paths:
           properties: 
            uiVersionNumber:
             type: integer
+            format: uint16
             default: 1
            udiSystCount:
             type: integer
+            format: uint32
            aDigitalOut:
             type: array
             maxItems: 8
@@ -936,6 +947,7 @@ paths:
                $ref: '#/components/schemas/IOState_t'
               udiCounter:
                type: integer
+               format: uint32
            aTimeBlock:
             type: array
             maxItems: 1
@@ -966,8 +978,10 @@ paths:
           properties: 
            uiVersionNumber:
             type: integer
+            format: uint16
            udiSystCount:
             type: integer
+            format: uint32
            aInternalPorts:
             type: array
             maxItems: 8
@@ -1061,6 +1075,7 @@ paths:
              default: [192,168,0,1]
              items: 
               type: integer
+              format: uint8
   post: 
    tags: 
    - 8 - Ethernet
@@ -1090,6 +1105,7 @@ paths:
            default: [192,168,0,1]
            items: 
             type: integer
+            format: uint8
    responses: 
     '200':
      description: successful operation
@@ -1129,6 +1145,7 @@ paths:
              default: [0,0,0,0]
              items: 
               type: integer
+              format: uint8
   post: 
    tags: 
    - 8 - Ethernet
@@ -1158,6 +1175,7 @@ paths:
            default: [0,0,0,0]
            items: 
             type: integer
+            format: uint8
    responses: 
     '200':
      description: successful operation
@@ -1197,6 +1215,7 @@ paths:
              default: [255,255,255,0]
              items: 
               type: integer
+              format: uint8
   post: 
    tags: 
    - 8 - Ethernet
@@ -1226,6 +1245,7 @@ paths:
            default: [255,255,255,0]
            items: 
             type: integer
+            format: uint8
    responses: 
     '200':
      description: successful operation
@@ -1586,6 +1606,7 @@ paths:
              default: [192,168,0,1]
              items: 
               type: integer
+              format: uint8
  /EtherIPGateAddressDHCP:
   get: 
    tags: 
@@ -1614,6 +1635,7 @@ paths:
              default: [0,0,0,0]
              items: 
               type: integer
+              format: uint8
  /EtherIPMaskDHCP:
   get: 
    tags: 
@@ -1642,6 +1664,7 @@ paths:
              default: [255,255,255,0]
              items: 
               type: integer
+              format: uint8
  /httpsStatus:
   get: 
    tags: 
@@ -1924,6 +1947,7 @@ paths:
          properties: 
           userLevel:
            type: integer
+           format: uint8
            minimum: 0
            maximum: 7
           isEnabled:
@@ -1974,6 +1998,7 @@ paths:
              default: [0,6,0x77,0,0,0]
              items: 
               type: integer
+              format: uint8
  /PowerOnCnt:
   get: 
    tags: 
@@ -1997,6 +2022,7 @@ paths:
            properties: 
             PowerOnCnt:
              type: integer
+             format: uint32
              default: 0
  /DailyOpHours:
   get: 
@@ -2021,6 +2047,7 @@ paths:
            properties: 
             DailyOpHours:
              type: number
+             format: float
              default: 0.0
  /OpHours:
   get: 
@@ -2045,6 +2072,7 @@ paths:
            properties: 
             OpHours:
              type: integer
+             format: uint32
              default: 0
  /DeviceType:
   get: 
@@ -2260,6 +2288,7 @@ paths:
               * 2 - CM_STRATEGY_SENSITIVE
            usiResponseTime:
             type: integer
+            format: uint16
             minimum: 3
             maximum: 60
             default: 3
@@ -2340,6 +2369,7 @@ paths:
                * 2 - CM_STRATEGY_SENSITIVE
             usiResponseTime:
              type: integer
+             format: uint16
              minimum: 3
              maximum: 60
              default: 3
@@ -2497,8 +2527,10 @@ paths:
             default: [192,168,0,100]
             items: 
              type: integer
+             format: uint8
            Port:
             type: integer
+            format: uint16
             default: 2115
   post: 
    tags: 
@@ -2542,8 +2574,10 @@ paths:
              default: [192,168,0,100]
              items: 
               type: integer
+              format: uint8
             Port:
              type: integer
+             format: uint16
              default: 2115
    responses: 
     '200':
@@ -2922,8 +2956,10 @@ paths:
             default: [192,168,0,100]
             items: 
              type: integer
+             format: uint8
            Port:
             type: integer
+            format: uint16
             default: 7504
   post: 
    tags: 
@@ -2967,8 +3003,10 @@ paths:
              default: [192,168,0,100]
              items: 
               type: integer
+              format: uint8
             Port:
              type: integer
+             format: uint16
              default: 7504
    responses: 
     '200':
@@ -3270,6 +3308,7 @@ paths:
            properties: 
             EncResolution:
              type: number
+             format: float
              minimum: 0.001
              maximum: 2000.0
              default: 1.0
@@ -3297,6 +3336,7 @@ paths:
          properties: 
           EncResolution:
            type: number
+           format: float
            minimum: 0.001
            maximum: 2000.0
            default: 1.0
@@ -3393,8 +3433,10 @@ paths:
             default: [192,168,0,100]
             items: 
              type: integer
+             format: uint8
            Port:
             type: integer
+            format: uint16
             default: 7503
   post: 
    tags: 
@@ -3438,8 +3480,10 @@ paths:
              default: [192,168,0,100]
              items: 
               type: integer
+              format: uint8
             Port:
              type: integer
+             format: uint16
              default: 7503
    responses: 
     '200':
@@ -3540,6 +3584,7 @@ paths:
             default: []
             items: 
              type: number
+             format: float
              default: 0.0
            AngularVelocity:
             type: array
@@ -3548,6 +3593,7 @@ paths:
             default: []
             items: 
              type: number
+             format: float
              default: 0.0
            Orientation:
             type: array
@@ -3556,9 +3602,11 @@ paths:
             default: []
             items: 
              type: number
+             format: float
              default: 0.0
            TimeStamp:
             type: integer
+            format: uint64
  /PortConfiguration:
   get: 
    tags: 
@@ -3610,6 +3658,7 @@ paths:
                   $ref: '#/components/schemas/Logic_t'
                  Debounce:
                   type: integer
+                  format: uint16
                   minimum: 1
                   maximum: 1000
                   default: 10
@@ -3625,9 +3674,11 @@ paths:
                     * 1 - LEVEL
                  Reserved1:
                   type: integer
+                  format: uint16
                   default: 0
                  Reserved2:
                   type: integer
+                  format: uint16
                   default: 0
                OutputSettings:
                 type: object
@@ -3660,11 +3711,13 @@ paths:
                     * 2 - RESTART_INPUT
                  RestartTime:
                   type: integer
+                  format: uint32
                   minimum: 20
                   maximum: 600000
                   default: 200
                  RestartInput:
                   type: integer
+                  format: uint16
                   minimum: 1
                   maximum: 8
                   default: 1
@@ -3682,9 +3735,11 @@ paths:
                     * 2 - XOR
                  Reserved3:
                   type: integer
+                  format: uint16
                   default: 0
                  Reserved4:
                   type: integer
+                  format: uint16
                   default: 0
                  Sources:
                   type: array
@@ -3704,9 +3759,11 @@ paths:
                      default: False
                     Reserved5:
                      type: integer
+                     format: uint8
                      default: 0
                     Reserved6:
                      type: integer
+                     format: uint8
                      default: 0
                EncoderPortType:
                 type: integer
@@ -3726,12 +3783,15 @@ paths:
                   * 4 - AUX2
                Reserved8:
                 type: integer
+                format: uint16
                 default: 0
                Reserved9:
                 type: integer
+                format: uint16
                 default: 0
                Reserved10:
                 type: integer
+                format: uint16
                 default: 0
   post: 
    tags: 
@@ -3785,6 +3845,7 @@ paths:
                 $ref: '#/components/schemas/Logic_t'
                Debounce:
                 type: integer
+                format: uint16
                 minimum: 1
                 maximum: 1000
                 default: 10
@@ -3800,9 +3861,11 @@ paths:
                   * 1 - LEVEL
                Reserved1:
                 type: integer
+                format: uint16
                 default: 0
                Reserved2:
                 type: integer
+                format: uint16
                 default: 0
              OutputSettings:
               type: object
@@ -3835,11 +3898,13 @@ paths:
                   * 2 - RESTART_INPUT
                RestartTime:
                 type: integer
+                format: uint32
                 minimum: 20
                 maximum: 600000
                 default: 200
                RestartInput:
                 type: integer
+                format: uint16
                 minimum: 1
                 maximum: 8
                 default: 1
@@ -3857,9 +3922,11 @@ paths:
                   * 2 - XOR
                Reserved3:
                 type: integer
+                format: uint16
                 default: 0
                Reserved4:
                 type: integer
+                format: uint16
                 default: 0
                Sources:
                 type: array
@@ -3879,9 +3946,11 @@ paths:
                    default: False
                   Reserved5:
                    type: integer
+                   format: uint8
                    default: 0
                   Reserved6:
                    type: integer
+                   format: uint8
                    default: 0
              EncoderPortType:
               type: integer
@@ -3901,12 +3970,15 @@ paths:
                 * 4 - AUX2
              Reserved8:
               type: integer
+              format: uint16
               default: 0
              Reserved9:
               type: integer
+              format: uint16
               default: 0
              Reserved10:
               type: integer
+              format: uint16
               default: 0
          example:
           PortConfiguration:
@@ -4133,8 +4205,10 @@ paths:
          properties: 
           Output:
            type: integer
+           format: uint8
           Value:
            type: integer
+           format: uint8
    responses: 
     '200':
      description: successful operation
@@ -4260,6 +4334,7 @@ paths:
          properties: 
           uiDuration:
            type: integer
+           format: uint16
          example:
           uiDuration: 100
    responses: 
@@ -4364,6 +4439,7 @@ paths:
             properties: 
              GroupId:
               type: integer
+              format: uint16
               minimum: 1
               maximum: 48
               default: 1
@@ -4425,6 +4501,7 @@ paths:
          properties: 
           EvaluationId:
            type: integer
+           format: uint16
           Points:
            type: array
            maxItems: 100
@@ -4435,16 +4512,20 @@ paths:
             properties: 
              x:
               type: integer
+              format: int32
               default: 0
              y:
               type: integer
+              format: int32
               default: 0
           LowerZLimit:
            type: integer
+           format: int32
            minimum: -100000
            maximum: 100000
           UpperZLimit:
            type: integer
+           format: int32
            minimum: -100000
            maximum: 100000
          example:
@@ -4513,6 +4594,7 @@ paths:
          properties: 
           EvaluationId:
            type: integer
+           format: uint16
    responses: 
     '200':
      description: successful operation
@@ -4537,6 +4619,7 @@ paths:
              properties: 
               EvaluationId:
                type: integer
+               format: uint16
               Points:
                type: array
                maxItems: 100
@@ -4547,16 +4630,20 @@ paths:
                 properties: 
                  x:
                   type: integer
+                  format: int32
                   default: 0
                  y:
                   type: integer
+                  format: int32
                   default: 0
               LowerZLimit:
                type: integer
+               format: int32
                minimum: -100000
                maximum: 100000
               UpperZLimit:
                type: integer
+               format: int32
                minimum: -100000
                maximum: 100000
  /EvaluationGroupType:
@@ -4875,6 +4962,7 @@ paths:
           properties: 
            timestamp:
             type: integer
+            format: uint64
            evaluations:
             type: array
             maxItems: 48
@@ -4885,10 +4973,13 @@ paths:
              properties: 
               evaluationId:
                type: integer
+               format: uint16
               minimumDistance:
                type: integer
+               format: int32
               maximumDistance:
                type: integer
+               format: int32
               minimumDistancePosition:
                $ref: '#/components/schemas/Point3d_t'
               maximumDistancePosition:
@@ -5103,6 +5194,7 @@ paths:
            properties: 
             MCSenseLevel:
              type: integer
+             format: uint8
              minimum: 0
              maximum: 1
              default: 0
@@ -5130,6 +5222,7 @@ paths:
          properties: 
           MCSenseLevel:
            type: integer
+           format: uint8
            minimum: 0
            maximum: 1
            default: 0
@@ -5225,6 +5318,7 @@ paths:
           properties: 
            udiScanFreq:
             type: integer
+            format: uint32
             minimum: 1500
             maximum: 5000
             default: 4000
@@ -5233,6 +5327,7 @@ paths:
             properties: 
              uiLength:
               type: integer
+              format: uint16
               minimum: 1
               maximum: 1
               default: 1
@@ -5245,16 +5340,19 @@ paths:
                properties: 
                 udiAngleRes:
                  type: integer
+                 format: uint32
                  minimum: 500
                  maximum: 10000
                  default: 2500
                 diStartAngle:
                  type: integer
+                 format: int32
                  minimum: -1380000
                  maximum: 1380000
                  default: -1380000
                 diStopAngle:
                  type: integer
+                 format: int32
                  minimum: -1380000
                  maximum: 1380000
                  default: 1380000
@@ -5419,9 +5517,11 @@ paths:
           properties: 
            upperThreshold:
             type: integer
+            format: int8
             default: 55
            lowerThreshold:
             type: integer
+            format: int8
             default: 50
   post: 
    tags: 
@@ -5450,9 +5550,11 @@ paths:
            properties: 
             upperThreshold:
              type: integer
+             format: int8
              default: 55
             lowerThreshold:
              type: integer
+             format: int8
              default: 50
    responses: 
     '200':
@@ -5512,6 +5614,7 @@ paths:
            properties: 
             CurrentTempDev:
              type: number
+             format: float
              default: 20.0
  /LFPparticle:
   get: 
@@ -5539,6 +5642,7 @@ paths:
             default: False
            uiThreshold:
             type: integer
+            format: uint16
             minimum: 20
             maximum: 5000
             default: 500
@@ -5572,6 +5676,7 @@ paths:
              default: False
             uiThreshold:
              type: integer
+             format: uint16
              minimum: 20
              maximum: 5000
              default: 500
@@ -5612,6 +5717,7 @@ paths:
             default: False
            uiAveragingDepth:
             type: integer
+            format: uint16
             minimum: 2
             maximum: 4
             default: 3
@@ -5645,6 +5751,7 @@ paths:
              default: False
             uiAveragingDepth:
              type: integer
+             format: uint16
              minimum: 2
              maximum: 4
              default: 3
@@ -5685,26 +5792,31 @@ paths:
             default: False
            fThetaStart:
             type: integer
+            format: int32
             minimum: -1380000
             maximum: 1380000
             default: -900000
            fThetaStop:
             type: integer
+            format: int32
             minimum: -1380000
             maximum: 1380000
             default: 900000
            fPhiStart:
             type: integer
+            format: int32
             minimum: -900000
             maximum: 900000
             default: -900000
            fPhiStop:
             type: integer
+            format: int32
             minimum: -900000
             maximum: 900000
             default: 900000
            uiBeamIncrement:
             type: integer
+            format: uint16
             minimum: 1
             maximum: 20
             default: 1
@@ -5738,26 +5850,31 @@ paths:
              default: False
             fThetaStart:
              type: integer
+             format: int32
              minimum: -1380000
              maximum: 1380000
              default: -900000
             fThetaStop:
              type: integer
+             format: int32
              minimum: -1380000
              maximum: 1380000
              default: 900000
             fPhiStart:
              type: integer
+             format: int32
              minimum: -900000
              maximum: 900000
              default: -900000
             fPhiStop:
              type: integer
+             format: int32
              minimum: -900000
              maximum: 900000
              default: 900000
             uiBeamIncrement:
              type: integer
+             format: uint16
              minimum: 1
              maximum: 20
              default: 1
@@ -5798,11 +5915,13 @@ paths:
             default: False
            ulDistMin:
             type: integer
+            format: int32
             minimum: 0
             maximum: 200000
             default: 0
            ulDistMax:
             type: integer
+            format: int32
             minimum: 0
             maximum: 200000
             default: 200000
@@ -5836,11 +5955,13 @@ paths:
              default: False
             ulDistMin:
              type: integer
+             format: int32
              minimum: 0
              maximum: 200000
              default: 0
             ulDistMax:
              type: integer
+             format: int32
              minimum: 0
              maximum: 200000
              default: 200000
@@ -5881,31 +6002,37 @@ paths:
             default: False
            lXMin:
             type: integer
+            format: int32
             minimum: -200000
             maximum: 200000
             default: 0
            lXMax:
             type: integer
+            format: int32
             minimum: -200000
             maximum: 200000
             default: 5000
            lYMin:
             type: integer
+            format: int32
             minimum: -200000
             maximum: 200000
             default: -5000
            lYMax:
             type: integer
+            format: int32
             minimum: -200000
             maximum: 200000
             default: 5000
            lZMin:
             type: integer
+            format: int32
             minimum: -200000
             maximum: 200000
             default: -20000
            lZMax:
             type: integer
+            format: int32
             minimum: -200000
             maximum: 200000
             default: 20000
@@ -5939,31 +6066,37 @@ paths:
              default: False
             lXMin:
              type: integer
+             format: int32
              minimum: -200000
              maximum: 200000
              default: 0
             lXMax:
              type: integer
+             format: int32
              minimum: -200000
              maximum: 200000
              default: 5000
             lYMin:
              type: integer
+             format: int32
              minimum: -200000
              maximum: 200000
              default: -5000
             lYMax:
              type: integer
+             format: int32
              minimum: -200000
              maximum: 200000
              default: 5000
             lZMin:
              type: integer
+             format: int32
              minimum: -200000
              maximum: 200000
              default: -20000
             lZMax:
              type: integer
+             format: int32
              minimum: -200000
              maximum: 200000
              default: 20000
@@ -6082,6 +6215,7 @@ paths:
             default: False
            uiReductionFactor:
             type: integer
+            format: int32
             minimum: 2
             maximum: 50
             default: 2
@@ -6115,6 +6249,7 @@ paths:
              default: False
             uiReductionFactor:
              type: integer
+             format: int32
              minimum: 2
              maximum: 50
              default: 2
@@ -6152,31 +6287,37 @@ paths:
           properties: 
            x:
             type: integer
+            format: int32
             minimum: -100000
             maximum: 100000
             default: 0
            y:
             type: integer
+            format: int32
             minimum: -100000
             maximum: 100000
             default: 0
            z:
             type: integer
+            format: int32
             minimum: -100000
             maximum: 100000
             default: 0
            yaw:
             type: integer
+            format: int32
             minimum: -3600000
             maximum: 3600000
             default: 0
            pitch:
             type: integer
+            format: int32
             minimum: -3600000
             maximum: 3600000
             default: 0
            roll:
             type: integer
+            format: int32
             minimum: -3600000
             maximum: 3600000
             default: 0
@@ -6207,31 +6348,37 @@ paths:
            properties: 
             x:
              type: integer
+             format: int32
              minimum: -100000
              maximum: 100000
              default: 0
             y:
              type: integer
+             format: int32
              minimum: -100000
              maximum: 100000
              default: 0
             z:
              type: integer
+             format: int32
              minimum: -100000
              maximum: 100000
              default: 0
             yaw:
              type: integer
+             format: int32
              minimum: -3600000
              maximum: 3600000
              default: 0
             pitch:
              type: integer
+             format: int32
              minimum: -3600000
              maximum: 3600000
              default: 0
             roll:
              type: integer
+             format: int32
              minimum: -3600000
              maximum: 3600000
              default: 0
@@ -6352,6 +6499,7 @@ paths:
              default: [192,168,0,11]
              items: 
               type: integer
+              format: uint8
   post: 
    tags: 
    - 5 - Date and System Time
@@ -6381,6 +6529,7 @@ paths:
            default: [192,168,0,11]
            items: 
             type: integer
+            format: uint8
    responses: 
     '200':
      description: successful operation
@@ -6901,6 +7050,7 @@ paths:
            properties: 
             TSCTCupdatetime:
              type: integer
+             format: uint32
              minimum: 1
              maximum: 3600
              default: 600
@@ -6928,6 +7078,7 @@ paths:
          properties: 
           TSCTCupdatetime:
            type: integer
+           format: uint32
            minimum: 1
            maximum: 3600
            default: 600
@@ -7068,8 +7219,7 @@ components:
      type: string
      default: " "
     user:
-     type: string
-     default: "AuthorizedClient"
+     $ref: '#/components/schemas/E_USER_LEVEL_TYPE'
   E_USER_LEVEL_TYPE:
    type: string
    default: Run
@@ -7108,36 +7258,43 @@ components:
    properties: 
     uiYear:
      type: integer
+     format: uint16
      minimum: 0
      maximum: 2105
      default: 0
     usiMonth:
      type: integer
+     format: uint8
      minimum: 0
      maximum: 12
      default: 1
     usiDay:
      type: integer
+     format: uint8
      minimum: 0
      maximum: 31
      default: 1
     usiHour:
      type: integer
+     format: uint8
      minimum: 0
      maximum: 23
      default: 0
     usiMinute:
      type: integer
+     format: uint8
      minimum: 0
      maximum: 59
      default: 0
     usiSec:
      type: integer
+     format: uint8
      minimum: 0
      maximum: 59
      default: 0
     udiUSec:
      type: integer
+     format: uint32
      minimum: 0
      maximum: 999999
      default: 0
@@ -7194,6 +7351,7 @@ components:
        * 4 - INPUT_NOT_ACTIVE
     PortCounter:
      type: integer
+     format: uint32
   LedStateType:
    type: object
    properties: 
@@ -7240,9 +7398,11 @@ components:
    properties: 
     x:
      type: integer
+     format: int32
      default: 0
     y:
      type: integer
+     format: int32
      default: 0
   EvaluationResult_t:
    type: object
@@ -7277,9 +7437,11 @@ components:
    properties: 
     Version:
      type: integer
+     format: uint16
      default: 1
     Timestamp:
      type: integer
+     format: uint64
     EvaluationResultList:
      type: array
      maxItems: 48
@@ -7292,16 +7454,19 @@ components:
    properties: 
     x:
      type: integer
+     format: int32
      minimum: -500000
      maximum: 500000
      default: 0
     y:
      type: integer
+     format: int32
      minimum: -500000
      maximum: 500000
      default: 0
     z:
      type: integer
+     format: int32
      minimum: -500000
      maximum: 500000
      default: 0

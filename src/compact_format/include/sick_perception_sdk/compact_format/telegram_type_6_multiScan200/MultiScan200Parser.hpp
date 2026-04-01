@@ -22,10 +22,12 @@ namespace sick::compact::multiscan200 {
 class SDK_EXPORT Parser : public CompactParser
 {
 public:
+  using DataT = MultiScan200Data;
+
   /**
    * @throws std::invalid_argument if validation or parsing fails.
    */
-  static auto validateAndParse(ByteView data, bool validateChecksum) -> MultiScan200Data;
+  static auto validateAndParse(ByteView data, bool validateChecksum) -> DataT;
 
   auto getSize(ByteView data) const -> std::optional<std::size_t> override;
 };

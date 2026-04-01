@@ -10,7 +10,7 @@ SPDX-License-Identifier: MIT
 #include <sick_perception_sdk/common/quantities/Angle.hpp>
 #include <sick_perception_sdk/common/quantities/Duration.hpp>
 #include <sick_perception_sdk/common/quantities/Timestamp.hpp>
-#include <sick_perception_sdk/compact_format/PointCloud/MultiEchoPointCloud.hpp>
+#include <sick_perception_sdk/compact_format/PointCloud/UnorganizedPointCloud.hpp>
 #include <sick_perception_sdk/compact_format/telegram_type_1_scan_data/ScanData.hpp>
 
 #include <algorithm>
@@ -44,6 +44,11 @@ auto bloomingMask(std::size_t echoIndex) -> std::uint8_t
  */
 void validateBeamContent(Module::MetaData const& moduleMetaData, BitField<BeamContent> requiredBeamContent)
 {
+  if (requiredBeamContent.isEmpty())
+  {
+    return;
+  }
+
   if ((moduleMetaData.beamContent.isUnset(requiredBeamContent)))
   {
     if ((requiredBeamContent.isSet(BeamContent::Azimuth)))
@@ -102,7 +107,7 @@ void validateScanData(ScanData const& scanData, BitField<BeamContent> requiredBe
  * sensor GUI if some layers are deactivated. This is because layer which are deactivated in the GUI are not sent in the
  * scan data at all. Layer IDs are descending with ascending elevation angle. LayerIds start at 1.
  */
-auto getElevationToLayerIdMapping(ScanData const& scanData) -> std::map<Angle, std::int8_t>
+auto getElevationToLayerIdMapping(ScanData const& scanData) -> std::map<Angle, std::uint8_t>
 {
   std::vector<Angle> allElevations;
   for (auto const& module : scanData.modules)
@@ -117,11 +122,11 @@ auto getElevationToLayerIdMapping(ScanData const& scanData) -> std::map<Angle, s
     );
   }
 
-  std::map<Angle, std::int8_t> elevationToLayerIdMapping;
+  std::map<Angle, std::uint8_t> elevationToLayerIdMapping;
   std::sort(allElevations.begin(), allElevations.end(), std::greater<>());
   for (std::size_t i = 1; i <= allElevations.size(); ++i)
   {
-    elevationToLayerIdMapping[allElevations[i - 1]] = static_cast<std::int8_t>(i);
+    elevationToLayerIdMapping[allElevations[i - 1]] = static_cast<std::uint8_t>(i);
   }
   return elevationToLayerIdMapping;
 }
@@ -140,6 +145,40 @@ auto getMaximumNumberOfPoints(ScanData const& scanData) -> std::size_t
                                 static_cast<std::size_t>(module.metaData.numberOfEchoesPerBeam);
   }
   return maximumNumberOfNewPoints;
+}
+
+auto getAvailableFields(ScanData const& scanData) -> std::set<point_cloud::PointField::FieldType>
+{
+  using FieldType = point_cloud::PointField::FieldType;
+  std::set<point_cloud::PointField::FieldType> availableFields {
+    FieldType::X,
+    FieldType::Y,
+    FieldType::Z,
+    FieldType::Range, // Distance is set to mandatory in the m_requiredEchoContent, so Range is always available
+    FieldType::Azimuth,
+    FieldType::Elevation,
+    // Intensity is optional
+    FieldType::TimeOffsetNanoseconds,
+    FieldType::TimeOffsetSeconds,
+    FieldType::Ring,
+    FieldType::LayerId,
+    FieldType::EchoIndex,
+    // IsReflector is optional
+    // HasBlooming is not available
+    // PulseWidth is not available
+  };
+  for (auto const& module : scanData.modules)
+  {
+    if (module.metaData.beamContent.isSet(BeamContent::Properties))
+    {
+      availableFields.insert(point_cloud::PointField::FieldType::IsReflector);
+    }
+    if (module.metaData.echoContent.isSet(EchoContent::Intensity))
+    {
+      availableFields.insert(point_cloud::PointField::FieldType::Intensity);
+    }
+  }
+  return availableFields;
 }
 
 template <typename ValueT>
@@ -186,21 +225,23 @@ auto getTotalNumberOfPoints(ScanData const& scanData) -> std::size_t
   return totalNumberOfPoints;
 }
 
+auto createDefaultBuilder(std::set<point_cloud::PointField::FieldType> const& desiredFields) -> point_cloud::UnorganizedPointCloudBuilder
+{
+  return point_cloud::UnorganizedPointCloudBuilder({desiredFields, desiredFields}, Timestamp(), 0);
+}
+
 } // namespace
 
 PointCloudCollector::PointCloudCollector()
-  : PointCloudCollector(PointCloudConfiguration())
+  : PointCloudCollector(point_cloud::PointCloudConfiguration())
 { }
 
-PointCloudCollector::PointCloudCollector(PointCloudConfiguration configuration)
-  : m_requiredBeamContent(BeamContent::None)
+PointCloudCollector::PointCloudCollector(point_cloud::PointCloudConfiguration configuration)
+  : m_configuration(std::move(configuration))
+  , m_desiredFields(m_configuration.fields.toSet())
+  , m_builder(createDefaultBuilder(m_desiredFields)) // empty point cloud builder with default fields. This will never actually be used.
+  , m_requiredBeamContent(BeamContent::None)
   , m_requiredEchoContent(EchoContent::None)
-  , m_builder(
-      Timestamp::fromMicrosecondsSinceEpoch(0), // Timestamp will be overwritten with the first collect call
-      configuration,                            //
-      0                                         // Maximum number of points will be incremented with each collect call
-    )
-  , m_configuration(std::move(configuration))
 {
   LOG_INFO("PointCloudCollector") << "Creating PointCloudCollector with configuration:\n" << m_configuration.toString();
 
@@ -209,7 +250,6 @@ PointCloudCollector::PointCloudCollector(PointCloudConfiguration configuration)
     throw std::invalid_argument("At least one of cartesian or spherical coordinates must be enabled");
   }
 
-  m_requiredBeamContent.set(BeamContent::Azimuth);
   m_requiredEchoContent.set(EchoContent::Distance);
 
   if (m_configuration.fields.enableIntensity || !m_configuration.filters.intensity.isEmpty())
@@ -236,8 +276,10 @@ void PointCloudCollector::collect(ScanData const& scanData)
 
   if (!m_hasCollectionStarted)
   {
-    m_pointCloudTimestamp = getSmallestTimestampInScanData(scanData);
-    m_builder.setPointCloudTimestamp(m_pointCloudTimestamp);
+    point_cloud::UnorganizedPointCloudBuilder::FieldConfig fieldConfig {m_desiredFields, getAvailableFields(scanData)};
+
+    m_pointCloudTimestamp  = getSmallestTimestampInScanData(scanData);
+    m_builder              = point_cloud::UnorganizedPointCloudBuilder(fieldConfig, m_pointCloudTimestamp, getTotalNumberOfPoints(scanData));
     m_hasCollectionStarted = true;
   }
   validateScanData(scanData, m_requiredBeamContent, m_requiredEchoContent);
@@ -260,6 +302,8 @@ void PointCloudCollector::collect(ScanData const& scanData)
     for (std::size_t layerIndex = 0; layerIndex < numberOfLayers; layerIndex++)
     {
       auto const& layerInfo = layerInfos[layerIndex];
+      // AXIVION Next Construct CertC++-MEM30: False positive, layerInfo is only a reference to the current element in the vector, so it is not a dangling reference.
+      // AXIVION Next Construct CertC++-MEM50
       if (!layerInfo.isInPointCloud)
       {
         continue;
@@ -325,19 +369,19 @@ void PointCloudCollector::collect(ScanData const& scanData)
   }
 }
 
-auto PointCloudCollector::getPointCloud() -> MultiEchoPointCloud
+auto PointCloudCollector::getPointCloud() -> point_cloud::UnorganizedPointCloud
 {
   return m_builder.build();
 }
 
 auto PointCloudCollector::calculateLayerInfo(
   Module::MetaData const& moduleMetaData,
-  std::map<Angle, std::int8_t> const& elevationToLayerIdMapping,
+  std::map<Angle, std::uint8_t> const& elevationToLayerIdMapping,
   bool useAzimuthFromHeader
 ) const -> std::vector<LayerInfo>
 {
   using namespace sick::literals; // NOLINT(google-build-using-namespace)
-  std::vector<LayerInfo> layerInfos = std::vector<LayerInfo>(moduleMetaData.numberOfRows, {0, false, 0.0f, 0.0f, 0_ms, 0_ms, 0_rad});
+  std::vector<LayerInfo> layerInfos(moduleMetaData.numberOfRows, {0, false, 0.0f, 0.0f, 0_ms, 0_ms, 0_rad});
 
   for (std::size_t layerIndex = 0; layerIndex < moduleMetaData.numberOfRows; layerIndex++)
   {
@@ -345,7 +389,7 @@ auto PointCloudCollector::calculateLayerInfo(
     auto const layerIdIt = elevationToLayerIdMapping.find(elevation);
     assert(layerIdIt != elevationToLayerIdMapping.end());
 
-    std::int8_t const layerId = layerIdIt->second;
+    std::uint8_t const layerId = layerIdIt->second;
 
     layerInfos[layerIndex].id = layerId;
   }
@@ -413,6 +457,8 @@ void PointCloudCollector::writeEcho(
   bool hasBlooming
 )
 {
+  using FieldType = point_cloud::PointField::FieldType;
+
   if (echo.distance.meters() < 0.0f)
   {
     return;
@@ -427,55 +473,55 @@ void PointCloudCollector::writeEcho(
     float const y = layerInfo.cosElevation * sinAzimuth * distanceScaled; // NOLINT(readability-identifier-length)
     float const z = -layerInfo.sinElevation * distanceScaled;             // NOLINT(readability-identifier-length)
 
-    m_builder.write(x);
-    m_builder.write(y);
-    m_builder.write(z);
+    m_builder.writeNextFieldValueOrIgnore(FieldType::X, x);
+    m_builder.writeNextFieldValueOrIgnore(FieldType::Y, y);
+    m_builder.writeNextFieldValueOrIgnore(FieldType::Z, z);
   }
 
   if (m_configuration.fields.enableSpherical)
   {
-    m_builder.write(distanceScaled);
-    m_builder.write(azimuth);
-    m_builder.write(elevation);
+    m_builder.writeNextFieldValueOrIgnore(FieldType::Range, distanceScaled);
+    m_builder.writeNextFieldValueOrIgnore(FieldType::Azimuth, azimuth);
+    m_builder.writeNextFieldValueOrIgnore(FieldType::Elevation, elevation);
   }
 
   if (m_configuration.fields.enableIntensity)
   {
-    m_builder.write(echo.intensity);
+    m_builder.writeNextFieldValueOrIgnore(FieldType::Intensity, echo.intensity);
   }
 
   if (m_configuration.fields.enableTimeOffset)
   {
-    m_builder.write(beamTimestampOffsetNanoseconds);
-    m_builder.write(beamTimestampOffsetSeconds);
+    m_builder.writeNextFieldValueOrIgnore(FieldType::TimeOffsetNanoseconds, beamTimestampOffsetNanoseconds);
+    m_builder.writeNextFieldValueOrIgnore(FieldType::TimeOffsetSeconds, beamTimestampOffsetSeconds);
   }
 
   if (m_configuration.fields.enableRing)
   {
-    m_builder.write(layerInfo.id);
+    m_builder.writeNextFieldValueOrIgnore(FieldType::Ring, layerInfo.id);
   }
 
   if (m_configuration.fields.enableLayer)
   {
-    m_builder.write(layerInfo.id);
+    m_builder.writeNextFieldValueOrIgnore(FieldType::LayerId, layerInfo.id);
   }
 
   if (m_configuration.fields.enableEcho)
   {
-    auto const echoId = static_cast<std::int8_t>(echoIndex);
-    m_builder.write(echoId);
+    auto const echoId = static_cast<std::uint8_t>(echoIndex);
+    m_builder.writeNextFieldValueOrIgnore(FieldType::EchoIndex, echoId);
   }
 
   if (m_configuration.fields.enableIsReflector)
   {
-    std::int8_t const isReflector = isAReflector ? 1 : 0;
-    m_builder.write(isReflector);
+    std::uint8_t const isReflector = isAReflector ? 1 : 0;
+    m_builder.writeNextFieldValueOrIgnore(FieldType::IsReflector, isReflector);
   }
 
   if (m_configuration.fields.enableHasBlooming)
   {
-    std::int8_t const hasBloomingInt8 = hasBlooming ? 1 : 0;
-    m_builder.write(hasBloomingInt8);
+    std::uint8_t const hasBloomingInt8 = hasBlooming ? 1 : 0;
+    m_builder.writeNextFieldValueOrIgnore(FieldType::HasBlooming, hasBloomingInt8);
   }
 }
 
@@ -522,7 +568,7 @@ void PointCloudCollector::validateTimestamps(ScanData const& scanData)
 void PointCloudCollector::reset()
 {
   m_pointCloudTimestamp  = Timestamp::fromMicrosecondsSinceEpoch(0);
-  m_builder              = UnorganizedPointCloudBuilder(m_pointCloudTimestamp, m_configuration, 0);
+  m_builder              = createDefaultBuilder(m_desiredFields);
   m_hasCollectionStarted = false;
 }
 

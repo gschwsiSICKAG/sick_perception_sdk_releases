@@ -14,13 +14,16 @@ namespace {
 
 auto createPointCloud(std::size_t numberOfPoints)
 {
-  sick::UnorganizedPointCloudBuilder builder(sick::Timestamp::fromMicrosecondsSinceEpoch(123456789), sick::PointCloudConfiguration(), numberOfPoints);
+  using Builder   = sick::point_cloud::UnorganizedPointCloudBuilder;
+  using FieldType = sick::point_cloud::PointField::FieldType;
+  Builder::FieldConfig fieldConfig {{FieldType::X, FieldType::Y, FieldType::Z}, {FieldType::X, FieldType::Y, FieldType::Z}};
+  Builder builder(fieldConfig, sick::Timestamp::fromMicrosecondsSinceEpoch(123456789), numberOfPoints);
   for (std::size_t i = 0; i < numberOfPoints; ++i)
   {
     builder.beginPoint();
-    builder.write<float>(static_cast<float>(i));        // X
-    builder.write<float>(static_cast<float>(i) + 0.5f); // Y
-    builder.write<float>(static_cast<float>(i) + 1.0f); // Z
+    builder.writeNextFieldValueOrIgnore<float>(FieldType::X, static_cast<float>(i));
+    builder.writeNextFieldValueOrIgnore<float>(FieldType::Y, static_cast<float>(i) + 0.5f);
+    builder.writeNextFieldValueOrIgnore<float>(FieldType::Z, static_cast<float>(i) + 1.0f);
   }
   return builder.build();
 }

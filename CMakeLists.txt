@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.22)
-project(sick_perception_sdk VERSION 0.5.0 LANGUAGES CXX)
-set(PRE_RELEASE_VERSION "-c.2")
+file(READ "${CMAKE_CURRENT_SOURCE_DIR}/Version.txt" PROJECT_VERSION)
+string(STRIP "${PROJECT_VERSION}" PROJECT_VERSION)
+project(sick_perception_sdk VERSION ${PROJECT_VERSION} LANGUAGES CXX)
+set(PRE_RELEASE_VERSION "-dev")
 
 #===============================================================================
 # User configuration for the SDK package.

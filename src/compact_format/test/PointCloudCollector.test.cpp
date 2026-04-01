@@ -13,7 +13,7 @@ SPDX-License-Identifier: MIT
 
 TEST(PointCloudCollectorTest, collect_returns_empty_point_cloud_with_default_initalized_collector)
 {
-  sick::PointCloudConfiguration config;
+  sick::point_cloud::PointCloudConfiguration config;
   sick::compact::scan_data::PointCloudCollector collector(config);
 
   auto const pc = collector.getPointCloud();
@@ -24,14 +24,14 @@ TEST(PointCloudCollectorTest, collect_returns_empty_point_cloud_with_default_ini
 
 TEST(PointCloudCollectorTest, collect_collects_consecutive_segments)
 {
-  sick::PointCloudConfiguration config;
+  sick::point_cloud::PointCloudConfiguration config;
   sick::compact::scan_data::PointCloudCollector collector(config);
 
   auto g = sick::test::ScanDataGenerator {}   //
              .withNumberOfSegmentsPerFrame(2) //
              .withNumberOfColumns(4)          //
              .withNumberOfRows(3)             //
-             .withTelegramCounter(1);
+             .withTelegramSequenceNumber(1);
 
   // Collect the first segment
   collector.collect(g.next());
@@ -40,19 +40,19 @@ TEST(PointCloudCollectorTest, collect_collects_consecutive_segments)
   auto const pc = collector.getPointCloud();
   // 2 collected scans with 4 beams per scan * 3 layers = 12 points each
   EXPECT_EQ(24, pc.numberOfPoints());
-  EXPECT_EQ(1000, pc.timestamp().microsecondsSinceEpoch()); // Timestamp is set by the generator to telegramCounter * 1000 us
+  EXPECT_EQ(1000, pc.timestamp().microsecondsSinceEpoch()); // Timestamp is set by the generator to telegramSequenceNumber * 1000 us
 }
 
 TEST(PointCloudCollectorTest, collect_collects_segments_with_gap)
 {
-  sick::PointCloudConfiguration config;
+  sick::point_cloud::PointCloudConfiguration config;
   sick::compact::scan_data::PointCloudCollector collector(config);
 
   auto g = sick::test::ScanDataGenerator {}   //
              .withNumberOfSegmentsPerFrame(3) //
              .withNumberOfColumns(1)          //
              .withNumberOfRows(1)             //
-             .withTelegramCounter(2);
+             .withTelegramSequenceNumber(2);
 
   // Collect the first segment
   collector.collect(g.next());
@@ -66,19 +66,19 @@ TEST(PointCloudCollectorTest, collect_collects_segments_with_gap)
 
   auto const pc = collector.getPointCloud();
   EXPECT_EQ(2, pc.numberOfPoints());
-  EXPECT_EQ(2000, pc.timestamp().microsecondsSinceEpoch()); // Timestamp is set by the generator to telegramCounter * 1000 us
+  EXPECT_EQ(2000, pc.timestamp().microsecondsSinceEpoch()); // Timestamp is set by the generator to telegramSequenceNumber * 1000 us
 }
 
 TEST(PointCloudCollectorTest, collect_collects_empty_point_cloud_without_crash)
 {
-  sick::PointCloudConfiguration config;
+  sick::point_cloud::PointCloudConfiguration config;
   sick::compact::scan_data::PointCloudCollector collector(config);
 
   auto g = sick::test::ScanDataGenerator {}   //
              .withNumberOfSegmentsPerFrame(0) //
              .withNumberOfColumns(0)          //
              .withNumberOfRows(0)             //
-             .withTelegramCounter(2);
+             .withTelegramSequenceNumber(2);
 
   collector.collect(g.next());
 
@@ -89,14 +89,14 @@ TEST(PointCloudCollectorTest, collect_collects_empty_point_cloud_without_crash)
 
 TEST(PointCloudCollectorTest, collect_works_for_multiple_frames)
 {
-  sick::PointCloudConfiguration config;
+  sick::point_cloud::PointCloudConfiguration config;
   sick::compact::scan_data::PointCloudCollector collector(config);
 
   auto g = sick::test::ScanDataGenerator {}   //
              .withNumberOfSegmentsPerFrame(2) //
              .withNumberOfColumns(1)          //
-             .withNumberOfRows(1)
-             .withTelegramCounter(3);
+             .withNumberOfRows(1)             //
+             .withTelegramSequenceNumber(3);
 
   // Collect the segments of the first frame
   collector.collect(g.next());
@@ -109,12 +109,12 @@ TEST(PointCloudCollectorTest, collect_works_for_multiple_frames)
 
   auto const pc = collector.getPointCloud();
   EXPECT_EQ(3, pc.numberOfPoints());
-  EXPECT_EQ(3000, pc.timestamp().microsecondsSinceEpoch()); // Timestamp is set by the generator to telegramCounter * 1000 us
+  EXPECT_EQ(3000, pc.timestamp().microsecondsSinceEpoch()); // Timestamp is set by the generator to telegramSequenceNumber * 1000 us
 }
 
 TEST(PointCloudCollectorTest, collect_works_when_number_of_beams_per_scan_changes)
 {
-  sick::PointCloudConfiguration config;
+  sick::point_cloud::PointCloudConfiguration config;
   sick::compact::scan_data::PointCloudCollector collector(config);
 
   // Collect a first segment with 1 beam per scan
@@ -136,7 +136,7 @@ TEST(PointCloudCollectorTest, collect_works_when_number_of_beams_per_scan_change
 
 TEST(PointCloudCollectorTest, collect_works_when_number_of_layers_changes)
 {
-  sick::PointCloudConfiguration config;
+  sick::point_cloud::PointCloudConfiguration config;
   sick::compact::scan_data::PointCloudCollector collector(config);
 
   // Collect a first segment with 1 layer
@@ -158,7 +158,7 @@ TEST(PointCloudCollectorTest, collect_works_when_number_of_layers_changes)
 
 TEST(PointCloudCollectorTest, collect_computes_correct_geometry)
 {
-  sick::PointCloudConfiguration config;
+  sick::point_cloud::PointCloudConfiguration config;
   sick::compact::scan_data::PointCloudCollector collector(config);
 
   auto g = sick::test::ScanDataGenerator {}   //
@@ -201,7 +201,7 @@ TEST(PointCloudCollectorTest, collect_computes_correct_geometry)
 
 TEST(PointCloudCollectorTest, reset_clears_pointcloud)
 {
-  sick::PointCloudConfiguration config;
+  sick::point_cloud::PointCloudConfiguration config;
   sick::compact::scan_data::PointCloudCollector collector(config);
 
   auto g = sick::test::ScanDataGenerator {}   //

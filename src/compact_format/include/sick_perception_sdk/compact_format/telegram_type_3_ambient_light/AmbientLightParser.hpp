@@ -17,10 +17,12 @@ namespace sick::compact::ambient_light {
 class SDK_EXPORT Parser : public CompactParser
 {
 public:
+  using DataT = AmbientLightData;
+
   /**
    * @throws std::invalid_argument if validation or parsing fails.
    */
-  static auto validateAndParse(ByteView data, bool validateChecksum) -> AmbientLightData;
+  static auto validateAndParse(ByteView data, bool validateChecksum) -> DataT;
 
   auto getSize(ByteView data) const -> std::optional<std::size_t> override;
 };

@@ -7,12 +7,12 @@ SPDX-License-Identifier: MIT
 
 #include "../examples_helper.hpp"
 #include <sick_perception_sdk/common/BitmapEncoder.hpp>
-#include <sick_perception_sdk/compact_format/PointCloud/MultiEchoPointCloud.hpp>
+#include <sick_perception_sdk/compact_format/PointCloud/OrganizedPointCloud.hpp>
 #include <sick_perception_sdk/compact_format/PointCloud/PointCloudToPcdConverter.hpp>
 #include <sick_perception_sdk/compact_format/telegram_type_6_multiScan200/MultiScan200Data.hpp>
-#include <sick_perception_sdk/drivers/multiScan200/Driver.hpp>
+#include <sick_perception_sdk/drivers/multiScan200/MultiScan200Driver.hpp>
 #include <sick_perception_sdk/sensor_configuration/HttpClient/httplib_client/HttpClient.hpp>
-#include <sick_perception_sdk/sensor_configuration/multiScan200/Configurator.hpp>
+#include <sick_perception_sdk/sensor_configuration/multiScan200/MultiScan200Configurator.hpp>
 
 #include <filesystem>
 #include <fstream>
@@ -52,9 +52,10 @@ void writeAmbientLightToBitmap(sick::compact::multiscan200::MultiScan200Data con
   std::ofstream file(filename, std::ios_base::binary);
   file.write(reinterpret_cast<char const*>(bitmap.data()), bitmap.size());
   file.close();
+  std::cout << "Wrote ambient light bitmap with " << ambientLightData.size() << "x" << ambientLightData[0].size() << " pixels to " << filename << "\n";
 }
 
-void writePointCloudToPCDFile(sick::MultiEchoPointCloud const& pointCloud, std::string const& filePath)
+void writePointCloudToPCDFile(sick::point_cloud::OrganizedPointCloud const& pointCloud, std::string const& filePath)
 {
   // open in binary mode to prevent the compiler from converting \n to \r\n on windows
   sick::pcd::writeToAsciiFile(pointCloud, filePath);
@@ -74,10 +75,10 @@ int main(int argc, char* argv[])
     // Change the default passwords during initial commissioning to secure your device.
     // Passwords can be updated via the web browser or API.
     // For production use, store passwords in a secure vault rather than in plain text.
-    sick::multiScan200::v0_9_0::Configurator configurator(httpClient, sick::UserLevel::Service, "servicelevel");
+    sick::multiScan200::v0_9_0_2C::Configurator configurator(httpClient, sick::UserLevel::Service, "servicelevel");
 
     std::cout << "Configuring compact streaming...\n";
-    configurator.streaming.set(sick::multiScan200::v0_9_0::Configurator::StreamingMode::Compact);
+    configurator.streaming.set(sick::multiScan200::v0_9_0_2C::Configurator::StreamingMode::Compact);
 
     // Create multiScan200_files directory if it doesn't exist
     std::filesystem::create_directories(basePath);
@@ -88,7 +89,7 @@ int main(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
-  sick::PointCloudConfiguration config;
+  sick::point_cloud::PointCloudConfiguration config;
   config.fields.enableIntensity  = true;
   config.fields.enableSpherical  = true;
   config.fields.enableRing       = true;
@@ -97,18 +98,21 @@ int main(int argc, char* argv[])
   config.fields.enableEcho       = true;
 
   sick::multiScan200::Driver driver(deviceAddress, sick::examples::printExceptionMessage);
-  driver.scanDataReceiver().setup();
-  driver.scanDataReceiver().setOnNewFrameCallback(
-    [basePath](sick::MultiEchoPointCloud const& framePointCloud) {
-      auto const filename = basePath / ("multiScan200_" + std::to_string(framePointCloud.timestamp().microsecondsSinceEpoch()) + ".pcd");
-      writePointCloudToPCDFile(framePointCloud, filename.string());
-    },
-    config
-  );
-  driver.scanDataReceiver().setOnNewFrameCallback([basePath](sick::compact::multiscan200::MultiScan200Data const& data) {
-    auto const filename = basePath / ("ambient_light_" + std::to_string(data.telegramHeader.transmitTimestamp.microsecondsSinceEpoch()) + ".bmp");
-    writeAmbientLightToBitmap(data, filename.string());
-  });
+  driver
+    .scanDataReceiver() //
+    .setup()            //
+    .setOnNewFrameCallback(
+      [basePath](sick::point_cloud::OrganizedPointCloud const& framePointCloud) {
+        auto const filename = basePath / ("multiScan200_point_cloud_" + std::to_string(framePointCloud.timestamp().microsecondsSinceEpoch()) + ".pcd");
+        writePointCloudToPCDFile(framePointCloud, filename.string());
+      },
+      config
+    )
+    .setOnNewFrameCallback([basePath](sick::compact::multiscan200::MultiScan200Data const& data) {
+      auto const filename =
+        basePath / ("multiScan200_ambient_light_" + std::to_string(data.telegramHeader.transmitTimestamp.microsecondsSinceEpoch()) + ".bmp");
+      writeAmbientLightToBitmap(data, filename.string());
+    });
   driver.run();
 
   std::this_thread::sleep_for(10s);

@@ -13,14 +13,12 @@ SPDX-License-Identifier: MIT
 static std::vector<std::string> const deviceNames = {
   "LRS4000",      //
   "multiScan100", //
-  "multiScan200", //
   "picoScan100",  //
 };
 
 static std::vector<std::string> const testFiles = {
   "LRS4581_scan-frame_0.bin",              //
   "multiScan136_scan-frame_0.bin",         //
-  "multiScan270_scan-frame_0.bin",         //
   "picoScan150_profile1_scan-frame_0.bin", //
 };
 

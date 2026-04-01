@@ -23,7 +23,6 @@ namespace sick::compact::ambient_light {
 struct SDK_EXPORT MetaData
 {
   std::uint64_t frameSequenceNumber {0};
-  std::uint32_t senderId {0};
   Timestamp startTimestamp;
   Timestamp stopTimestamp;
   std::uint16_t numberOfLayers {0};
@@ -47,7 +46,7 @@ struct SDK_EXPORT Payload
 
 struct SDK_EXPORT AmbientLightData
 {
-  TelegramHeader telegramHeader;
+  TelegramHeaderWithSenderSerialNumber telegramHeader;
   Payload payload;
 };
 

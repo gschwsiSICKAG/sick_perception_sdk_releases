@@ -8,8 +8,8 @@ SPDX-License-Identifier: MIT
 #include <sick_perception_sdk/common/export.hpp>
 #include <sick_perception_sdk/common/quantities/Angle.hpp>
 #include <sick_perception_sdk/common/quantities/Duration.hpp>
-#include <sick_perception_sdk/compact_format/PointCloud/MultiEchoPointCloud.hpp>
 #include <sick_perception_sdk/compact_format/PointCloud/PointCloudConfiguration.hpp>
+#include <sick_perception_sdk/compact_format/PointCloud/UnorganizedPointCloud.hpp>
 #include <sick_perception_sdk/compact_format/PointCloud/UnorganizedPointCloudBuilder.hpp>
 #include <sick_perception_sdk/compact_format/telegram_type_1_scan_data/ScanData.hpp>
 
@@ -29,7 +29,7 @@ namespace sick::compact::scan_data {
  */
 struct SDK_EXPORT LayerInfo
 {
-  std::int8_t id {-1};
+  std::uint8_t id {0};
   bool isInPointCloud {false};
   float sinElevation {std::numeric_limits<float>::quiet_NaN()};
   float cosElevation {std::numeric_limits<float>::quiet_NaN()};
@@ -47,7 +47,7 @@ class SDK_EXPORT PointCloudCollector
 {
 public:
   PointCloudCollector();
-  explicit PointCloudCollector(PointCloudConfiguration configuration);
+  explicit PointCloudCollector(point_cloud::PointCloudConfiguration configuration);
 
   /**
    * @brief Collects the scan data into the point cloud.
@@ -64,17 +64,18 @@ public:
    * 
    * @warning The collector is in an unspecified state after calling this function and must be resetted before collecting new data.
    */
-  auto getPointCloud() -> MultiEchoPointCloud;
+  auto getPointCloud() -> point_cloud::UnorganizedPointCloud;
 
 private:
-  UnorganizedPointCloudBuilder m_builder;
-  PointCloudConfiguration m_configuration;
+  point_cloud::PointCloudConfiguration m_configuration;
+  std::set<point_cloud::PointField::FieldType> m_desiredFields; // Cached set of desired fields from m_configuration
+  point_cloud::UnorganizedPointCloudBuilder m_builder;
   BitField<BeamContent> m_requiredBeamContent;
   BitField<EchoContent> m_requiredEchoContent;
   Timestamp m_pointCloudTimestamp;
   bool m_hasCollectionStarted {false};
 
-  auto calculateLayerInfo(Module::MetaData const& moduleMetaData, std::map<Angle, std::int8_t> const& elevationToLayerIdMapping, bool useAzimuthFromHeader)
+  auto calculateLayerInfo(Module::MetaData const& moduleMetaData, std::map<Angle, std::uint8_t> const& elevationToLayerIdMapping, bool useAzimuthFromHeader)
     const -> std::vector<LayerInfo>;
 
   auto isEchoInvalid(Beam const& beam, Echo const& echo, std::size_t echoIndex, bool echoIsTheLastValidEcho) const -> bool;

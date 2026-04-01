@@ -5,12 +5,9 @@ SPDX-License-Identifier: MIT
 
 #include <sick_perception_sdk/compact_format/telegram_type_6_multiScan200/PointCloudConverter.hpp>
 
-#include <sick_perception_sdk/compact_format/telegram_type_6_multiScan200/MultiScan200Parser.hpp>
-
-#include <sick_perception_sdk/compact_format/CompactParser.hpp>
-
 #include "../test/utils/TestParams.hpp"
 #include "benchmark_tools.hpp"
+#include <sick_perception_sdk/compact_format/telegram_type_6_multiScan200/MultiScan200Parser.hpp>
 
 #include <benchmark/benchmark.h>
 
@@ -23,8 +20,8 @@ static std::vector<std::string> const deviceNames = {
 };
 
 static std::vector<std::string> const testFiles = {
-  "multiScan270_0.8.0_2337_ms270-frame_0.bin",      //
-  "multiScan270_0.8.0_2337_ms270_full-frame_0.bin", //
+  "multiScan270_0.9.0_ms270_all_fields-frame_0.bin",     //
+  "multiScan270_0.9.0_ms270_minimal_fields-frame_0.bin", //
 };
 
 class MultiScan200PointCloudConverterBenchmark : public ::benchmark::Fixture
@@ -41,11 +38,11 @@ BENCHMARK_DEFINE_F(MultiScan200PointCloudConverterBenchmark, convert_cartesian)(
   constexpr bool validateChecksum = true;
   auto const data                 = sick::compact::multiscan200::Parser::validateAndParse(rawDataView, validateChecksum);
 
-  sick::compact::multiscan200::PointCloudConverter converter {sick::PointCloudConfiguration {}};
+  sick::compact::multiscan200::PointCloudConverter converter {sick::point_cloud::PointCloudConfiguration {}};
 
   for (auto _ : state)
   {
-    benchmark::DoNotOptimize(converter.convert(data));
+    benchmark::DoNotOptimize(converter.convertToOrganized(data));
   }
 }
 
@@ -60,7 +57,7 @@ BENCHMARK_DEFINE_F(MultiScan200PointCloudConverterBenchmark, convert_all)(benchm
   constexpr bool validateChecksum = true;
   auto const data                 = sick::compact::multiscan200::Parser::validateAndParse(rawDataView, validateChecksum);
 
-  sick::compact::multiscan200::PointCloudConverter converter {sick::PointCloudConfiguration {
+  sick::compact::multiscan200::PointCloudConverter converter {sick::point_cloud::PointCloudConfiguration {
     true, // enableCartesian
     true, // enableSpherical
     true, // enableIntensity
@@ -75,7 +72,7 @@ BENCHMARK_DEFINE_F(MultiScan200PointCloudConverterBenchmark, convert_all)(benchm
 
   for (auto _ : state)
   {
-    benchmark::DoNotOptimize(converter.convert(data));
+    benchmark::DoNotOptimize(converter.convertToOrganized(data));
   }
 }
 

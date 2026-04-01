@@ -21,8 +21,8 @@ ScanDataGenerator::ScanDataGenerator()
   , m_numberOfRows(1)
   , m_numberOfModules(1)
   , m_numberOfSegmentsPerFrame(1)
-  , m_segmentCounter(0)
-  , m_telegramCounter(0)
+  , m_segmentIndex(0)
+  , m_telegramSequenceNumber(0)
 { }
 
 auto ScanDataGenerator::withNumberOfColumns(int value) -> ScanDataGenerator&
@@ -49,9 +49,9 @@ auto ScanDataGenerator::withNumberOfSegmentsPerFrame(int value) -> ScanDataGener
   return *this;
 }
 
-auto ScanDataGenerator::withTelegramCounter(std::uint64_t value) -> ScanDataGenerator&
+auto ScanDataGenerator::withTelegramSequenceNumber(std::uint64_t value) -> ScanDataGenerator&
 {
-  m_telegramCounter = value;
+  m_telegramSequenceNumber = value;
   return *this;
 }
 
@@ -64,7 +64,7 @@ auto ScanDataGenerator::next(Timestamp transmitTimestamp) -> compact::scan_data:
   compact::TelegramHeader header {
     kStartOfFrame,
     compact::TelegramType::ScanData,
-    m_telegramCounter,
+    m_telegramSequenceNumber,
     transmitTimestamp,
     kTelegramVersion,
     0 // number of bytes of first module; we don't use this for tests
@@ -80,31 +80,31 @@ auto ScanDataGenerator::next(Timestamp transmitTimestamp) -> compact::scan_data:
   constexpr std::uint32_t kChecksum = 0; // We don't use this for tests
 
   compact::scan_data::ScanData data {header, std::move(modules), kChecksum};
-  m_segmentCounter++;
-  if (m_segmentCounter == m_numberOfSegmentsPerFrame)
+  m_segmentIndex++;
+  if (m_segmentIndex == m_numberOfSegmentsPerFrame)
   {
-    m_segmentCounter = 0;
+    m_segmentIndex = 0;
     m_frameSequenceNumber++;
   }
-  m_telegramCounter++;
+  m_telegramSequenceNumber++;
   return data;
 }
 
 void ScanDataGenerator::reset()
 {
-  m_telegramCounter     = 0;
-  m_segmentCounter      = 0;
-  m_frameSequenceNumber = 0;
+  m_telegramSequenceNumber = 0;
+  m_segmentIndex           = 0;
+  m_frameSequenceNumber    = 0;
 }
 
 auto ScanDataGenerator::createModule() -> compact::scan_data::Module
 {
   // Start azimuth of the current segment
-  auto const startAzimuth = kAzimuthResolution * m_segmentCounter * m_numberOfColumns;
+  auto const startAzimuth = kAzimuthResolution * m_segmentIndex * m_numberOfColumns;
   // End azimuth of the current segment
   auto const stopAzimuth = startAzimuth + kAzimuthResolution * (m_numberOfColumns - 1);
   // Timestamp of the first beam of the segment
-  auto const firstTimestamp = Timestamp::fromMicrosecondsSinceEpoch(m_telegramCounter * 1'000);
+  auto const firstTimestamp = Timestamp::fromMicrosecondsSinceEpoch(m_telegramSequenceNumber * 1'000);
   // Timestamp of the last beam of the segment
   auto const lastTimestamp = firstTimestamp + Duration::fromMicroseconds(m_numberOfColumns - 1);
 
@@ -114,7 +114,7 @@ auto ScanDataGenerator::createModule() -> compact::scan_data::Module
   using BeamContent = compact::scan_data::BeamContent;
 
   compact::scan_data::Module::MetaData metaData = {
-    m_segmentCounter,
+    m_segmentIndex,
     m_frameSequenceNumber,
     kSenderId,
     m_numberOfRows,

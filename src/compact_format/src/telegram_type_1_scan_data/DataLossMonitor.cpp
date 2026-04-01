@@ -22,7 +22,7 @@ auto DataLossMonitor::check(ScanData const& scanData) -> LossCounts
 {
   LossCounts ret;
 
-  ret.numberOfLostTelegrams = m_telegramLossMonitor.computeNumberOfMissingElements(scanData.telegramHeader.telegramCounter);
+  ret.numberOfLostTelegrams = m_telegramLossMonitor.computeNumberOfMissingElements(scanData.telegramHeader.telegramSequenceNumber);
 
   if (scanData.modules.empty())
   {

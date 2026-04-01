@@ -62,7 +62,7 @@ auto readPayload(ByteView data, Payload& payload) -> std::size_t
 
 auto Parser::validateAndParse(ByteView data, bool validateChecksum) -> AmbientLightData
 {
-  TelegramHeader telegramHeader {};
+  TelegramHeaderWithSenderSerialNumber telegramHeader {};
   std::size_t readPosition = CompactParser::readValue(data, telegramHeader);
   CompactParser::validateTelegramHeader(telegramHeader, TelegramType::AmbientLight, kSupportedTelegramVersions);
 
@@ -79,16 +79,16 @@ auto Parser::validateAndParse(ByteView data, bool validateChecksum) -> AmbientLi
 
 auto Parser::getSize(ByteView data) const -> std::optional<std::size_t>
 {
-  if (data.size() < sizeof(TelegramHeader))
+  if (data.size() < sizeof(TelegramHeaderWithSenderSerialNumber))
   {
     return std::nullopt;
   }
 
-  TelegramHeader header;
+  TelegramHeaderWithSenderSerialNumber header;
   CompactParser::readValue(data, header);
   CompactParser::validateTelegramHeader(header, TelegramType::AmbientLight, kSupportedTelegramVersions);
 
-  return sizeof(TelegramHeader) + header.payloadLength + sizeof(std::uint32_t);
+  return sizeof(TelegramHeaderWithSenderSerialNumber) + header.payloadLength + sizeof(std::uint32_t);
 }
 
 } // namespace sick::compact::ambient_light

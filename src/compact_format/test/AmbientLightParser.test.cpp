@@ -41,7 +41,7 @@ TEST_P(AmbientLightParserTest, invalid_data_is_detected)
 INSTANTIATE_TEST_SUITE_P(
   AmbientLightParser,
   AmbientLightParserTest,
-  testing::Values(sick::test::TestParams {"multiScan200", "data/multiScan270_ambient_light-frame_0.bin"}),
+  testing::Values(sick::test::TestParams {"multiScan200", "data/multiScan270_0.9.0_ambient_light-frame_0.bin"}),
   [](testing::TestParamInfo<sick::test::TestParams> const& info) {
     return info.param.device;
   }
@@ -49,7 +49,7 @@ INSTANTIATE_TEST_SUITE_P(
 
 TEST(AmbientLightParserTest, corrupted_start_of_frame_is_detected)
 {
-  auto data = sick::test::readBinary("data/multiScan270_ambient_light-frame_0.bin");
+  auto data = sick::test::readBinary("data/multiScan270_0.9.0_ambient_light-frame_0.bin");
   data[0]   = 42;
 
   // Recompute the checksum to ensure that the parser does not fail due to invalid checksum.
@@ -61,7 +61,7 @@ TEST(AmbientLightParserTest, corrupted_start_of_frame_is_detected)
 
 TEST(AmbientLightParserTest, corrupted_frame_id_is_detected)
 {
-  auto data = sick::test::readBinary("data/multiScan270_ambient_light-frame_0.bin");
+  auto data = sick::test::readBinary("data/multiScan270_0.9.0_ambient_light-frame_0.bin");
   data[4]   = 42; // Command ID is the 5th byte (index 4).
 
   // Recompute the checksum to ensure that the parser does not fail due to invalid checksum.
@@ -73,7 +73,7 @@ TEST(AmbientLightParserTest, corrupted_frame_id_is_detected)
 
 TEST(AmbientLightParserTest, corrupted_telegram_version_is_detected)
 {
-  auto data = sick::test::readBinary("data/multiScan270_ambient_light-frame_0.bin");
+  auto data = sick::test::readBinary("data/multiScan270_0.9.0_ambient_light-frame_0.bin");
   data[24]  = 42; // Telegram version is the 25th byte (index 24).
 
   // Recompute the checksum to ensure that the parser does not fail due to invalid checksum.
@@ -85,7 +85,7 @@ TEST(AmbientLightParserTest, corrupted_telegram_version_is_detected)
 
 TEST(AmbientLightParserTest, injected_data_errors_are_detected)
 {
-  auto data = sick::test::readBinary("data/multiScan270_ambient_light-frame_0.bin");
+  auto data = sick::test::readBinary("data/multiScan270_0.9.0_ambient_light-frame_0.bin");
   data.insert(data.end() - 10, 42); // Inject an error byte. Do it close to the end so the test is faster.
 
   constexpr bool validateChecksum = true;

@@ -9,5 +9,5 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/sensor_configuration/api/LRS4000/1_9_0_0R.nlohmann_json.g.hpp>
+#include <sick_perception_sdk/sensor_configuration/api/LRS4000/1_9_1_0R.nlohmann_json.g.hpp>
 

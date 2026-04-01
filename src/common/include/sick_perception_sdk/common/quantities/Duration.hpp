@@ -164,7 +164,11 @@ constexpr auto operator"" _ns(unsigned long long value) -> Duration
 
 constexpr auto min(Duration const& lhs, Duration const& rhs) -> Duration
 {
-  return lhs.nanoseconds() < rhs.nanoseconds() ? lhs : rhs;
+  if (lhs.nanoseconds() < rhs.nanoseconds())
+  {
+    return lhs;
+  }
+  return rhs;
 }
 
 } // namespace sick

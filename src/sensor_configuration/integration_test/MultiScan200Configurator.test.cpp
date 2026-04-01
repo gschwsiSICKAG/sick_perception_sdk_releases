@@ -3,7 +3,7 @@ Copyright (c) 2026 SICK AG
 SPDX-License-Identifier: MIT
 */
 
-#include <sick_perception_sdk/sensor_configuration/multiScan200/Configurator.hpp>
+#include <sick_perception_sdk/sensor_configuration/multiScan200/MultiScan200Configurator.hpp>
 
 #include "test_config.hpp"
 #include <sick_perception_sdk/sensor_configuration/HttpClient/httplib_client/HttpClient.hpp>
@@ -26,7 +26,7 @@ protected:
   static void SetUpTestSuite()
   {
     std::cout << "Waiting for factory reset to complete ";
-    sick::multiScan200::v0_9_0::Configurator configurator {
+    sick::multiScan200::v0_9_0_2C::Configurator configurator {
       std::make_unique<sick::httplib_client::HttpClient>(getSensorAddress(), getSensorPort()),
       sick::UserLevel::Service,
       "servicelevel"
@@ -49,7 +49,7 @@ protected:
     std::cout << "\n";
   }
 
-  sick::multiScan200::v0_9_0::Configurator m_configurator;
+  sick::multiScan200::v0_9_0_2C::Configurator m_configurator;
 };
 
 TEST_F(MultiScan200ConfiguratorTest, deviceType_get)
@@ -152,7 +152,7 @@ TEST_F(MultiScan200ConfiguratorTest, stopStartMeasure)
 
 TEST_F(MultiScan200ConfiguratorTest, rebootDevice)
 {
-  auto const previousPowerOnCount = m_configurator.readVariable<sick::multiScan200::v0_9_0::api::rest::PowerOnCnt>()._PowerOnCnt;
+  auto const previousPowerOnCount = m_configurator.readVariable<sick::multiScan200::v0_9_0_2C::api::rest::PowerOnCnt>()._PowerOnCnt;
 
   m_configurator.reboot();
   std::cout << "Waiting for device to reboot";
@@ -172,7 +172,7 @@ TEST_F(MultiScan200ConfiguratorTest, rebootDevice)
   }
   std::cout << "\n";
 
-  auto const newPowerOnCount = m_configurator.readVariable<sick::multiScan200::v0_9_0::api::rest::PowerOnCnt>()._PowerOnCnt;
+  auto const newPowerOnCount = m_configurator.readVariable<sick::multiScan200::v0_9_0_2C::api::rest::PowerOnCnt>()._PowerOnCnt;
   EXPECT_EQ(newPowerOnCount, previousPowerOnCount + 1);
 }
 

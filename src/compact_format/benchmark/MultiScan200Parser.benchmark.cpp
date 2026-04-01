@@ -5,10 +5,9 @@ SPDX-License-Identifier: MIT
 
 #include <sick_perception_sdk/compact_format/telegram_type_6_multiScan200/MultiScan200Parser.hpp>
 
-#include <sick_perception_sdk/compact_format/CompactParser.hpp>
-
 #include "../test/utils/TestParams.hpp"
 #include "benchmark_tools.hpp"
+#include <sick_perception_sdk/compact_format/CompactParser.hpp>
 
 #include <benchmark/benchmark.h>
 
@@ -21,8 +20,8 @@ static std::vector<std::string> const deviceNames = {
 };
 
 static std::vector<std::string> const testFiles = {
-  "multiScan270_0.8.0_2337_ms270-frame_0.bin",      //
-  "multiScan270_0.8.0_2337_ms270_full-frame_0.bin", //
+  "multiScan270_0.9.0_ms270_all_fields-frame_0.bin",     //
+  "multiScan270_0.9.0_ms270_minimal_fields-frame_0.bin", //
 };
 
 class MultiScan200ParserBenchmark : public ::benchmark::Fixture

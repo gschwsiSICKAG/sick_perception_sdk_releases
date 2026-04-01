@@ -21,6 +21,11 @@ set(LIB_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/src/quantities/Temperature.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/quantities/Speed.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/quantities/Timestamp.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/socket/ConnectionError.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/socket/ReceiveError.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/socket/SocketError.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/socket/TcpClientSocket.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/socket/UdpListeningSocket.cpp
 )
 
 target_sources(${LIB_NAME} PRIVATE ${LIB_SOURCES})

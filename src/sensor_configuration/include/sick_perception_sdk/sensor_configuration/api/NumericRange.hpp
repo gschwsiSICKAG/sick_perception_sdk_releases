@@ -7,12 +7,13 @@ SPDX-License-Identifier: MIT
 
 #pragma once
 
+#include <cstdint>
 #include <nlohmann/json.hpp>
 #include <stdexcept>
 
 namespace sick {
 
-template <int min, int max, int defaultValue>
+template <typename ValueT, ValueT min, ValueT max, ValueT defaultValue>
 class NumericRange
 {
 public:
@@ -22,8 +23,8 @@ public:
     static_assert(defaultValue >= min && defaultValue <= max, "Default value is out of range");
   }
 
-  // NOLINTNEXTLINE(google-explicit-constructor): implicit conversion from int is desired
-  constexpr NumericRange(int value)
+  // NOLINTNEXTLINE(google-explicit-constructor): implicit conversion from ValueT is desired
+  constexpr NumericRange(ValueT value)
     : m_value(value)
   {
     if (value < min || value > max)
@@ -32,20 +33,20 @@ public:
     }
   }
 
-  constexpr auto value() const
+  constexpr auto value() const -> ValueT
   {
     return m_value;
   }
 
 private:
-  int m_value;
+  ValueT m_value;
 };
 
-template <int min, int max, int defaultValue>
-inline void from_json(nlohmann::json const& j, NumericRange<min, max, defaultValue>& r)
+template <typename ValueT, ValueT min, ValueT max, ValueT defaultValue>
+inline void from_json(nlohmann::json const& j, NumericRange<ValueT, min, max, defaultValue>& r)
 {
-  int const value = j.get<int>();
-  r               = NumericRange<min, max, defaultValue>(value);
+  ValueT const value = j.get<ValueT>();
+  r                  = NumericRange<ValueT, min, max, defaultValue>(value);
 }
 
 } // namespace sick

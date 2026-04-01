@@ -13,14 +13,14 @@ using namespace sick::compact::multiscan200;
 
 namespace {
 
-auto makeData(uint64_t telegramCounter, uint64_t frameNumber, uint64_t segmentIndex) -> MultiScan200Data
+auto makeData(uint64_t telegramSequenceNumber, uint64_t frameSequenceNumber, uint64_t segmentIndex) -> MultiScan200Data
 {
   TelegramHeaderWithSenderSerialNumber header;
   SegmentMetaData metaData;
 
-  header.telegramCounter       = telegramCounter;
-  metaData.frameSequenceNumber = frameNumber;
-  metaData.segmentIndex        = segmentIndex;
+  header.telegramSequenceNumber = telegramSequenceNumber;
+  metaData.frameSequenceNumber  = frameSequenceNumber;
+  metaData.segmentIndex         = segmentIndex;
 
   return MultiScan200Data {
     header,                                  //
@@ -36,14 +36,14 @@ auto makeData(uint64_t telegramCounter, uint64_t frameNumber, uint64_t segmentIn
 
 } // namespace
 
-TEST(Telegram_type_6_multiScan200_DataLossMonitorTest, check_uses_telegram_counter_from_telegram_header)
+TEST(Telegram_type_6_multiScan200_DataLossMonitorTest, check_uses_telegram_sequence_number_from_telegram_header)
 {
   constexpr std::uint64_t expectedFrameSequenceNumberIncrement = 1;
   constexpr std::uint64_t expectedNumberOfSegmentsPerFrame     = 12;
   DataLossMonitor monitor {expectedFrameSequenceNumberIncrement, expectedNumberOfSegmentsPerFrame};
 
   monitor.check(makeData(1, 10, 5));
-  auto result = monitor.check(makeData(5, 10, 5)); // gap in telegram counter
+  auto result = monitor.check(makeData(5, 10, 5)); // gap in telegram sequence number
 
   EXPECT_EQ(result.numberOfLostTelegrams, 3);
 }
@@ -55,7 +55,7 @@ TEST(Telegram_type_6_multiScan200_DataLossMonitorTest, check_uses_frame_sequence
   DataLossMonitor monitor {expectedFrameSequenceNumberIncrement, expectedNumberOfSegmentsPerFrame};
 
   monitor.check(makeData(1, 10, 5));
-  auto result = monitor.check(makeData(2, 15, 5)); // gap in frame number
+  auto result = monitor.check(makeData(2, 15, 5)); // gap in frame sequence number
 
   EXPECT_EQ(result.numberOfLostFrames, 4);
 }

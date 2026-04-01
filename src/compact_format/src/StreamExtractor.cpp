@@ -105,6 +105,7 @@ void StreamExtractor::discardStx()
 {
   if (m_buffer.size() >= kStxBytes.size())
   {
+    // AXIVION Next Construct CertC++-CTR55: iterator increment is safe because of the size check above.
     m_buffer.erase(m_buffer.begin(), m_buffer.begin() + kStxBytes.size());
   }
 }
@@ -176,6 +177,11 @@ void StreamExtractor::readTelegramType()
 
 auto StreamExtractor::extractPacket() -> std::optional<std::vector<std::uint8_t>>
 {
+  if (m_parser == nullptr)
+  {
+    throw std::runtime_error("No valid Compact telegram received yet.");
+  }
+
   LOG_FAST_LOOP_INFO("StreamExtractor") << "Validating and extracting packet.";
   m_state                         = State::WaitingForChecksum;
   ByteView const view             = getBufferFromStx();

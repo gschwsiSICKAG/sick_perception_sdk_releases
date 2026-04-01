@@ -11,10 +11,10 @@ namespace sick {
 
 constexpr auto angleToSopas(Angle const& angle)
 {
-  return static_cast<int>(angle.degrees() * 10'000.0f); // NOLINT(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
+  return static_cast<std::int32_t>(angle.degrees() * 10'000.0f); // NOLINT(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
 }
 
-constexpr auto sopasToAngle(int sopas)
+constexpr auto sopasToAngle(std::int32_t sopas)
 {
   return Angle::fromDegrees(static_cast<float>(sopas) / 10'000.0f); // NOLINT(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
 }

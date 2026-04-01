@@ -7,9 +7,9 @@ SPDX-License-Identifier: MIT
 
 #include "../examples_helper.hpp"
 #include <sick_perception_sdk/compact_format/telegram_type_6_multiScan200/DataLossMonitor.hpp>
-#include <sick_perception_sdk/drivers/multiScan200/Driver.hpp>
+#include <sick_perception_sdk/drivers/multiScan200/MultiScan200Driver.hpp>
 #include <sick_perception_sdk/sensor_configuration/HttpClient/httplib_client/HttpClient.hpp>
-#include <sick_perception_sdk/sensor_configuration/multiScan200/Configurator.hpp>
+#include <sick_perception_sdk/sensor_configuration/multiScan200/MultiScan200Configurator.hpp>
 
 #include <chrono>
 #include <iostream>
@@ -19,21 +19,21 @@ using namespace sick::literals;
 using namespace std::chrono_literals;
 using LossCounts = sick::compact::multiscan200::DataLossMonitor::LossCounts;
 
-std::uint8_t newScanCounter = 0;
+std::uint8_t numberOfScans = 0;
 
 void onNewData(sick::compact::multiscan200::MultiScan200Data const& data)
 {
-  newScanCounter++;
-  if (newScanCounter == 100)
+  numberOfScans++;
+  if (numberOfScans == 100)
   {
-    std::cout << "Received scan data with telegram counter: " << data.telegramHeader.telegramCounter << '\n';
-    newScanCounter = 0;
+    std::cout << "Received scan data with telegram sequence number: " << data.telegramHeader.telegramSequenceNumber << '\n';
+    numberOfScans = 0;
   }
 }
 
 void onDataLoss(LossCounts const& lossCounts)
 {
-  std::cout << "Package losses detected: lost telegrams=" << lossCounts.numberOfLostTelegrams << ", lost frames=" << lossCounts.numberOfLostFrames
+  std::cout << "Data losses detected: lost telegrams=" << lossCounts.numberOfLostTelegrams << ", lost frames=" << lossCounts.numberOfLostFrames
             << ", lost segments=" << lossCounts.numberOfLostSegments << '\n';
 }
 
@@ -49,7 +49,7 @@ int main(int argc, char* argv[])
   // Change the default passwords during initial commissioning to secure your device.
   // Passwords can be updated via the web browser or API.
   // For production use, store passwords in a secure vault rather than in plain text.
-  sick::multiScan200::v0_9_0::Configurator configurator(httpClient, sick::UserLevel::Service, "servicelevel");
+  sick::multiScan200::v0_9_0_2C::Configurator configurator(httpClient, sick::UserLevel::Service, "servicelevel");
 
   try
   {
@@ -67,7 +67,7 @@ int main(int argc, char* argv[])
     configurator.findMe(5_s);
 
     std::cout << "Configuring scan data streaming...\n";
-    configurator.streaming.set(sick::multiScan200::v0_9_0::Configurator::StreamingMode::Compact);
+    configurator.streaming.set(sick::multiScan200::v0_9_0_2C::Configurator::StreamingMode::Compact);
   }
   catch (std::exception const& exception)
   {
@@ -112,9 +112,11 @@ int main(int argc, char* argv[])
   sick::compact::multiscan200::DataLossMonitor dataLossMonitor {expectedFrameSequenceNumberIncrement, expectedNumberOfSegments};
 
   sick::multiScan200::Driver driver(deviceAddress, sick::examples::printExceptionMessage);
-  driver.scanDataReceiver().setup();
-  driver.scanDataReceiver().setDataLossMonitor(std::move(dataLossMonitor), onDataLoss);
-  driver.scanDataReceiver().setOnNewFrameCallback(onNewData);
+  driver
+    .scanDataReceiver()                                         //
+    .setup()                                                    //
+    .setDataLossMonitor(std::move(dataLossMonitor), onDataLoss) //
+    .setOnNewFrameCallback(onNewData);
   driver.run();
   std::this_thread::sleep_for(60s);
   deviceHealthThread.join();

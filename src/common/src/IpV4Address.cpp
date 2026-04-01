@@ -8,6 +8,7 @@ SPDX-License-Identifier: MIT
 #include <array>
 #include <cstddef>
 #include <cstdint>
+#include <cstring>
 #include <exception>
 #include <limits>
 #include <sstream>
@@ -16,8 +17,9 @@ SPDX-License-Identifier: MIT
 
 namespace sick {
 
+// AXIVION Next Construct CertC++-STR32: this ctor is not 100% safe. The implications are documented in the header.
 IpV4Address::IpV4Address(char const* str)
-  : IpV4Address {std::string(str)}
+  : IpV4Address {std::string(str, strlen(str))}
 { }
 
 IpV4Address::IpV4Address(std::string const& str)
@@ -59,7 +61,8 @@ IpV4Address::IpV4Address(std::string const& str)
   }
   catch (std::exception const& exception)
   {
-    throw std::invalid_argument("Invalid IP address format: " + std::string(exception.what()));
+    auto const message = std::string("Invalid IP address format: ") + exception.what();
+    throw std::invalid_argument(message);
   }
 }
 

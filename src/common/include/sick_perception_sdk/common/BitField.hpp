@@ -43,6 +43,11 @@ public:
     : m_value {static_cast<EnumT>(value)}
   { }
 
+  constexpr auto isEmpty() const -> bool
+  {
+    return m_value == static_cast<EnumT>(0);
+  }
+
   constexpr auto isSet(EnumT mask) const -> bool
   {
     return static_cast<std::underlying_type_t<EnumT>>(m_value & mask) == static_cast<std::underlying_type_t<EnumT>>(mask);

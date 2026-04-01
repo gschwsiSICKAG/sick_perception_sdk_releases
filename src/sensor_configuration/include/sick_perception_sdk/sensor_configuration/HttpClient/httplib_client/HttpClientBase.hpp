@@ -37,15 +37,7 @@ public:
                                        << "ms)";
     });
 
-    m_client->set_error_logger([](httplib::Error const& err, httplib::Request const* req) -> void {
-      std::string message = "Request ";
-      if (req)
-      {
-        message += req->method + " " + req->path + " ";
-      }
-      message += "failed: " + httplib::to_string(err);
-      LOG_ERROR("HttpClient") << message;
-    });
+    enableErrorLogging();
   }
 
   ~HttpClientBase() override = default;
@@ -59,6 +51,7 @@ public:
   {
     auto const result = m_client->Get(endpoint);
     throwIfNotSuccessful(result, "GET", endpoint);
+    // AXIVION Next Line CertC++-EXP34 : validity of the result variable is checked in throwIfNotSuccessful.
     return result->body;
   }
 
@@ -66,6 +59,7 @@ public:
   {
     auto const result = m_client->Post(endpoint, payload, "application/json");
     throwIfNotSuccessful(result, "POST", endpoint);
+    // AXIVION Next Line CertC++-EXP34 : validity of the result variable is checked in throwIfNotSuccessful.
     return result->body;
   }
 
@@ -78,6 +72,24 @@ public:
   auto client() const -> ClientT&
   {
     return *m_client;
+  }
+
+  void enableErrorLogging()
+  {
+    m_client->set_error_logger([](httplib::Error const& err, httplib::Request const* req) -> void {
+      std::string message = "Request ";
+      if (req)
+      {
+        message += req->method + " " + req->path + " ";
+      }
+      message += "failed: " + httplib::to_string(err);
+      LOG_ERROR("HttpClient") << message;
+    });
+  }
+
+  void disableErrorLogging()
+  {
+    m_client->set_error_logger(nullptr);
   }
 
 protected:
@@ -94,14 +106,14 @@ private:
         throw std::runtime_error("HTTP " + method + " " + endpoint + " failed due to SSL connection error: " + std::to_string(result.ssl_error()));
         break;
       case httplib::Error::SSLLoadingCerts:
-        throw std::runtime_error("HTTP " + method + " " + endpoint + " failed due to SSL cert loading error: " + std::to_string(result.ssl_openssl_error()));
+        throw std::runtime_error("HTTP " + method + " " + endpoint + " failed due to SSL cert loading error: " + std::to_string(result.ssl_backend_error()));
         break;
       case httplib::Error::SSLServerVerification:
-        throw std::runtime_error("HTTP " + method + " " + endpoint + " failed due to SSL verification error: " + std::to_string(result.ssl_openssl_error()));
+        throw std::runtime_error("HTTP " + method + " " + endpoint + " failed due to SSL verification error: " + std::to_string(result.ssl_backend_error()));
         break;
       case httplib::Error::SSLServerHostnameVerification:
         throw std::runtime_error(
-          "HTTP " + method + " " + endpoint + " failed due to SSL hostname verification, X509 error: " + std::to_string(result.ssl_openssl_error())
+          "HTTP " + method + " " + endpoint + " failed due to SSL hostname verification, X509 error: " + std::to_string(result.ssl_backend_error())
         );
         break;
       default:

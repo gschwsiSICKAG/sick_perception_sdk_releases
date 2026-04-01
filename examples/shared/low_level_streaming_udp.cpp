@@ -7,8 +7,8 @@ SPDX-License-Identifier: MIT
 
 #include "../examples_helper.hpp"
 #include <sick_perception_sdk/common/ByteView.hpp>
+#include <sick_perception_sdk/common/socket/UdpListeningSocket.hpp>
 #include <sick_perception_sdk/compact_format/telegram_type_1_scan_data/ScanDataParser.hpp>
-#include <sick_perception_sdk/drivers/socket/UdpListeningSocket.hpp>
 
 #include <chrono>
 #include <iostream>

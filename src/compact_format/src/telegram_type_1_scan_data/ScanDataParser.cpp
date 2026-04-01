@@ -56,7 +56,7 @@ auto Parser::readModuleMetaData(ByteView data, std::uint32_t version, Module::Me
   std::size_t readPosition = 0;
 
   // FIXME Potential for optimization: Read all of those variables at once with a single
-  // memcpy(&metaData.segmentCounter, data.data() + readPosition, sizeOfFirstFixedSizePortionOfMetaData)
+  // memcpy(&metaData.segmentIndex, data.data() + readPosition, sizeOfFirstFixedSizePortionOfMetaData)
   readPosition += CompactParser::readValueUnsafe(data.subview(readPosition), metaData.segmentIndex);
   readPosition += CompactParser::readValueUnsafe(data.subview(readPosition), metaData.frameSequenceNumber);
   readPosition += CompactParser::readValueUnsafe(data.subview(readPosition), metaData.senderSerialNumber);

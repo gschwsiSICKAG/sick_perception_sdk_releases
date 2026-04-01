@@ -23,7 +23,7 @@ auto DataLossMonitor::check(MultiScan200Data const& data) -> LossCounts
   auto const segmentIndex        = data.segmentMetaData.segmentIndex;
 
   LossCounts ret {
-    m_telegramLossMonitor.computeNumberOfMissingElements(data.telegramHeader.telegramCounter),
+    m_telegramLossMonitor.computeNumberOfMissingElements(data.telegramHeader.telegramSequenceNumber),
     m_frameLossMonitor.computeNumberOfMissingElements(frameSequenceNumber),
     m_segmentLossMonitor.computeNumberOfMissingElements(frameSequenceNumber, segmentIndex)
   };

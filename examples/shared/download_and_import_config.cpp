@@ -8,14 +8,14 @@ SPDX-License-Identifier: MIT
 #include "../examples_helper.hpp"
 
 #if defined(USE_MULTISCAN100)
-#  include <sick_perception_sdk/sensor_configuration/multiScan100/Configurator.hpp>
-using ConfiguratorT = sick::multiScan100::v2_4_1::Configurator;
+#  include <sick_perception_sdk/sensor_configuration/multiScan100/MultiScan100Configurator.hpp>
+using ConfiguratorT = sick::multiScan100::v2_4_2_0R::Configurator;
 #elif defined(USE_MULTISCAN200)
-#  include <sick_perception_sdk/sensor_configuration/multiScan200/Configurator.hpp>
-using ConfiguratorT = sick::multiScan200::v0_9_0::Configurator;
+#  include <sick_perception_sdk/sensor_configuration/multiScan200/MultiScan200Configurator.hpp>
+using ConfiguratorT = sick::multiScan200::v0_9_0_2C::Configurator;
 #else // Default to picoScan150
-#  include <sick_perception_sdk/sensor_configuration/picoScan150/Configurator.hpp>
-using ConfiguratorT = sick::picoScan150::v2_2_1::Configurator;
+#  include <sick_perception_sdk/sensor_configuration/picoScan150/PicoScan150Configurator.hpp>
+using ConfiguratorT = sick::picoScan150::v2_2_1_0R::Configurator;
 #endif
 
 #include <sick_perception_sdk/sensor_configuration/HttpClient/httplib_client/HttpClient.hpp>

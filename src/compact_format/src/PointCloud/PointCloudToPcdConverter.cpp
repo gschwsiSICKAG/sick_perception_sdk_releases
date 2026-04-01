@@ -5,7 +5,7 @@ SPDX-License-Identifier: MIT
 
 #include <sick_perception_sdk/compact_format/PointCloud/PointCloudToPcdConverter.hpp>
 
-#include <sick_perception_sdk/compact_format/PointCloud/MultiEchoPointCloud.hpp>
+#include <sick_perception_sdk/compact_format/PointCloud/UnorganizedPointCloud.hpp>
 
 #include <cstdint>
 #include <cstring> // for std::memcpy
@@ -19,8 +19,8 @@ namespace sick::pcd {
 
 namespace {
 
-using FieldType = MultiEchoPointCloud::PointField::FieldType;
-using DataType  = MultiEchoPointCloud::PointField::DataType;
+using FieldType = point_cloud::PointField::FieldType;
+using DataType  = point_cloud::PointField::DataType;
 
 auto toPcdFieldName(FieldType type) -> char const*
 {
@@ -46,9 +46,9 @@ auto toPcdFieldName(FieldType type) -> char const*
     return "ts";
   case FieldType::Ring:
     return "ring";
-  case FieldType::Layer:
+  case FieldType::LayerId:
     return "layer";
-  case FieldType::Echo:
+  case FieldType::EchoIndex:
     return "echo";
   case FieldType::IsReflector:
     return "isReflector";
@@ -99,7 +99,7 @@ auto getPcdFieldInfo(DataType type) -> PcdFieldInfo
 }
 
 // Helper to write PCD header for all fields
-void writePcdHeader(std::ostream& stream, MultiEchoPointCloud const& cloud, bool binary)
+void writePcdHeader(std::ostream& stream, point_cloud::UnorganizedPointCloud const& cloud, bool binary)
 {
   stream << "# .PCD v.7 - Point Cloud Data file format\n";
   stream << "VERSION .7\n";
@@ -130,7 +130,7 @@ void writePcdHeader(std::ostream& stream, MultiEchoPointCloud const& cloud, bool
 }
 
 // Helper to write one point in ASCII
-void writePointAscii(MultiEchoPointCloud const& cloud, std::size_t pointIndex, std::ostream& stream)
+void writePointAscii(point_cloud::UnorganizedPointCloud const& cloud, std::size_t pointIndex, std::ostream& stream)
 {
   constexpr int kFloatPrecision = 6;
 
@@ -138,63 +138,55 @@ void writePointAscii(MultiEchoPointCloud const& cloud, std::size_t pointIndex, s
   {
     auto const& field = cloud.fields()[fieldIndex];
 
-    switch (field.dataType)
+    switch (field.fieldType)
     {
-    case DataType::Bool:
-    {
-      stream << (cloud.getFieldValue<bool>(field.fieldType, pointIndex) ? "1" : "0");
+    case FieldType::X:
+      stream << std::fixed << std::setprecision(kFloatPrecision) << cloud.getX(pointIndex);
       break;
-    }
-    case DataType::Int8:
-    {
-      stream << static_cast<int>(cloud.getFieldValue<std::int8_t>(field.fieldType, pointIndex));
+    case FieldType::Y:
+      stream << std::fixed << std::setprecision(kFloatPrecision) << cloud.getY(pointIndex);
       break;
-    }
-    case DataType::Uint8:
-    {
-      stream << static_cast<unsigned int>(cloud.getFieldValue<std::uint8_t>(field.fieldType, pointIndex));
+    case FieldType::Z:
+      stream << std::fixed << std::setprecision(kFloatPrecision) << cloud.getZ(pointIndex);
       break;
-    }
-    case DataType::Int16:
-    {
-      stream << cloud.getFieldValue<std::int16_t>(field.fieldType, pointIndex);
+    case FieldType::Range:
+      stream << std::fixed << std::setprecision(kFloatPrecision) << cloud.getRange(pointIndex);
       break;
-    }
-    case DataType::Uint16:
-    {
-      stream << cloud.getFieldValue<std::uint16_t>(field.fieldType, pointIndex);
+    case FieldType::Azimuth:
+      stream << std::fixed << std::setprecision(kFloatPrecision) << cloud.getAzimuth(pointIndex);
       break;
-    }
-    case DataType::Int32:
-    {
-      stream << cloud.getFieldValue<std::int32_t>(field.fieldType, pointIndex);
+    case FieldType::Elevation:
+      stream << std::fixed << std::setprecision(kFloatPrecision) << cloud.getElevation(pointIndex);
       break;
-    }
-    case DataType::Uint32:
-    {
-      stream << cloud.getFieldValue<std::uint32_t>(field.fieldType, pointIndex);
+    case FieldType::Intensity:
+      stream << std::fixed << std::setprecision(kFloatPrecision) << cloud.getIntensity(pointIndex);
       break;
-    }
-    case DataType::Int64:
-    {
-      stream << cloud.getFieldValue<std::int64_t>(field.fieldType, pointIndex);
+    case FieldType::TimeOffsetNanoseconds:
+      stream << std::get<1>(cloud.getTimeOffset(pointIndex));
       break;
-    }
-    case DataType::Uint64:
-    {
-      stream << cloud.getFieldValue<std::uint64_t>(field.fieldType, pointIndex);
+    case FieldType::TimeOffsetSeconds:
+      stream << std::get<0>(cloud.getTimeOffset(pointIndex));
       break;
-    }
-    case DataType::Float32:
-    {
-      stream << std::fixed << std::setprecision(kFloatPrecision) << cloud.getFieldValue<float>(field.fieldType, pointIndex);
+    case FieldType::Ring:
+      stream << static_cast<unsigned int>(cloud.getRing(pointIndex));
       break;
-    }
-    case DataType::Float64:
-    {
-      stream << std::fixed << std::setprecision(kFloatPrecision) << cloud.getFieldValue<double>(field.fieldType, pointIndex);
+    case FieldType::LayerId:
+      stream << static_cast<unsigned int>(cloud.getLayer(pointIndex));
       break;
-    }
+    case FieldType::EchoIndex:
+      stream << static_cast<unsigned int>(cloud.getEcho(pointIndex));
+      break;
+    case FieldType::IsReflector:
+      stream << (cloud.isReflector(pointIndex) ? "1" : "0");
+      break;
+    case FieldType::HasBlooming:
+      stream << (cloud.hasBlooming(pointIndex) ? "1" : "0");
+      break;
+    case FieldType::PulseWidth:
+      stream << std::fixed << std::setprecision(kFloatPrecision) << cloud.getPulseWidth(pointIndex);
+      break;
+    default:
+      throw std::runtime_error("Unsupported PointField type");
     }
 
     if (fieldIndex + 1 < cloud.fields().size())
@@ -207,14 +199,14 @@ void writePointAscii(MultiEchoPointCloud const& cloud, std::size_t pointIndex, s
 
 } // anonymous namespace
 
-void convertToBinary(MultiEchoPointCloud const& pointCloud, std::ostream& outputStream)
+void convertToBinary(point_cloud::UnorganizedPointCloud const& pointCloud, std::ostream& outputStream)
 {
   writePcdHeader(outputStream, pointCloud, true);
   // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
   outputStream.write(reinterpret_cast<char const*>(pointCloud.rawBytes()), static_cast<std::streamsize>(pointCloud.rawByteSize()));
 }
 
-void convertToAscii(MultiEchoPointCloud const& pointCloud, std::ostream& outputStream)
+void convertToAscii(point_cloud::UnorganizedPointCloud const& pointCloud, std::ostream& outputStream)
 {
   writePcdHeader(outputStream, pointCloud, false);
   for (auto pointIndex = 0; pointIndex < pointCloud.numberOfPoints(); ++pointIndex)
@@ -223,7 +215,7 @@ void convertToAscii(MultiEchoPointCloud const& pointCloud, std::ostream& outputS
   }
 }
 
-void writeToAsciiFile(sick::MultiEchoPointCloud const& pointCloud, std::string const& filePath)
+void writeToAsciiFile(point_cloud::UnorganizedPointCloud const& pointCloud, std::string const& filePath)
 {
   // open in binary mode to prevent the compiler from converting \n to \r\n on windows
   std::ofstream file(filePath, std::ios_base::binary);

@@ -40,6 +40,11 @@ public:
   // Overload for ostream manipulators like std::endl, std::flush, etc.
   auto operator<<(std::ostream& (*manip)(std::ostream&)) -> LogMessage&
   {
+    if (manip == nullptr)
+    {
+      // Silently ignore invalid manipulators
+      return *this;
+    }
     manip(m_stream);
     return *this;
   }

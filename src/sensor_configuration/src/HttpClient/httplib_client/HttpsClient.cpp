@@ -6,6 +6,7 @@ SPDX-License-Identifier: MIT
 #include <sick_perception_sdk/sensor_configuration/HttpClient/httplib_client/HttpsClient.hpp>
 
 #include <sick_perception_sdk/common/IpV4Address.hpp>
+#include <sick_perception_sdk/common/logging/logging.hpp>
 #include <sick_perception_sdk/sensor_configuration/HttpClient/httplib_client/HttpClientBase.hpp>
 
 #include <csignal>
@@ -33,18 +34,21 @@ namespace {
 void setupSigpipeHandling()
 {
 #ifdef SIGPIPE
-  // Only set SIGPIPE handler if it's still at the default (SIG_DFL)
-  // to avoid overriding existing signal handlers
-  if (std::signal(SIGPIPE, SIG_IGN) == SIG_DFL)
+  // Set SIGPIPE handler to SIG_IGN and get the previous handler
+  auto const previousHandler = std::signal(SIGPIPE, SIG_IGN);
+  if (previousHandler == SIG_ERR)
   {
-    // Handler was SIG_DFL, so we successfully set it to SIG_IGN
+    // Failed to set signal handler
+    return;
   }
-  else
+  if (previousHandler != SIG_DFL)
   {
     // Handler was already set by something else, restore the previous handler
-    // Note: std::signal returns the previous handler, so we need to get it again and restore it
-    auto const previousHandler = std::signal(SIGPIPE, SIG_DFL);
-    std::signal(SIGPIPE, previousHandler);
+    if (std::signal(SIGPIPE, previousHandler) == SIG_ERR)
+    {
+      // Failed to restore previous handler, nothing we can do.
+      LOG_WARNING("HttpsClient") << "Failed to restore previous SIGPIPE handler after setting it to SIG_IGN.";
+    }
   }
 #endif
 }

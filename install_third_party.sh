@@ -74,12 +74,12 @@ cmake -S 3rd_party/nlohmann_json -B 3rd_party/nlohmann_json/build -DJSON_BuildTe
 cmake --install 3rd_party/nlohmann_json/build --prefix "$PWD/install"
 
 # Download, build and install cpp-httplib
-download_and_unpack "3rd_party/cpp-httplib" "cpp-httplib-v0.29.0.zip" "https://github.com/yhirose/cpp-httplib/archive/refs/tags/v0.29.0.zip" "3rd_party/cpp-httplib-0.29.0"
+download_and_unpack "3rd_party/cpp-httplib" "cpp-httplib-v0.39.0.zip" "https://github.com/yhirose/cpp-httplib/archive/refs/tags/v0.39.0.zip" "3rd_party/cpp-httplib-0.39.0"
 cmake -S 3rd_party/cpp-httplib -B 3rd_party/cpp-httplib/build
 cmake --install 3rd_party/cpp-httplib/build --prefix "$PWD/install"
 
 # Download, build and install Google Test
-download_and_unpack "3rd_party/googletest" "googletest-1.16.0.zip" "https://github.com/google/googletest/archive/refs/tags/v1.16.0.zip" "3rd_party/googletest-1.16.0"
+download_and_unpack "3rd_party/googletest" "googletest-1.17.0.zip" "https://github.com/google/googletest/archive/refs/tags/v1.17.0.zip" "3rd_party/googletest-1.17.0"
 cmake -S 3rd_party/googletest -B 3rd_party/googletest/build -DCMAKE_BUILD_TYPE="$BUILD_TYPE"
 cmake --build 3rd_party/googletest/build --config "$BUILD_TYPE"
 cmake --install 3rd_party/googletest/build --config "$BUILD_TYPE" --prefix "$PWD/install"

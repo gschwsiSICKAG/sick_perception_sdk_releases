@@ -7,13 +7,13 @@ set(BENCHMARK_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/MultiScan200Parser.benchmark.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/MultiScan200PointCloudConverter.benchmark.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/ScanDataParser.benchmark.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/UnorganizedPointCloud.benchmark.cpp
 )
 set(BENCHMARK_RESOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/../test/data/LRS4581_scan-frame_0.bin
   ${CMAKE_CURRENT_SOURCE_DIR}/../test/data/multiScan136_scan-frame_0.bin
-  ${CMAKE_CURRENT_SOURCE_DIR}/../test/data/multiScan270_0.8.0_2337_ms270-frame_0.bin
-  ${CMAKE_CURRENT_SOURCE_DIR}/../test/data/multiScan270_0.8.0_2337_ms270_full-frame_0.bin
-  ${CMAKE_CURRENT_SOURCE_DIR}/../test/data/multiScan270_scan-frame_0.bin
+  ${CMAKE_CURRENT_SOURCE_DIR}/../test/data/multiScan270_0.9.0_ms270_all_fields-frame_0.bin
+  ${CMAKE_CURRENT_SOURCE_DIR}/../test/data/multiScan270_0.9.0_ms270_minimal_fields-frame_0.bin
   ${CMAKE_CURRENT_SOURCE_DIR}/../test/data/picoScan150_profile1_scan-frame_0.bin
 )
 

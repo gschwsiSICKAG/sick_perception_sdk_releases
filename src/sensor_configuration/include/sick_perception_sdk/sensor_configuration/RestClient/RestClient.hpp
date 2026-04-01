@@ -102,6 +102,7 @@ public:
   {
     std::string const endpoint = "/api/" + variableName;
 
+    // AXIVION Next Line CertC++-EXP34: false positive, m_httpClient is checked for nullptr in the constructor and cannot be changed afterwards.
     auto const responseJson = m_httpClient->get(endpoint);
 
     // Verify that the response header indicates success before trying to deserializing the whole response.

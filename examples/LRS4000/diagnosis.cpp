@@ -7,9 +7,9 @@ SPDX-License-Identifier: MIT
 
 #include "../examples_helper.hpp"
 #include <sick_perception_sdk/compact_format/telegram_type_1_scan_data/DataLossMonitor.hpp>
-#include <sick_perception_sdk/drivers/LRS4000/Driver.hpp>
+#include <sick_perception_sdk/drivers/LRS4000/LRS4000Driver.hpp>
 #include <sick_perception_sdk/sensor_configuration/HttpClient/httplib_client/HttpClient.hpp>
-#include <sick_perception_sdk/sensor_configuration/LRS4000/Configurator.hpp>
+#include <sick_perception_sdk/sensor_configuration/LRS4000/LRS4000Configurator.hpp>
 
 #include <chrono>
 #include <iostream>
@@ -19,21 +19,21 @@ using namespace sick::literals;
 using namespace std::chrono_literals;
 using LossCounts = sick::compact::scan_data::DataLossMonitor::LossCounts;
 
-std::uint8_t newScanCounter = 0;
+std::uint8_t numberOfScans = 0;
 
-void onNewScanData(sick::compact::scan_data::ScanData const& compactScanData)
+void onNewScanData(sick::compact::scan_data::ScanData const& data)
 {
-  newScanCounter++;
-  if (newScanCounter == 100)
+  numberOfScans++;
+  if (numberOfScans == 100)
   {
-    std::cout << "Received scan data with telegram counter: " << compactScanData.telegramHeader.telegramCounter << '\n';
-    newScanCounter = 0;
+    std::cout << "Received scan data with telegram sequence number: " << data.telegramHeader.telegramSequenceNumber << '\n';
+    numberOfScans = 0;
   }
 }
 
 void onDataLoss(LossCounts const& lossCounts)
 {
-  std::cout << "Package losses detected: lost telegrams=" << lossCounts.numberOfLostTelegrams << ", lost frames=" << lossCounts.numberOfLostFrames
+  std::cout << "Data losses detected: lost telegrams=" << lossCounts.numberOfLostTelegrams << ", lost frames=" << lossCounts.numberOfLostFrames
             << ", lost segments=" << lossCounts.numberOfLostSegments << '\n';
 }
 
@@ -49,7 +49,7 @@ int main(int argc, char* argv[])
   // Change the default passwords during initial commissioning to secure your device.
   // Passwords can be updated via the web browser or API.
   // For production use, store passwords in a secure vault rather than in plain text.
-  sick::LRS4000::v1_9_0_0R::Configurator configurator(httpClient, sick::UserLevel::Service, "servicelevel");
+  sick::LRS4000::v1_9_1_0R::Configurator configurator(httpClient, sick::UserLevel::Service, "servicelevel");
 
   try
   {
@@ -67,7 +67,7 @@ int main(int argc, char* argv[])
     configurator.findMe(5_s);
 
     std::cout << "Configuring scan data streaming...\n";
-    configurator.streaming.set(sick::LRS4000::v1_9_0_0R::Configurator::StreamingMode::Compact);
+    configurator.streaming.set(sick::LRS4000::v1_9_1_0R::Configurator::StreamingMode::Compact);
   }
   catch (std::exception const& exception)
   {
@@ -106,14 +106,16 @@ int main(int argc, char* argv[])
 
   // depends on the configured field of view
   constexpr std::uint64_t expectedFrameSequenceNumberIncrement = 1;
-  constexpr std::uint64_t expectedNumberOfSegments             = 12;
+  constexpr std::uint64_t expectedNumberOfSegments             = 1;
 
   sick::compact::scan_data::DataLossMonitor dataLossMonitor {expectedFrameSequenceNumberIncrement, expectedNumberOfSegments};
 
   sick::LRS4000::Driver driver(deviceAddress, sick::examples::printExceptionMessage);
-  driver.scanDataReceiver().setup();
-  driver.scanDataReceiver().setDataLossMonitor(std::move(dataLossMonitor), onDataLoss);
-  driver.scanDataReceiver().setOnNewFrameCallback(onNewScanData);
+  driver
+    .scanDataReceiver()                                         //
+    .setup()                                                    //
+    .setDataLossMonitor(std::move(dataLossMonitor), onDataLoss) //
+    .setOnNewFrameCallback(onNewScanData);
   driver.run();
   std::this_thread::sleep_for(60s);
   deviceHealthThread.join();

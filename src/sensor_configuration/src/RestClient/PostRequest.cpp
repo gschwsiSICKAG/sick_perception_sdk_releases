@@ -23,7 +23,12 @@ PostRequest::PostRequest(std::string variableName, std::shared_ptr<IHttpClient> 
   : m_variableName(std::move(variableName))
   , m_httpClient(std::move(httpClient))
   , m_requestJson(std::nullopt)
-{ }
+{
+  if (m_httpClient == nullptr)
+  {
+    throw std::invalid_argument("HttpClient cannot be null");
+  }
+}
 
 auto PostRequest::execute() -> PostRequest const&
 {
@@ -52,7 +57,8 @@ auto PostRequest::execute() -> PostRequest const&
   }();
 
   std::string const requestJsonStr = requestJson.dump();
-  m_responseJson                   = m_httpClient->post(endpoint, requestJsonStr);
+  // AXIVION Next Line CertC++-EXP34: false positive, m_httpClient is checked for nullptr in the constructor and cannot be changed afterwards.
+  m_responseJson = m_httpClient->post(endpoint, requestJsonStr);
 
   // Verify that the response header indicates success before trying to deserializing the whole response.
   // Therefore we just deserialize an `EmptyResponse` here. After execute() returns the caller can call

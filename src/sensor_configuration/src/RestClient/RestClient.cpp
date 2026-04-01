@@ -16,7 +16,12 @@ namespace sick {
 
 RestClient::RestClient(std::shared_ptr<IHttpClient> httpClient)
   : m_httpClient(std::move(httpClient))
-{ }
+{
+  if (m_httpClient == nullptr)
+  {
+    throw std::invalid_argument("HttpClient cannot be null");
+  }
+}
 
 auto RestClient::post(std::string const& variableName) const -> PostRequest
 {

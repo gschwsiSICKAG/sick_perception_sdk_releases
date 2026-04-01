@@ -9,33 +9,33 @@ SPDX-License-Identifier: MIT
 #include <sick_perception_sdk/sensor_configuration/HttpClient/httplib_client/HttpClient.hpp>
 
 #if defined(USE_MULTISCAN100)
-#  include <sick_perception_sdk/drivers/multiScan100/Driver.hpp>
-#  include <sick_perception_sdk/sensor_configuration/api/multiScan100/2_4_1/FREchoFilter.nlohmann_json.g.hpp>
-#  include <sick_perception_sdk/sensor_configuration/api/multiScan100/2_4_1/OpHours.nlohmann_json.g.hpp>
-#  include <sick_perception_sdk/sensor_configuration/multiScan100/Configurator.hpp>
-using ConfiguratorT = sick::multiScan100::v2_4_1::Configurator;
-namespace api       = sick::multiScan100::v2_4_1::api::rest;
+#  include <sick_perception_sdk/drivers/multiScan100/MultiScan100Driver.hpp>
+#  include <sick_perception_sdk/sensor_configuration/api/multiScan100/2_4_2_0R/FREchoFilter.nlohmann_json.g.hpp>
+#  include <sick_perception_sdk/sensor_configuration/api/multiScan100/2_4_2_0R/OpHours.nlohmann_json.g.hpp>
+#  include <sick_perception_sdk/sensor_configuration/multiScan100/MultiScan100Configurator.hpp>
+using ConfiguratorT = sick::multiScan100::v2_4_2_0R::Configurator;
+namespace api       = sick::multiScan100::v2_4_2_0R::api::rest;
 #elif defined(USE_MULTISCAN200)
-#  include <sick_perception_sdk/drivers/multiScan200/Driver.hpp>
-#  include <sick_perception_sdk/sensor_configuration/api/multiScan200/0_9_0/FREchoFilter.nlohmann_json.g.hpp>
-#  include <sick_perception_sdk/sensor_configuration/api/multiScan200/0_9_0/OpHours.nlohmann_json.g.hpp>
-#  include <sick_perception_sdk/sensor_configuration/multiScan200/Configurator.hpp>
-using ConfiguratorT = sick::multiScan200::v0_9_0::Configurator;
-namespace api       = sick::multiScan200::v0_9_0::api::rest;
+#  include <sick_perception_sdk/drivers/multiScan200/MultiScan200Driver.hpp>
+#  include <sick_perception_sdk/sensor_configuration/api/multiScan200/0_9_0_2C/FREchoFilter.nlohmann_json.g.hpp>
+#  include <sick_perception_sdk/sensor_configuration/api/multiScan200/0_9_0_2C/OpHours.nlohmann_json.g.hpp>
+#  include <sick_perception_sdk/sensor_configuration/multiScan200/MultiScan200Configurator.hpp>
+using ConfiguratorT = sick::multiScan200::v0_9_0_2C::Configurator;
+namespace api       = sick::multiScan200::v0_9_0_2C::api::rest;
 #elif defined(USE_LRS4000)
-#  include <sick_perception_sdk/drivers/LRS4000/Driver.hpp>
-#  include <sick_perception_sdk/sensor_configuration/LRS4000/Configurator.hpp>
-#  include <sick_perception_sdk/sensor_configuration/api/LRS4000/1_9_0_0R/FREchoFilter.nlohmann_json.g.hpp>
-#  include <sick_perception_sdk/sensor_configuration/api/LRS4000/1_9_0_0R/OpHours.nlohmann_json.g.hpp>
-using ConfiguratorT = sick::LRS4000::v1_9_0_0R::Configurator;
-namespace api       = sick::LRS4000::v1_9_0_0R::api::rest;
+#  include <sick_perception_sdk/drivers/LRS4000/LRS4000Driver.hpp>
+#  include <sick_perception_sdk/sensor_configuration/LRS4000/LRS4000Configurator.hpp>
+#  include <sick_perception_sdk/sensor_configuration/api/LRS4000/1_9_1_0R/FREchoFilter.nlohmann_json.g.hpp>
+#  include <sick_perception_sdk/sensor_configuration/api/LRS4000/1_9_1_0R/OpHours.nlohmann_json.g.hpp>
+using ConfiguratorT = sick::LRS4000::v1_9_1_0R::Configurator;
+namespace api       = sick::LRS4000::v1_9_1_0R::api::rest;
 #else // Default to picoScan100
-#  include <sick_perception_sdk/drivers/picoScan100/Driver.hpp>
-#  include <sick_perception_sdk/sensor_configuration/api/picoScan100/picoScan150/2_2_1/FREchoFilter.nlohmann_json.g.hpp>
-#  include <sick_perception_sdk/sensor_configuration/api/picoScan100/picoScan150/2_2_1/OpHours.nlohmann_json.g.hpp>
-#  include <sick_perception_sdk/sensor_configuration/picoScan150/Configurator.hpp>
-using ConfiguratorT = sick::picoScan150::v2_2_1::Configurator;
-namespace api       = sick::picoScan150::v2_2_1::api::rest;
+#  include <sick_perception_sdk/drivers/picoScan100/PicoScan100Driver.hpp>
+#  include <sick_perception_sdk/sensor_configuration/api/picoScan100/picoScan150/2_2_1_0R/FREchoFilter.nlohmann_json.g.hpp>
+#  include <sick_perception_sdk/sensor_configuration/api/picoScan100/picoScan150/2_2_1_0R/OpHours.nlohmann_json.g.hpp>
+#  include <sick_perception_sdk/sensor_configuration/picoScan150/PicoScan150Configurator.hpp>
+using ConfiguratorT = sick::picoScan150::v2_2_1_0R::Configurator;
+namespace api       = sick::picoScan150::v2_2_1_0R::api::rest;
 #endif
 
 #include <cstdint>
@@ -67,13 +67,13 @@ int main(int argc, char* argv[])
     std::cout << "SystemTime:      " << configurator.systemTime.get().count() << " us since epoch\n";
     std::cout << "IpAddress:       " << configurator.sensorIPAddress.get().toString() << '\n';
 
-    std::cout << "Reading object without convenience function...\n";
+    std::cout << "Reading object with raw variable access and without convenience function...\n";
     std::cout << "OpHours:         " << configurator.readVariable<api::OpHours>()._OpHours << '\n';
 
     std::cout << "Setting echo filter with convenience function...\n";
     configurator.echoFilter.set(ConfiguratorT::EchoFilterSetting::LastEcho);
 
-    std::cout << "Setting echo filter without convenience function...\n";
+    std::cout << "Setting echo filter with raw variable access and without convenience function...\n";
     api::FREchoFilter::Post::Request settings;
     settings._FREchoFilter = api::FREchoFilter::Post::Request::FREchoFilter::FirstEcho;
     configurator.writeVariable<api::FREchoFilter>(settings);

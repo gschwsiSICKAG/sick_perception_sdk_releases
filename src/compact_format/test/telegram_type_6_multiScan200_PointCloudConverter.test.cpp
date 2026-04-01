@@ -8,6 +8,7 @@ SPDX-License-Identifier: MIT
 #include "utils/MultiScan200DataGenerator.hpp"
 #include <sick_perception_sdk/common/quantities/Angle.hpp>
 #include <sick_perception_sdk/common/quantities/Distance.hpp>
+#include <sick_perception_sdk/compact_format/PointCloud/PointCloudAttributes.hpp>
 #include <sick_perception_sdk/compact_format/PointCloud/PointCloudConfiguration.hpp>
 
 #include <gtest/gtest.h>
@@ -20,11 +21,11 @@ SPDX-License-Identifier: MIT
 
 // Basic Functionality Tests
 
-using FieldType = sick::MultiEchoPointCloud::PointField::FieldType;
+using FieldType = sick::point_cloud::PointField::FieldType;
 
 namespace {
 
-auto hasField(sick::MultiEchoPointCloud const& pc, FieldType fieldType) -> bool
+auto hasField(sick::point_cloud::OrganizedPointCloud const& pc, FieldType fieldType) -> bool
 {
   for (auto const& field : pc.fields())
   {
@@ -40,8 +41,7 @@ auto hasField(sick::MultiEchoPointCloud const& pc, FieldType fieldType) -> bool
 
 TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_returns_empty_point_cloud_for_zero_rows_and_columns)
 {
-  sick::PointCloudConfiguration config;
-  config.organization = sick::MultiEchoPointCloud::Organization::Organized; // Unorganized requires height = 1
+  sick::point_cloud::PointCloudConfiguration config;
   sick::compact::multiscan200::PointCloudConverter converter(config);
 
   auto const data =
@@ -49,15 +49,14 @@ TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_returns_empty
       .withNumberOfRows(0)                  //
       .withNumberOfColumnsInSegment(0)      //
       .next();
-  auto const pc = converter.convert(data);
+  auto const pc = converter.convertToOrganized(data);
 
   EXPECT_TRUE(pc.isEmpty());
 }
 
 TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_returns_point_cloud_with_correct_number_of_points)
 {
-  sick::PointCloudConfiguration config;
-  config.organization = sick::MultiEchoPointCloud::Organization::Organized; // Unorganized requires number of echoes = 1
+  sick::point_cloud::PointCloudConfiguration config;
   sick::compact::multiscan200::PointCloudConverter converter(config);
 
   auto const data =
@@ -66,7 +65,7 @@ TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_returns_point
       .withNumberOfColumnsInSegment(5)      //
       .withNumberOfEchoes(2)                //
       .next();
-  auto const pc = converter.convert(data);
+  auto const pc = converter.convertToOrganized(data);
 
   // 5 columns * 4 rows * 2 echoes = 40 points
   EXPECT_EQ(40, pc.numberOfPoints());
@@ -74,7 +73,7 @@ TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_returns_point
 
 TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_single_echo_produces_correct_point_count)
 {
-  sick::PointCloudConfiguration config;
+  sick::point_cloud::PointCloudConfiguration config;
   sick::compact::multiscan200::PointCloudConverter converter(config);
 
   auto const data =
@@ -83,7 +82,7 @@ TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_single_e
       .withNumberOfColumnsInSegment(3)      //
       .withNumberOfEchoes(1)                //
       .next();
-  auto const pc = converter.convert(data);
+  auto const pc = converter.convertToOrganized(data);
 
   EXPECT_EQ(9, pc.numberOfPoints()); // 3 * 3 * 1 = 9
 }
@@ -92,7 +91,7 @@ TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_single_e
 
 TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_cartesian_enabled_creates_xyz_fields)
 {
-  sick::PointCloudConfiguration config;
+  sick::point_cloud::PointCloudConfiguration config;
   config.fields.enableCartesian = true;
   config.fields.enableSpherical = false;
 
@@ -104,7 +103,7 @@ TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_cartesia
       .withNumberOfColumnsInSegment(1)      //
       .withNumberOfEchoes(1)                //
       .next();
-  auto const pc = converter.convert(data);
+  auto const pc = converter.convertToOrganized(data);
 
   ASSERT_EQ(pc.fields().size(), 3);
   // The order is not guaranteed or specified so we just check that the fields exist.
@@ -115,7 +114,7 @@ TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_cartesia
 
 TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_spherical_enabled_creates_spherical_fields)
 {
-  sick::PointCloudConfiguration config;
+  sick::point_cloud::PointCloudConfiguration config;
   config.fields.enableCartesian = false;
   config.fields.enableSpherical = true;
 
@@ -127,7 +126,7 @@ TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_spherica
       .withNumberOfColumnsInSegment(1)      //
       .withNumberOfEchoes(1)                //
       .next();
-  auto const pc = converter.convert(data);
+  auto const pc = converter.convertToOrganized(data);
 
   ASSERT_EQ(pc.fields().size(), 3);
   // The order is not guaranteed or specified so we just check that the fields exist.
@@ -138,7 +137,7 @@ TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_spherica
 
 TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_intensity_enabled_creates_intensity_field)
 {
-  sick::PointCloudConfiguration config;
+  sick::point_cloud::PointCloudConfiguration config;
   config.fields.enableIntensity = true;
 
   sick::compact::multiscan200::PointCloudConverter converter(config);
@@ -150,14 +149,14 @@ TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_intensit
       .withNumberOfEchoes(1)                                                        //
       .withEchoDataContent(sick::compact::multiscan200::EchoDataContent::Intensity) //
       .next();
-  auto const pc = converter.convert(data);
+  auto const pc = converter.convertToOrganized(data);
 
   EXPECT_TRUE(hasField(pc, FieldType::Intensity));
 }
 
 TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_time_offset_enabled_creates_time_fields)
 {
-  sick::PointCloudConfiguration config;
+  sick::point_cloud::PointCloudConfiguration config;
   config.fields.enableTimeOffset = true;
 
   sick::compact::multiscan200::PointCloudConverter converter(config);
@@ -168,7 +167,7 @@ TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_time_off
       .withNumberOfColumnsInSegment(1)      //
       .withNumberOfEchoes(1)                //
       .next();
-  auto const pc = converter.convert(data);
+  auto const pc = converter.convertToOrganized(data);
 
   EXPECT_TRUE(hasField(pc, FieldType::TimeOffsetNanoseconds));
   EXPECT_TRUE(hasField(pc, FieldType::TimeOffsetSeconds));
@@ -176,7 +175,7 @@ TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_time_off
 
 TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_ring_enabled_creates_ring_field)
 {
-  sick::PointCloudConfiguration config;
+  sick::point_cloud::PointCloudConfiguration config;
   config.fields.enableRing = true;
 
   sick::compact::multiscan200::PointCloudConverter converter(config);
@@ -187,14 +186,14 @@ TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_ring_ena
       .withNumberOfColumnsInSegment(1)      //
       .withNumberOfEchoes(1)                //
       .next();
-  auto const pc = converter.convert(data);
+  auto const pc = converter.convertToOrganized(data);
 
   EXPECT_TRUE(hasField(pc, FieldType::Ring));
 }
 
 TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_layer_enabled_creates_layer_field)
 {
-  sick::PointCloudConfiguration config;
+  sick::point_cloud::PointCloudConfiguration config;
   config.fields.enableLayer = true;
 
   sick::compact::multiscan200::PointCloudConverter converter(config);
@@ -205,14 +204,14 @@ TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_layer_en
       .withNumberOfColumnsInSegment(1)      //
       .withNumberOfEchoes(1)                //
       .next();
-  auto const pc = converter.convert(data);
+  auto const pc = converter.convertToOrganized(data);
 
-  EXPECT_TRUE(hasField(pc, FieldType::Layer));
+  EXPECT_TRUE(hasField(pc, FieldType::LayerId));
 }
 
 TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_echo_enabled_creates_echo_field)
 {
-  sick::PointCloudConfiguration config;
+  sick::point_cloud::PointCloudConfiguration config;
   config.fields.enableEcho = true;
 
   sick::compact::multiscan200::PointCloudConverter converter(config);
@@ -223,16 +222,16 @@ TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_echo_ena
       .withNumberOfColumnsInSegment(1)      //
       .withNumberOfEchoes(1)                //
       .next();
-  auto const pc = converter.convert(data);
+  auto const pc = converter.convertToOrganized(data);
 
-  EXPECT_TRUE(hasField(pc, FieldType::Echo));
+  EXPECT_TRUE(hasField(pc, FieldType::EchoIndex));
 }
 
 // Filter Tests
 
 TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_echo_filter_includes_only_selected_echoes)
 {
-  sick::PointCloudConfiguration config;
+  sick::point_cloud::PointCloudConfiguration config;
   config.filters.selectedEchos = std::set<std::size_t> {0, 2};
 
   sick::compact::multiscan200::PointCloudConverter converter(config);
@@ -243,7 +242,7 @@ TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_echo_fil
       .withNumberOfColumnsInSegment(2)      //
       .withNumberOfEchoes(3)                //
       .next();
-  auto const pc = converter.convert(data);
+  auto const pc = converter.convertToUnorganized(data);
 
   // 2 columns * 2 rows * 2 echoes (0 and 2) = 8 points
   EXPECT_EQ(8, pc.numberOfPoints());
@@ -251,7 +250,7 @@ TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_echo_fil
 
 TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_single_echo_filter)
 {
-  sick::PointCloudConfiguration config;
+  sick::point_cloud::PointCloudConfiguration config;
   config.filters.selectedEchos = std::set<std::size_t> {1};
 
   sick::compact::multiscan200::PointCloudConverter converter(config);
@@ -262,7 +261,7 @@ TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_single_e
       .withNumberOfColumnsInSegment(3)      //
       .withNumberOfEchoes(3)                //
       .next();
-  auto const pc = converter.convert(data);
+  auto const pc = converter.convertToUnorganized(data);
 
   // 3 columns * 3 rows * 1 echo (index 1) = 9 points
   EXPECT_EQ(9, pc.numberOfPoints());
@@ -270,7 +269,7 @@ TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_single_e
 
 TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_layer_filter_includes_only_selected_layers)
 {
-  sick::PointCloudConfiguration config;
+  sick::point_cloud::PointCloudConfiguration config;
   config.filters.selectedLayers = std::set<std::uint32_t> {1, 3};
 
   sick::compact::multiscan200::PointCloudConverter converter(config);
@@ -281,7 +280,7 @@ TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_layer_fi
       .withNumberOfColumnsInSegment(2)      //
       .withNumberOfEchoes(1)                //
       .next();
-  auto const pc = converter.convert(data);
+  auto const pc = converter.convertToUnorganized(data);
 
   // 2 columns * 2 layers (1 and 3) * 1 echo = 4 points
   EXPECT_EQ(4, pc.numberOfPoints());
@@ -289,7 +288,7 @@ TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_layer_fi
 
 TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_range_filter_excludes_out_of_range_points)
 {
-  sick::PointCloudConfiguration config;
+  sick::point_cloud::PointCloudConfiguration config;
   config.filters.range = sick::Interval<sick::Distance> {sick::Distance::fromMillimeters(1500.0), sick::Distance::fromMillimeters(2500.0), false};
 
   sick::compact::multiscan200::PointCloudConverter converter(config);
@@ -300,16 +299,38 @@ TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_range_fi
       .withNumberOfColumnsInSegment(10)     //
       .withNumberOfEchoes(1)                //
       .next();
-  auto const pc = converter.convert(data);
+  auto const pc = converter.convertToUnorganized(data);
 
   // Should include only points within range filter
   EXPECT_LT(pc.numberOfPoints(), 100); // Less than total possible
   EXPECT_GT(pc.numberOfPoints(), 0);   // But some should pass
 }
 
+TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_range_filter_sets_out_of_range_points_nan)
+{
+  sick::point_cloud::PointCloudConfiguration config;
+  config.filters.range = sick::Interval<sick::Distance> {sick::Distance::fromMillimeters(1500.0), sick::Distance::fromMillimeters(2500.0), false};
+
+  sick::compact::multiscan200::PointCloudConverter converter(config);
+
+  auto const data =
+    sick::test::MultiScan200DataGenerator() //
+      .withNumberOfRows(10)                 //
+      .withNumberOfColumnsInSegment(10)     //
+      .withNumberOfEchoes(1)                //
+      .next();
+  auto const pc = converter.convertToOrganized(data);
+
+  auto const [x, y, z] = pc.getCartesian(pc.pointIndex(0, 0, 0));
+  EXPECT_TRUE(std::isnan(x));
+  EXPECT_TRUE(std::isnan(y));
+  EXPECT_TRUE(std::isnan(z));
+  EXPECT_EQ(pc.density(), sick::point_cloud::Density::InvalidPointsContained);
+}
+
 TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_inverted_range_filter)
 {
-  sick::PointCloudConfiguration config;
+  sick::point_cloud::PointCloudConfiguration config;
   // Exclude points in range [2000, 3000]
   config.filters.range = sick::Interval<sick::Distance> {sick::Distance::fromMillimeters(2000.0), sick::Distance::fromMillimeters(3000.0), true};
 
@@ -321,7 +342,7 @@ TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_inverted
       .withNumberOfColumnsInSegment(5)      //
       .withNumberOfEchoes(1)                //
       .next();
-  auto const pc = converter.convert(data);
+  auto const pc = converter.convertToUnorganized(data);
 
   // Should include points outside the specified range
   EXPECT_GT(pc.numberOfPoints(), 0);
@@ -329,7 +350,7 @@ TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_inverted
 
 TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_azimuth_filter)
 {
-  sick::PointCloudConfiguration config;
+  sick::point_cloud::PointCloudConfiguration config;
   config.filters.azimuth = sick::Interval<sick::Angle> {sick::Angle::fromDegrees(4), sick::Angle::fromDegrees(8), false};
 
   sick::compact::multiscan200::PointCloudConverter converter(config);
@@ -342,7 +363,7 @@ TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_azimuth_
       .withNumberOfEchoes(1)                //
       .next();
 
-  auto const pc = converter.convert(data);
+  auto const pc = converter.convertToUnorganized(data);
 
   // The segment spans the azimuth range 0° to 20° (20 columns in frame of 360 columns).
   // With the filter set to 4°..8°, we expect to 20°/4° = 5 columns * 4 rows * 1 echo = 20 points.
@@ -351,7 +372,7 @@ TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_azimuth_
 
 TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_elevation_filter)
 {
-  sick::PointCloudConfiguration config;
+  sick::point_cloud::PointCloudConfiguration config;
   config.filters.elevation = sick::Interval<sick::Angle> {sick::Angle::fromDegrees(-5.0), sick::Angle::fromDegrees(5.0), false};
 
   sick::compact::multiscan200::PointCloudConverter converter(config);
@@ -362,7 +383,7 @@ TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_elevatio
       .withNumberOfColumnsInSegment(10)     //
       .withNumberOfEchoes(1)                //
       .next();
-  auto const pc = converter.convert(data);
+  auto const pc = converter.convertToUnorganized(data);
 
   // Should include only rows within elevation range
   EXPECT_LT(pc.numberOfPoints(), 160); // Less than total
@@ -371,7 +392,7 @@ TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_elevatio
 
 TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_intensity_filter_when_intensity_available)
 {
-  sick::PointCloudConfiguration config;
+  sick::point_cloud::PointCloudConfiguration config;
   config.filters.intensity = sick::Interval<float> {105.0F, 115.0F, false};
 
   sick::compact::multiscan200::PointCloudConverter converter(config);
@@ -383,7 +404,7 @@ TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_intensit
       .withNumberOfEchoes(1)                                                        //
       .withEchoDataContent(sick::compact::multiscan200::EchoDataContent::Intensity) //
       .next();
-  auto const pc = converter.convert(data);
+  auto const pc = converter.convertToUnorganized(data);
 
   // Should include only points within intensity range
   EXPECT_LT(pc.numberOfPoints(), 100);
@@ -392,7 +413,7 @@ TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_intensit
 
 TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_combined_filters)
 {
-  sick::PointCloudConfiguration config;
+  sick::point_cloud::PointCloudConfiguration config;
   config.filters.selectedEchos  = std::set<std::size_t> {0};
   config.filters.selectedLayers = std::set<std::uint32_t> {1, 2, 3};
   config.filters.range          = sick::Interval<sick::Distance> {sick::Distance::fromMillimeters(1000.0), sick::Distance::fromMillimeters(5000.0), false};
@@ -405,7 +426,7 @@ TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_combined
       .withNumberOfColumnsInSegment(5)      //
       .withNumberOfEchoes(2)                //
       .next();
-  auto const pc = converter.convert(data);
+  auto const pc = converter.convertToUnorganized(data);
 
   // Should apply all filters
   EXPECT_LT(pc.numberOfPoints(), 50); // Less than total possible
@@ -416,7 +437,7 @@ TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_combined
 
 TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_applies_distance_scaling_factor)
 {
-  sick::PointCloudConfiguration config;
+  sick::point_cloud::PointCloudConfiguration config;
   config.distanceScalingFactor = 1000.0F; // Convert to millimeters
 
   sick::compact::multiscan200::PointCloudConverter converter(config);
@@ -427,7 +448,7 @@ TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_applies_dista
       .withNumberOfColumnsInSegment(1)      //
       .withNumberOfEchoes(1)                //
       .next();
-  auto const pc = converter.convert(data);
+  auto const pc = converter.convertToOrganized(data);
 
   EXPECT_EQ(1, pc.numberOfPoints());
   // The actual values would be scaled by the factor
@@ -435,7 +456,7 @@ TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_applies_dista
 
 TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_zero_distance_scaling_factor)
 {
-  sick::PointCloudConfiguration config;
+  sick::point_cloud::PointCloudConfiguration config;
   config.distanceScalingFactor = 0.0F;
 
   sick::compact::multiscan200::PointCloudConverter converter(config);
@@ -446,7 +467,7 @@ TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_zero_dis
       .withNumberOfColumnsInSegment(1)      //
       .withNumberOfEchoes(1)                //
       .next();
-  auto const pc = converter.convert(data);
+  auto const pc = converter.convertToOrganized(data);
 
   // Should still produce a point cloud, coordinates will be zero
   EXPECT_EQ(1, pc.numberOfPoints());
@@ -456,7 +477,7 @@ TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_zero_dis
 
 TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_zero_echoes)
 {
-  sick::PointCloudConfiguration config;
+  sick::point_cloud::PointCloudConfiguration config;
   sick::compact::multiscan200::PointCloudConverter converter(config);
 
   auto const data =
@@ -465,14 +486,14 @@ TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_zero_ech
       .withNumberOfColumnsInSegment(5)      //
       .withNumberOfEchoes(0)                //
       .next();
-  auto const pc = converter.convert(data);
+  auto const pc = converter.convertToOrganized(data);
 
   EXPECT_EQ(0, pc.numberOfPoints());
 }
 
 TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_mismatched_geometry_and_scan_data_sizes)
 {
-  sick::PointCloudConfiguration config;
+  sick::point_cloud::PointCloudConfiguration config;
   sick::compact::multiscan200::PointCloudConverter converter(config);
 
   auto generator = sick::test::MultiScan200DataGenerator().withNumberOfRows(3).withNumberOfColumnsInSegment(3).withNumberOfEchoes(1);
@@ -483,12 +504,12 @@ TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_mismatch
   data.geometry.azimuths.resize(2); // Should be 3
 
   // This should not crash, might produce fewer points or handle gracefully
-  EXPECT_THROW(converter.convert(data), std::runtime_error);
+  EXPECT_THROW(converter.convertToOrganized(data), std::runtime_error);
 }
 
 TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_nan_distance_values)
 {
-  sick::PointCloudConfiguration config;
+  sick::point_cloud::PointCloudConfiguration config;
   sick::compact::multiscan200::PointCloudConverter converter(config);
 
   auto generator = sick::test::MultiScan200DataGenerator().withNumberOfRows(2).withNumberOfColumnsInSegment(2).withNumberOfEchoes(1);
@@ -498,14 +519,14 @@ TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_nan_dist
   // Set invalid distance
   data.distances[0] = sick::Distance::fromMillimeters(std::numeric_limits<double>::quiet_NaN());
 
-  auto const pc = converter.convert(data);
+  auto const pc = converter.convertToOrganized(data);
   // Should handle NaN values (may filter them out or include them)
   EXPECT_LE(pc.numberOfPoints(), 4);
 }
 
 TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_infinite_distance_values)
 {
-  sick::PointCloudConfiguration config;
+  sick::point_cloud::PointCloudConfiguration config;
   sick::compact::multiscan200::PointCloudConverter converter(config);
 
   auto generator = sick::test::MultiScan200DataGenerator().withNumberOfRows(2).withNumberOfColumnsInSegment(2).withNumberOfEchoes(1);
@@ -515,14 +536,14 @@ TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_infinite
   // Set invalid distance
   data.distances[0] = sick::Distance::fromMillimeters(std::numeric_limits<double>::infinity());
 
-  auto const pc = converter.convert(data);
+  auto const pc = converter.convertToOrganized(data);
   // Should handle infinite values
   EXPECT_LE(pc.numberOfPoints(), 4);
 }
 
 TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_negative_distance_values)
 {
-  sick::PointCloudConfiguration config;
+  sick::point_cloud::PointCloudConfiguration config;
   sick::compact::multiscan200::PointCloudConverter converter(config);
 
   auto generator = sick::test::MultiScan200DataGenerator().withNumberOfRows(2).withNumberOfColumnsInSegment(2).withNumberOfEchoes(1);
@@ -532,14 +553,14 @@ TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_negative
   // Set negative distance
   data.distances[0] = sick::Distance::fromMillimeters(-1000.0);
 
-  auto const pc = converter.convert(data);
+  auto const pc = converter.convertToOrganized(data);
   // Should handle negative values
   EXPECT_LE(pc.numberOfPoints(), 4);
 }
 
 TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_nan_angles)
 {
-  sick::PointCloudConfiguration config;
+  sick::point_cloud::PointCloudConfiguration config;
   sick::compact::multiscan200::PointCloudConverter converter(config);
 
   auto generator = sick::test::MultiScan200DataGenerator().withNumberOfRows(2).withNumberOfColumnsInSegment(2).withNumberOfEchoes(1);
@@ -556,56 +577,14 @@ TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_nan_angl
     data.geometry.elevations[0] = sick::Angle::fromRadians(std::numeric_limits<double>::quiet_NaN());
   }
 
-  auto const pc = converter.convert(data);
+  auto const pc = converter.convertToOrganized(data);
   // Should handle NaN angles
   EXPECT_LE(pc.numberOfPoints(), 4);
 }
 
-TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_intensity_missing_when_expected)
-{
-  sick::PointCloudConfiguration config;
-  config.fields.enableIntensity = true;
-
-  sick::compact::multiscan200::PointCloudConverter converter(config);
-
-  auto generator = sick::test::MultiScan200DataGenerator().withNumberOfRows(2).withNumberOfColumnsInSegment(2).withNumberOfEchoes(1).withEchoDataContent(
-    sick::compact::multiscan200::EchoDataContent::None
-  ); // No intensity data
-
-  auto data = generator.next();
-
-  // Ensure intensities are not set
-  data.intensities.clear();
-
-  auto const pc = converter.convert(data);
-  // Should handle missing intensity gracefully
-  EXPECT_EQ(4, pc.numberOfPoints());
-}
-
-TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_properties_missing_when_expected)
-{
-  sick::PointCloudConfiguration config;
-  config.fields.enableIsReflector = true;
-
-  sick::compact::multiscan200::PointCloudConverter converter(config);
-
-  auto generator = sick::test::MultiScan200DataGenerator().withNumberOfRows(2).withNumberOfColumnsInSegment(2).withNumberOfEchoes(1).withEchoDataContent(
-    sick::compact::multiscan200::EchoDataContent::None
-  );
-
-  auto data = generator.next();
-
-  // Ensure properties are not set
-  data.echoProperties.clear();
-
-  auto const pc = converter.convert(data);
-  // Should handle missing properties gracefully
-  EXPECT_EQ(4, pc.numberOfPoints());
-}
-
 TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_empty_filter_should_exclude_all_points)
 {
-  sick::PointCloudConfiguration config;
+  sick::point_cloud::PointCloudConfiguration config;
   config.filters.selectedEchos = std::set<std::size_t> {}; // Empty set
 
   sick::compact::multiscan200::PointCloudConverter converter(config);
@@ -616,7 +595,7 @@ TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_empty_fi
       .withNumberOfColumnsInSegment(3)      //
       .withNumberOfEchoes(3)                //
       .next();
-  auto const pc = converter.convert(data);
+  auto const pc = converter.convertToUnorganized(data);
 
   // Empty echo filter should exclude all points
   EXPECT_EQ(0, pc.numberOfPoints());
@@ -624,7 +603,7 @@ TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_empty_fi
 
 TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_out_of_bounds_echo_filter)
 {
-  sick::PointCloudConfiguration config;
+  sick::point_cloud::PointCloudConfiguration config;
   config.filters.selectedEchos = std::set<std::size_t> {10, 20}; // Out of bounds
 
   sick::compact::multiscan200::PointCloudConverter converter(config);
@@ -635,7 +614,7 @@ TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_out_of_b
       .withNumberOfColumnsInSegment(2)      //
       .withNumberOfEchoes(2)                // Only echoes 0 and 1
       .next();
-  auto const pc = converter.convert(data);
+  auto const pc = converter.convertToUnorganized(data);
 
   // Should exclude all points since selected echoes don't exist
   EXPECT_EQ(0, pc.numberOfPoints());
@@ -643,7 +622,7 @@ TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_out_of_b
 
 TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_out_of_bounds_layer_filter)
 {
-  sick::PointCloudConfiguration config;
+  sick::point_cloud::PointCloudConfiguration config;
   config.filters.selectedLayers = std::set<std::uint32_t> {100, 200}; // Out of bounds
 
   sick::compact::multiscan200::PointCloudConverter converter(config);
@@ -654,7 +633,7 @@ TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_out_of_b
       .withNumberOfColumnsInSegment(2)      //
       .withNumberOfEchoes(1)                //
       .next();
-  auto const pc = converter.convert(data);
+  auto const pc = converter.convertToUnorganized(data);
 
   // Should exclude all points since selected layers don't exist
   EXPECT_EQ(0, pc.numberOfPoints());
@@ -662,7 +641,7 @@ TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_out_of_b
 
 TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_impossible_range_filter)
 {
-  sick::PointCloudConfiguration config;
+  sick::point_cloud::PointCloudConfiguration config;
   config.filters.range = sick::Interval<sick::Distance> {sick::Distance::fromMillimeters(5000.0), sick::Distance::fromMillimeters(1000.0), false};
 
   sick::compact::multiscan200::PointCloudConverter converter(config);
@@ -673,7 +652,7 @@ TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_impossib
       .withNumberOfColumnsInSegment(3)      //
       .withNumberOfEchoes(1)                //
       .next();
-  auto const pc = converter.convert(data);
+  auto const pc = converter.convertToUnorganized(data);
 
   // Invalid range should exclude all points
   EXPECT_EQ(0, pc.numberOfPoints());
@@ -683,7 +662,7 @@ TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_with_impossib
 
 TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_sets_point_step_correctly)
 {
-  sick::PointCloudConfiguration config;
+  sick::point_cloud::PointCloudConfiguration config;
   config.fields.enableCartesian = true;
   config.fields.enableIntensity = true;
 
@@ -696,7 +675,7 @@ TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_sets_point_st
       .withNumberOfEchoes(1)                                                        //
       .withEchoDataContent(sick::compact::multiscan200::EchoDataContent::Intensity) //
       .next();
-  auto const pc = converter.convert(data);
+  auto const pc = converter.convertToOrganized(data);
 
   EXPECT_GT(pc.pointSizeBytes(), 0);
   EXPECT_EQ(pc.rawByteSize(), pc.numberOfPoints() * pc.pointSizeBytes());
@@ -704,7 +683,7 @@ TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_sets_point_st
 
 TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_data_size_matches_point_count_and_step)
 {
-  sick::PointCloudConfiguration config;
+  sick::point_cloud::PointCloudConfiguration config;
   sick::compact::multiscan200::PointCloudConverter converter(config);
 
   auto const data =
@@ -713,14 +692,14 @@ TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_data_size_mat
       .withNumberOfColumnsInSegment(4)      //
       .withNumberOfEchoes(2)                //
       .next();
-  auto const pc = converter.convert(data);
+  auto const pc = converter.convertToOrganized(data);
 
   EXPECT_EQ(pc.rawByteSize(), pc.numberOfPoints() * pc.pointSizeBytes());
 }
 
 TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_sets_header_timestamp)
 {
-  sick::PointCloudConfiguration config;
+  sick::point_cloud::PointCloudConfiguration config;
   sick::compact::multiscan200::PointCloudConverter converter(config);
 
   auto const data =
@@ -729,7 +708,7 @@ TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_sets_header_t
       .withNumberOfColumnsInSegment(1)      //
       .withNumberOfEchoes(1)                //
       .next();
-  auto const pc = converter.convert(data);
+  auto const pc = converter.convertToOrganized(data);
 
   // Header timestamp should be set from the input data
   EXPECT_EQ(pc.timestamp(), data.segmentMetaData.frameTimestamp);
@@ -739,7 +718,7 @@ TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_sets_header_t
 
 TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_can_be_called_multiple_times)
 {
-  sick::PointCloudConfiguration config;
+  sick::point_cloud::PointCloudConfiguration config;
   sick::compact::multiscan200::PointCloudConverter converter(config);
 
   auto generator =
@@ -748,12 +727,12 @@ TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_can_be_called
 
   // First conversion
   auto const data1 = generator.next();
-  auto const pc1   = converter.convert(data1);
+  auto const pc1   = converter.convertToOrganized(data1);
   EXPECT_EQ(4, pc1.numberOfPoints());
 
   // Second conversion with different data
   auto const data2 = generator.next();
-  auto const pc2   = converter.convert(data2);
+  auto const pc2   = converter.convertToOrganized(data2);
   EXPECT_EQ(4, pc2.numberOfPoints());
 
   // Results should be independent
@@ -762,7 +741,7 @@ TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_can_be_called
 
 TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_handles_different_segment_indices)
 {
-  sick::PointCloudConfiguration config;
+  sick::point_cloud::PointCloudConfiguration config;
   sick::compact::multiscan200::PointCloudConverter converter(config);
 
   auto generator =
@@ -772,7 +751,7 @@ TEST(telegram_type_6_multiScan200_PointCloudConverterTest, convert_handles_diffe
   for (int i = 0; i < 4; ++i)
   {
     auto const data = generator.next();
-    auto const pc   = converter.convert(data);
+    auto const pc   = converter.convertToOrganized(data);
     EXPECT_EQ(10, pc.numberOfPoints()); // 2 rows * 5 columns
   }
 }

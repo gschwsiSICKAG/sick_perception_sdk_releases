@@ -1,4 +1,4 @@
-# multiScan200 Examples
+# multiScan200 Learning Examples
 
 - [Diagnosis](#diagnosis)
 - [Write to PCD files](#write-to-pcd-files)

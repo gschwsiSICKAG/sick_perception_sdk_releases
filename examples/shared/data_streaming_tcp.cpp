@@ -6,18 +6,18 @@ SPDX-License-Identifier: MIT
 // For a description of this example, refer to: examples/shared_learning_examples.md
 
 #include "../examples_helper.hpp"
-#include <sick_perception_sdk/compact_format/PointCloud/MultiEchoPointCloud.hpp>
+#include <sick_perception_sdk/compact_format/PointCloud/UnorganizedPointCloud.hpp>
 #include <sick_perception_sdk/sensor_configuration/HttpClient/httplib_client/HttpClient.hpp>
 
 #if defined(USE_LRS4000)
-#  include <sick_perception_sdk/drivers/LRS4000/Driver.hpp>
-#  include <sick_perception_sdk/sensor_configuration/LRS4000/Configurator.hpp>
-using ConfiguratorT = sick::LRS4000::v1_9_0_0R::Configurator;
+#  include <sick_perception_sdk/drivers/LRS4000/LRS4000Driver.hpp>
+#  include <sick_perception_sdk/sensor_configuration/LRS4000/LRS4000Configurator.hpp>
+using ConfiguratorT = sick::LRS4000::v1_9_1_0R::Configurator;
 using DriverT       = sick::LRS4000::Driver;
 #else // Defaults to multiScan200
-#  include <sick_perception_sdk/drivers/multiScan200/Driver.hpp>
-#  include <sick_perception_sdk/sensor_configuration/multiScan200/Configurator.hpp>
-using ConfiguratorT = sick::multiScan200::v0_9_0::Configurator;
+#  include <sick_perception_sdk/drivers/multiScan200/MultiScan200Driver.hpp>
+#  include <sick_perception_sdk/sensor_configuration/multiScan200/MultiScan200Configurator.hpp>
+using ConfiguratorT = sick::multiScan200::v0_9_0_2C::Configurator;
 using DriverT       = sick::multiScan200::Driver;
 #endif
 
@@ -38,16 +38,13 @@ void onNewImuData(sick::compact::imu::ImuData const& compactImu)
 }
 #endif
 
-void onNewPointCloud(sick::MultiEchoPointCloud const& pointCloud)
+void onNewPointCloud(sick::point_cloud::UnorganizedPointCloud const& pointCloud)
 {
   std::cout << "Got point cloud with " << pointCloud.numberOfPoints() << " points.\n";
 }
 
 int main(int argc, char* argv[])
 {
-  sick::examples::printSdkVersion();
-  using namespace sick::literals;
-
   sick::examples::printSdkVersion();
   auto const deviceAddress = sick::examples::getDeviceAddress(argc, argv);
 
@@ -69,18 +66,24 @@ int main(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
-  sick::PointCloudConfiguration config;
+  sick::point_cloud::PointCloudConfiguration config;
   config.fields.enableCartesian = true;
   config.fields.enableIntensity = true;
 
   DriverT driver(deviceAddress, sick::examples::printExceptionMessage);
-  driver.scanDataReceiver().setup();
-  driver.scanDataReceiver().setOnNewFrameCallback(onNewPointCloud, config);
+  driver
+    .scanDataReceiver() //
+    .setup()            //
+    .setOnNewFrameCallback(std::function<void(sick::point_cloud::UnorganizedPointCloud const&)> {onNewPointCloud}, config);
 #if defined(USE_MULTISCAN200)
-  driver.ambientLightReceiver().setup();
-  driver.ambientLightReceiver().setOnNewDataCallback(onNewAmbientLightData);
-  driver.imuReceiver().setup();
-  driver.imuReceiver().setOnNewDataCallback(onNewImuData);
+  driver
+    .ambientLightReceiver() //
+    .setup()                //
+    .setOnNewDataCallback(onNewAmbientLightData);
+  driver
+    .imuReceiver() //
+    .setup()       //
+    .setOnNewDataCallback(onNewImuData);
 #endif
   driver.run();
 

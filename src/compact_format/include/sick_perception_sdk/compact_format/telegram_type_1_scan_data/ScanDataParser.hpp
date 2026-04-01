@@ -18,10 +18,12 @@ namespace sick::compact::scan_data {
 class SDK_EXPORT Parser : public CompactParser
 {
 public:
+  using DataT = ScanData;
+
   /**
    * @throws std::invalid_argument if validation or parsing fails.
    */
-  static auto validateAndParse(ByteView data, bool validateChecksum) -> ScanData;
+  static auto validateAndParse(ByteView data, bool validateChecksum) -> DataT;
 
   auto getSize(ByteView data) const -> std::optional<std::size_t> override;
 

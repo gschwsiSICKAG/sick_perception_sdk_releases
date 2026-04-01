@@ -31,6 +31,10 @@ public:
   CompactParser(CompactParser&&)                         = default;
   auto operator=(CompactParser&&) -> CompactParser&      = default;
 
+  /**
+   * @brief Get the size of the complete telegram (header + payload + checksum) if enough data is available to determine the size, 
+   *        otherwise std::nullopt.
+   */
   virtual auto getSize(ByteView data) const -> std::optional<std::size_t> = 0;
 
   /**
@@ -108,9 +112,17 @@ public:
   /**
    * @brief Checks if the checksum of the given telegram is valid.
    *
-   * The position of the assumed checksum is derived from the telegram header (headerSizeBeforePayloadLength + payloadLength).
+   * The position of the assumed checksum is derived from the telegram header (header size + payloadLength).
    */
-  static void validateChecksum(TelegramHeader const& header, ByteView data);
+  template <class HeaderT>
+  static void validateChecksum(HeaderT const& header, ByteView data)
+  {
+    auto const requiredSize = sizeof(HeaderT) + header.payloadLength + sizeof(std::uint32_t);
+    if (!isChecksumValid(data.first(requiredSize)))
+    {
+      throw std::invalid_argument("Invalid checksum");
+    }
+  }
 
   static void validateTelegramHeader(TelegramHeader const& header, TelegramType expectedType, std::set<std::uint32_t> expectedVersions);
 };

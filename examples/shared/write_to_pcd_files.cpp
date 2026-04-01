@@ -6,19 +6,19 @@ SPDX-License-Identifier: MIT
 // For a description of this example, refer to: examples/shared_learning_examples.md
 
 #include "../examples_helper.hpp"
-#include <sick_perception_sdk/compact_format/PointCloud/MultiEchoPointCloud.hpp>
 #include <sick_perception_sdk/compact_format/PointCloud/PointCloudToPcdConverter.hpp>
+#include <sick_perception_sdk/compact_format/PointCloud/UnorganizedPointCloud.hpp>
 #include <sick_perception_sdk/sensor_configuration/HttpClient/httplib_client/HttpClient.hpp>
 
 #if defined(USE_MULTISCAN100)
-#  include <sick_perception_sdk/drivers/multiScan100/Driver.hpp>
-#  include <sick_perception_sdk/sensor_configuration/multiScan100/Configurator.hpp>
-using ConfiguratorT = sick::multiScan100::v2_4_1::Configurator;
+#  include <sick_perception_sdk/drivers/multiScan100/MultiScan100Driver.hpp>
+#  include <sick_perception_sdk/sensor_configuration/multiScan100/MultiScan100Configurator.hpp>
+using ConfiguratorT = sick::multiScan100::v2_4_2_0R::Configurator;
 using DriverT       = sick::multiScan100::Driver;
 #else // Default to picoScan100
-#  include <sick_perception_sdk/drivers/picoScan100/Driver.hpp>
-#  include <sick_perception_sdk/sensor_configuration/picoScan150/Configurator.hpp>
-using ConfiguratorT = sick::picoScan150::v2_2_1::Configurator;
+#  include <sick_perception_sdk/drivers/picoScan100/PicoScan100Driver.hpp>
+#  include <sick_perception_sdk/sensor_configuration/picoScan150/PicoScan150Configurator.hpp>
+using ConfiguratorT = sick::picoScan150::v2_2_1_0R::Configurator;
 using DriverT       = sick::picoScan100::Driver;
 #endif
 
@@ -61,19 +61,21 @@ int main(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
-  sick::PointCloudConfiguration config;
+  sick::point_cloud::PointCloudConfiguration config;
   config.fields.enableCartesian = true;
   config.fields.enableIntensity = true;
 
   DriverT driver(sick::examples::printExceptionMessage);
-  driver.scanDataReceiver().setup();
-  driver.scanDataReceiver().setOnNewFrameCallback(
-    [basePath](sick::MultiEchoPointCloud const& framePointCloud) {
-      auto const filePath = basePath / (std::string(kDeviceName) + "_" + std::to_string(framePointCloud.timestamp().microsecondsSinceEpoch()) + ".pcd");
-      sick::pcd::writeToAsciiFile(framePointCloud, filePath.string());
-    },
-    config
-  );
+  driver
+    .scanDataReceiver() //
+    .setup()            //
+    .setOnNewFrameCallback(
+      [basePath](sick::point_cloud::UnorganizedPointCloud const& framePointCloud) {
+        auto const filePath = basePath / (std::string(kDeviceName) + "_" + std::to_string(framePointCloud.timestamp().microsecondsSinceEpoch()) + ".pcd");
+        sick::pcd::writeToAsciiFile(framePointCloud, filePath.string());
+      },
+      config
+    );
 
   driver.run();
 

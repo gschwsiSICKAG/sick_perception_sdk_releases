@@ -8,6 +8,7 @@ SPDX-License-Identifier: MIT
 #include <sick_perception_sdk/common/export.hpp>
 #include <sick_perception_sdk/common/quantities/Duration.hpp>
 
+#include <chrono>
 #include <cstdint>
 #include <ostream>
 #include <string>
@@ -25,6 +26,12 @@ class SDK_EXPORT Timestamp
 {
 public:
   using value_type = std::uint64_t;
+
+  static Timestamp now()
+  {
+    auto const now = std::chrono::steady_clock::now().time_since_epoch();
+    return Timestamp::fromMicrosecondsSinceEpoch(std::chrono::duration_cast<std::chrono::microseconds>(now).count());
+  }
 
   constexpr Timestamp()
     : m_microsecondsSinceEpoch(0)
@@ -99,12 +106,20 @@ auto SDK_EXPORT operator<<(std::ostream& stream, Timestamp const& timestamp) -> 
 
 constexpr auto max(Timestamp const& lhs, Timestamp const& rhs) -> Timestamp
 {
-  return lhs.microsecondsSinceEpoch() > rhs.microsecondsSinceEpoch() ? lhs : rhs;
+  if (lhs.microsecondsSinceEpoch() > rhs.microsecondsSinceEpoch())
+  {
+    return lhs;
+  }
+  return rhs;
 }
 
 constexpr auto min(Timestamp const& lhs, Timestamp const& rhs) -> Timestamp
 {
-  return lhs.microsecondsSinceEpoch() < rhs.microsecondsSinceEpoch() ? lhs : rhs;
+  if (lhs.microsecondsSinceEpoch() < rhs.microsecondsSinceEpoch())
+  {
+    return lhs;
+  }
+  return rhs;
 }
 
 } // namespace sick

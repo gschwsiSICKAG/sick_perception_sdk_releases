@@ -9,14 +9,14 @@ SPDX-License-Identifier: MIT
 #include <sick_perception_sdk/common/export.hpp>
 #include <sick_perception_sdk/common/quantities/Angle.hpp>
 #include <sick_perception_sdk/common/quantities/Distance.hpp>
-#include <sick_perception_sdk/compact_format/PointCloud/MultiEchoPointCloud.hpp>
+#include <sick_perception_sdk/compact_format/PointCloud/PointCloudAttributes.hpp>
 
 #include <cstdint>
 #include <optional>
 #include <set>
 #include <string>
 
-namespace sick {
+namespace sick::point_cloud {
 
 // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
 
@@ -36,6 +36,7 @@ struct SDK_EXPORT PointCloudConfiguration
     bool enablePulseWidth  = false;
 
     auto toString() const -> std::string;
+    auto toSet() const -> std::set<PointField::FieldType>;
   };
 
   struct Filters
@@ -70,6 +71,10 @@ struct SDK_EXPORT PointCloudConfiguration
      * the range scaling factor.
      */
     Interval<Distance> range;
+
+    /**
+     * @brief A filter for the intensity of the points in the point cloud.
+     */
     Interval<float> intensity;
 
     /**
@@ -97,11 +102,9 @@ struct SDK_EXPORT PointCloudConfiguration
 
   Filters filters;
 
-  MultiEchoPointCloud::Organization organization = MultiEchoPointCloud::Organization::Unorganized;
-
   auto toString() const -> std::string;
 };
 
 // NOLINTEND(misc-non-private-member-variables-in-classes)
 
-} // namespace sick
+} // namespace sick::point_cloud

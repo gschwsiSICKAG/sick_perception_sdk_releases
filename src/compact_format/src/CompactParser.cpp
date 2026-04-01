@@ -32,15 +32,6 @@ auto CompactParser::isChecksumValid(ByteView data) -> bool
   return expectedCRC == computedCRC;
 }
 
-void CompactParser::validateChecksum(TelegramHeader const& header, ByteView data)
-{
-  auto const requiredSize = sizeof(TelegramHeader) + header.payloadLength + sizeof(std::uint32_t);
-  if (!isChecksumValid(data.first(requiredSize)))
-  {
-    throw std::invalid_argument("Invalid checksum");
-  }
-}
-
 void CompactParser::validateTelegramHeader(TelegramHeader const& header, TelegramType expectedType, std::set<std::uint32_t> expectedVersions)
 {
   if (header.startOfFrame != kStartOfFrame)

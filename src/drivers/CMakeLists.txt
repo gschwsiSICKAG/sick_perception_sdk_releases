@@ -10,15 +10,12 @@ add_library(${LIB_NAME})
 add_library(${PROJECT_NAME}::${LIB_NAME} ALIAS ${LIB_NAME})
 
 set(LIB_SOURCES
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/LRS4000/Driver.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/multiScan100/Driver.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/multiScan200/Driver.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/picoScan100/Driver.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/socket/ConnectionError.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/socket/ReceiveError.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/socket/SocketError.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/socket/TcpClientSocket.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/socket/UdpListeningSocket.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/LRS4000/LRS4000Driver.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/multiScan100/MultiScan100Driver.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/multiScan200/MultiScan200Driver.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/picoScan100/PicoScan100Driver.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Receiver/UdpImuReceiver.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Receiver/UdpScanDataReceiver.cpp
 )
 
 target_sources(${LIB_NAME} PRIVATE ${LIB_SOURCES})

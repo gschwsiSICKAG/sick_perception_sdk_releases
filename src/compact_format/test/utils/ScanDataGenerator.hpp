@@ -40,7 +40,7 @@ public:
   auto withNumberOfEchoesPerBeam(int value) -> ScanDataGenerator&;
   auto withNumberOfRows(int value) -> ScanDataGenerator&;
   auto withNumberOfSegmentsPerFrame(int value) -> ScanDataGenerator&;
-  auto withTelegramCounter(std::uint64_t value) -> ScanDataGenerator&;
+  auto withTelegramSequenceNumber(std::uint64_t value) -> ScanDataGenerator&;
 
   auto next(Timestamp transmitTimestamp = Timestamp::fromMicrosecondsSinceEpoch(0)) -> compact::scan_data::ScanData;
   void reset();
@@ -52,8 +52,8 @@ private:
   std::uint32_t m_numberOfEchoesPerBeam;
   std::uint32_t m_numberOfRows;
   int m_numberOfSegmentsPerFrame;
-  std::uint64_t m_telegramCounter;
-  std::uint64_t m_segmentCounter;
+  std::uint64_t m_telegramSequenceNumber;
+  std::uint64_t m_segmentIndex;
 
   auto createModule() -> compact::scan_data::Module;
 };

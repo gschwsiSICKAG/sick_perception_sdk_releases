@@ -207,12 +207,12 @@ public:
   void setSensorPosition(SensorPosition const& position) const
   {
     typename PayloadT::Post::Request const request {
-      static_cast<int>(position.x.millimeters()), //
-      static_cast<int>(position.y.millimeters()), //
-      static_cast<int>(position.z.millimeters()), //
-      angleToSopas(position.yaw),                 //
-      angleToSopas(position.pitch),               //
-      angleToSopas(position.roll),                //
+      static_cast<std::int32_t>(position.x.millimeters()), //
+      static_cast<std::int32_t>(position.y.millimeters()), //
+      static_cast<std::int32_t>(position.z.millimeters()), //
+      angleToSopas(position.yaw),                          //
+      angleToSopas(position.pitch),                        //
+      angleToSopas(position.roll),                         //
     };
     writeVariable<PayloadT>(request);
   }
@@ -229,12 +229,12 @@ public:
 
     std::tm timeStruct {};
     // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
-    timeStruct.tm_year = sickDatetime._uiYear.value() - 1900;
-    timeStruct.tm_mon  = sickDatetime._usiMonth.value() - 1;
-    timeStruct.tm_mday = sickDatetime._usiDay.value();
-    timeStruct.tm_hour = sickDatetime._usiHour.value();
-    timeStruct.tm_min  = sickDatetime._usiMinute.value();
-    timeStruct.tm_sec  = sickDatetime._usiSec.value();
+    timeStruct.tm_year = static_cast<int>(sickDatetime._uiYear.value()) - 1900;
+    timeStruct.tm_mon  = static_cast<int>(sickDatetime._usiMonth.value()) - 1;
+    timeStruct.tm_mday = static_cast<int>(sickDatetime._usiDay.value());
+    timeStruct.tm_hour = static_cast<int>(sickDatetime._usiHour.value());
+    timeStruct.tm_min  = static_cast<int>(sickDatetime._usiMinute.value());
+    timeStruct.tm_sec  = static_cast<int>(sickDatetime._usiSec.value());
 
 #ifdef _WIN32
     time_t const secondsSinceEpoch = _mkgmtime(&timeStruct);
@@ -277,13 +277,13 @@ public:
 
     typename PayloadT::Post::Request::DateTime sickDateTime;
     // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
-    sickDateTime._uiYear    = timeStruct.tm_year + 1900;
-    sickDateTime._usiMonth  = timeStruct.tm_mon + 1;
-    sickDateTime._usiDay    = timeStruct.tm_mday;
-    sickDateTime._usiHour   = timeStruct.tm_hour;
-    sickDateTime._usiMinute = timeStruct.tm_min;
-    sickDateTime._usiSec    = timeStruct.tm_sec;
-    sickDateTime._udiUSec   = static_cast<int>(microseconds.count());
+    sickDateTime._uiYear    = static_cast<std::uint16_t>(timeStruct.tm_year) + 1900;
+    sickDateTime._usiMonth  = static_cast<std::uint8_t>(timeStruct.tm_mon) + 1;
+    sickDateTime._usiDay    = static_cast<std::uint8_t>(timeStruct.tm_mday);
+    sickDateTime._usiHour   = static_cast<std::uint8_t>(timeStruct.tm_hour);
+    sickDateTime._usiMinute = static_cast<std::uint8_t>(timeStruct.tm_min);
+    sickDateTime._usiSec    = static_cast<std::uint8_t>(timeStruct.tm_sec);
+    sickDateTime._udiUSec   = static_cast<std::uint32_t>(microseconds.count());
 
     typename PayloadT::Post::Request const request {sickDateTime};
     auto const ret =

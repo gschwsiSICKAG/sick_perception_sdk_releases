@@ -35,7 +35,7 @@ struct SDK_EXPORT TelegramHeader
 
   std::uint32_t startOfFrame {0};
   TelegramType telegramType {TelegramType::Invalid};
-  std::uint64_t telegramCounter {0};
+  std::uint64_t telegramSequenceNumber {0};
   Timestamp transmitTimestamp;
   std::uint32_t telegramVersion {0};
   std::uint32_t payloadLength {0};

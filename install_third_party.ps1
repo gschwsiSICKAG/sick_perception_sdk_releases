@@ -62,12 +62,12 @@ cmake -S 3rd_party/nlohmann_json -B 3rd_party/nlohmann_json/build -DJSON_BuildTe
 cmake --install 3rd_party/nlohmann_json/build --prefix "$PWD/install"
 
 # Download, build and install cpp-httplib
-Download-And-Unpack -TargetDir "3rd_party/cpp-httplib" -ZipName "cpp-httplib-v0.29.0.zip" -Url "https://github.com/yhirose/cpp-httplib/archive/refs/tags/v0.29.0.zip" -ExtractedDir "3rd_party/cpp-httplib-0.29.0"
+Download-And-Unpack -TargetDir "3rd_party/cpp-httplib" -ZipName "cpp-httplib-v0.39.0.zip" -Url "https://github.com/yhirose/cpp-httplib/archive/refs/tags/v0.39.0.zip" -ExtractedDir "3rd_party/cpp-httplib-0.39.0"
 cmake -S 3rd_party/cpp-httplib -B 3rd_party/cpp-httplib/build
 cmake --install 3rd_party/cpp-httplib/build --prefix "$PWD/install"
 
 # Download, build and install Google Test
-Download-And-Unpack -TargetDir "3rd_party/googletest" -ZipName "googletest-1.16.0.zip" -Url "https://github.com/google/googletest/archive/refs/tags/v1.16.0.zip" -ExtractedDir "3rd_party/googletest-1.16.0"
+Download-And-Unpack -TargetDir "3rd_party/googletest" -ZipName "googletest-1.17.0.zip" -Url "https://github.com/google/googletest/archive/refs/tags/v1.17.0.zip" -ExtractedDir "3rd_party/googletest-1.17.0"
 # Use static runtime (MT/MTd) to match OpenSSL from slproweb.com
 $RuntimeLibrary = if ($BuildType -eq "Debug") { "MultiThreadedDebug" } else { "MultiThreaded" }
 cmake -S 3rd_party/googletest -B 3rd_party/googletest/build -Dgtest_force_shared_crt=OFF -DCMAKE_MSVC_RUNTIME_LIBRARY="$RuntimeLibrary"

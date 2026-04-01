@@ -1,4 +1,66 @@
+import re
 from objects import *
+
+
+def _parse_integer_format(format_str: str | None) -> str:
+    """
+    Convert an OpenAPI integer format to a C++ type.
+
+    Supported formats:
+    - uint1-uint64: Maps to std::uint8_t, std::uint16_t, std::uint32_t, or std::uint64_t
+    - int1-int64: Maps to std::int8_t, std::int16_t, std::int32_t, or std::int64_t
+    - None: Maps to int
+
+    Raises:
+        Exception: If the format specifies more than 64 bits.
+    """
+    if format_str is None:
+        return "int"
+
+    # Parse uint<N> or int<N> format
+    match = re.match(r"^(u?int)(\d+)$", format_str)
+    if not match:
+        raise Exception(f"⚠️  Unknown integer format '{format_str}'.")
+
+    prefix = match.group(1)
+    bits = int(match.group(2))
+
+    if bits > 64:
+        raise Exception(f"Integer format '{format_str}' exceeds maximum supported width of 64 bits")
+
+    # Round up to next multiple of 8
+    if bits <= 8:
+        width = 8
+    elif bits <= 16:
+        width = 16
+    elif bits <= 32:
+        width = 32
+    else:
+        width = 64
+
+    if prefix == "uint":
+        return f"std::uint{width}_t"
+    else:
+        return f"std::int{width}_t"
+
+
+def _parse_number_format(format_str: str | None) -> str:
+    """
+    Convert an OpenAPI number format to a C++ type.
+
+    Supported formats:
+    - float: Maps to float
+    - double: Maps to double
+    - None: Maps to float
+    """
+    if format_str is None:
+        return "float"
+    if format_str == "float":
+        return "float"
+    if format_str == "double":
+        return "double"
+
+    raise Exception(f"⚠️  Unknown number format '{format_str}'.")
 
 
 def parse_path(path_name: str, path, endpoints: List[EndpointDescription]) -> None:
@@ -8,7 +70,7 @@ def parse_path(path_name: str, path, endpoints: List[EndpointDescription]) -> No
 
     endpoint_description = EndpointDescription(path_name)
     all_tags = []
-    
+
     for method, operation in path.items():
         if method not in ["get", "post"]:
             print(f"⚠️  Method '{method}' of path '{path_name}' not supported. Skipping it.")
@@ -121,16 +183,21 @@ def _parse_schema(payload_name: str, schema) -> Optional[ObjectDescription]:
 
 
 def _parse_array(prop_name, prop, parent: ObjectDescription) -> str:
-    item_type = prop["items"]["type"]
+    items = prop["items"]
+    item_type = items["type"]
+    item_format = items.get("format")
+
     if item_type == "boolean":
         item_type_cpp = "bool"
     elif item_type == "integer":
-        item_type_cpp = "int"
+        item_type_cpp = _parse_integer_format(item_format)
+        if item_type_cpp.startswith("std::"):
+            parent.includes.append("#include <cstdint>")
     elif item_type == "number":
-        item_type_cpp = "float"
+        item_type_cpp = _parse_number_format(item_format)
     elif item_type == "object":
         item_type_cpp = prop_name + "Item"
-        _parse_object(item_type_cpp, prop["items"], parent)
+        _parse_object(item_type_cpp, items, parent)
     else:
         raise Exception(f"Array type mapping for '{item_type}' not implemented")
 
@@ -221,6 +288,8 @@ def _parse_prop_type(prop_name, prop, obj: ObjectDescription) -> str:
     Convert a SRT REST property type to a C++ type.
     """
     prop_type = prop["type"]
+    prop_format = prop.get("format")
+
     if prop_type == "array":
         return _parse_array(prop_name, prop, obj)
     if prop_type == "boolean":
@@ -232,23 +301,25 @@ def _parse_prop_type(prop_name, prop, obj: ObjectDescription) -> str:
             _parse_enum(prop_name, prop, obj)
             return prop_name
 
+        # Get the C++ type from the format specifier
+        cpp_type = _parse_integer_format(prop_format)
+        if cpp_type.startswith("std::"):
+            obj.includes.append("#include <cstdint>")
+
         # Properties that don't specify valid limits are handled like regular integers.
         if "minimum" not in prop or "maximum" not in prop:
-            return "int"
+            return cpp_type
 
         # We possibly add the includes multiple times. That's ok, we'll remove duplicates later.
         obj.includes.append("#include <sick_perception_sdk/sensor_configuration/api/NumericRange.hpp>")
         # Properties with a full specification will be converted to a `NumericRange` to make the C++ API self-documenting.
-        min = prop["minimum"]
-        max = prop["maximum"]
+        min_val = prop["minimum"]
+        max_val = prop["maximum"]
+        default_val = prop.get("default", 0)
 
-        if "default" in prop:
-            default = prop["default"]
-            return "NumericRange<" + str(min) + ", " + str(max) + ", " + str(default) + ">"
-        else:
-            return "NumericRange<" + str(min) + ", " + str(max) + ", 0>"
+        return f"NumericRange<{cpp_type}, {min_val}, {max_val}, {default_val}>"
     if prop_type == "number":
-        return "float"
+        return _parse_number_format(prop_format)
     if prop_type == "object":
         _parse_object(prop_name, prop, obj)
         return prop_name

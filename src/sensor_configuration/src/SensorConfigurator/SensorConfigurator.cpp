@@ -96,6 +96,7 @@ auto SensorConfigurator::getAuthenticationHeader(std::string const& variableName
       return start;
     }
 
+    // AXIVION Next Construct CertC++-STR51: data pointer of salt is checked above
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast): the REST API requires this behavior
     auto const saltStr = std::string(reinterpret_cast<char const*>(challenge.salt.data()), challenge.salt.size());
     return start + ":" + saltStr;

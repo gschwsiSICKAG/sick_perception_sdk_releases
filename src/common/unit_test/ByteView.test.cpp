@@ -14,15 +14,6 @@ SPDX-License-Identifier: MIT
 
 using namespace sick;
 
-TEST(ByteView, default_constructor_creates_empty_view)
-{
-  ByteView const view;
-
-  EXPECT_EQ(nullptr, view.data());
-  EXPECT_EQ(0, view.size());
-  EXPECT_TRUE(view.empty());
-}
-
 TEST(ByteView, constructor_from_pointer_and_size_creates_view)
 {
   std::uint8_t const data[] = {1, 2, 3, 4, 5};
@@ -83,7 +74,8 @@ TEST(ByteView, at_throws_on_out_of_range_index)
 
 TEST(ByteView, at_throws_on_empty_view)
 {
-  ByteView const view;
+  std::vector<std::uint8_t> const data;
+  ByteView const view(data);
 
   EXPECT_THROW(view.at(0), std::out_of_range);
 }
@@ -316,7 +308,8 @@ TEST(ByteView, to_vector_creates_copy_of_data)
 
 TEST(ByteView, to_vector_from_empty_view_returns_empty_vector)
 {
-  ByteView const view;
+  std::vector<std::uint8_t> const data;
+  ByteView const view(data);
 
   std::vector<std::uint8_t> const copy = view.toVector();
 

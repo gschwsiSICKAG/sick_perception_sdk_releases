@@ -1,16 +1,16 @@
 from conan import ConanFile
 from conan.tools.cmake import CMake, CMakeToolchain, cmake_layout, CMakeDeps
+from conan.tools.files import load
 
 required_conan_version = ">=2.13"
 
 
 class SickPerceptionSDK(ConanFile):
     name = "sick_perception_sdk"
-    version = "0.5.0-c.2"
     description = "This packages contains SDK components for interacting with SICK sensors."
     license = "Copyright SICK AG"
     settings = "os", "compiler", "build_type", "arch"
-    exports_sources = "CMakeLists.txt", "cmake/*", "src/*", "LICENSE", "README.md"
+    exports_sources = "Version.txt", "CMakeLists.txt", "cmake/*", "src/*", "LICENSE", "README.md"
 
     options = {
         "shared": [True, False],
@@ -37,6 +37,9 @@ class SickPerceptionSDK(ConanFile):
         "build_unit_tests": False,
         "build_examples_device_type": None,
     }
+
+    def set_version(self):
+        self.version = load(self, "Version.txt").strip()
 
     def configure(self):
         if self.options.get_safe("shared"):
@@ -70,15 +73,16 @@ class SickPerceptionSDK(ConanFile):
     def requirements(self):
         self.requires("plog/[^1.1.10]")
         if self.options.get_safe("build_sensor_configuration") or self.options.get_safe("build_drivers") or self.options.get_safe("build_examples_device_type") != None:
-            self.requires("cpp-httplib/[^0.29.0]", transitive_headers=True)
-            self.requires("nlohmann_json/[^3.11.3]", transitive_headers=True)
-            self.requires("openssl/[^3.4]", transitive_headers=True)
+            self.requires("cpp-httplib/[^0.39.0]", transitive_headers=True)
+            self.requires("nlohmann_json/[^3.11.0]", transitive_headers=True)
+            self.requires("openssl/[^3.6]", transitive_headers=True)
         if self.options.get_safe("build_compact_format") or self.options.get_safe("build_drivers") or self.options.get_safe("build_examples_device_type") != None:
-            self.requires("zlib/[^1.3.1]")
+            # Caution: zlib 1.3.2 introduces cmake changes that are not compatible to sick_perception_sdk's CMakeLists.txt.
+            self.requires("zlib/1.3.1")
         if self.options.get_safe("build_unit_tests"):
-            self.requires("gtest/[^1.16.0]")
+            self.test_requires("gtest/[^1.16.0]")
         if self.options.build_benchmarks:
-            self.test_requires("benchmark/[^1.8.3]")
+            self.test_requires("benchmark/1.9.4")
 
     def layout(self):
         cmake_layout(self)

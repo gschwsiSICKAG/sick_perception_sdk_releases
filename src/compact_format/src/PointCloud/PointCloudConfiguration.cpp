@@ -7,7 +7,7 @@ SPDX-License-Identifier: MIT
 
 #include <string>
 
-namespace sick {
+namespace sick::point_cloud {
 
 auto PointCloudConfiguration::Fields::toString() const -> std::string
 {
@@ -22,6 +22,57 @@ auto PointCloudConfiguration::Fields::toString() const -> std::string
   result += "  enableIsReflector: " + std::string(enableIsReflector ? "true" : "false") + "\n";
   result += "  enableHasBlooming: " + std::string(enableHasBlooming ? "true" : "false") + "\n";
   return result;
+}
+
+auto PointCloudConfiguration::Fields::toSet() const -> std::set<PointField::FieldType>
+{
+  std::set<PointField::FieldType> fields;
+  if (enableCartesian)
+  {
+    fields.insert(PointField::FieldType::X);
+    fields.insert(PointField::FieldType::Y);
+    fields.insert(PointField::FieldType::Z);
+  }
+  if (enableSpherical)
+  {
+    fields.insert(PointField::FieldType::Range);
+    fields.insert(PointField::FieldType::Azimuth);
+    fields.insert(PointField::FieldType::Elevation);
+  }
+  if (enableIntensity)
+  {
+    fields.insert(PointField::FieldType::Intensity);
+  }
+  if (enableTimeOffset)
+  {
+    fields.insert(PointField::FieldType::TimeOffsetNanoseconds);
+    fields.insert(PointField::FieldType::TimeOffsetSeconds);
+  }
+  if (enableRing)
+  {
+    fields.insert(PointField::FieldType::Ring);
+  }
+  if (enableLayer)
+  {
+    fields.insert(PointField::FieldType::LayerId);
+  }
+  if (enableEcho)
+  {
+    fields.insert(PointField::FieldType::EchoIndex);
+  }
+  if (enableIsReflector)
+  {
+    fields.insert(PointField::FieldType::IsReflector);
+  }
+  if (enableHasBlooming)
+  {
+    fields.insert(PointField::FieldType::HasBlooming);
+  }
+  if (enablePulseWidth)
+  {
+    fields.insert(PointField::FieldType::PulseWidth);
+  }
+  return fields;
 }
 
 auto PointCloudConfiguration::Filters::toString() const -> std::string
@@ -106,4 +157,4 @@ auto PointCloudConfiguration::toString() const -> std::string
   return result;
 }
 
-} // namespace sick
+} // namespace sick::point_cloud

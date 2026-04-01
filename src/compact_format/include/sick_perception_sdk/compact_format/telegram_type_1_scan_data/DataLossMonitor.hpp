@@ -8,6 +8,7 @@ SPDX-License-Identifier: MIT
 #include <sick_perception_sdk/common/export.hpp>
 #include <sick_perception_sdk/compact_format/DataLoss/SegmentIndexLossMonitor.hpp>
 #include <sick_perception_sdk/compact_format/DataLoss/SequenceNumberLossMonitor.hpp>
+#include <sick_perception_sdk/compact_format/telegram_type_1_scan_data/FrameSequenceNumberLossMonitor.hpp>
 #include <sick_perception_sdk/compact_format/telegram_type_1_scan_data/ScanData.hpp>
 
 namespace sick::compact::scan_data {
@@ -43,7 +44,7 @@ public:
 
 private:
   SequenceNumberLossMonitor<std::uint64_t> m_telegramLossMonitor;
-  SequenceNumberLossMonitor<std::uint64_t> m_frameLossMonitor;
+  FrameSequenceNumberLossMonitor m_frameLossMonitor;
   SegmentIndexLossMonitor m_segmentLossMonitor;
 };
 

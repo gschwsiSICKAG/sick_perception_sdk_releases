@@ -79,12 +79,13 @@ auto MultiScan200DataGenerator::next() -> sick::compact::multiscan200::MultiScan
   sick::compact::multiscan200::MultiScan200Data data;
 
   // Fill telegram header
-  data.telegramHeader.startOfFrame      = 0x02020202;
-  data.telegramHeader.telegramType      = sick::compact::TelegramType::MultiScan200;
-  data.telegramHeader.telegramCounter   = m_frameSequenceNumber;
-  data.telegramHeader.transmitTimestamp = Timestamp::fromMicrosecondsSinceEpoch(m_frameSequenceNumber * 1000);
-  data.telegramHeader.telegramVersion   = 1;
-  data.telegramHeader.payloadLength     = 0; // Not used in tests
+  // The generator has no separate telegram sequence number, so we use the frame sequence number here for simplicity.
+  data.telegramHeader.startOfFrame           = 0x02020202;
+  data.telegramHeader.telegramType           = sick::compact::TelegramType::MultiScan200;
+  data.telegramHeader.telegramSequenceNumber = m_frameSequenceNumber;
+  data.telegramHeader.transmitTimestamp      = Timestamp::fromMicrosecondsSinceEpoch(m_frameSequenceNumber * 1000);
+  data.telegramHeader.telegramVersion        = 1;
+  data.telegramHeader.payloadLength          = 0; // Not used in tests
 
   // Fill segment metadata
   data.segmentMetaData.frameSequenceNumber         = m_frameSequenceNumber;

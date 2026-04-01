@@ -149,7 +149,7 @@ auto readScanData(ByteView data, MultiScan200Data& scanData) -> std::size_t
   std::memcpy(rawDistances.data(), data.data() + readPosition, numberOfSamples * sizeof(std::uint16_t));
   readPosition += numberOfSamples * sizeof(std::uint16_t);
 
-  scanData.distances.resize(numberOfSamples);
+  scanData.distances       = std::vector<Distance>(numberOfSamples);
   auto const scalingFactor = scanData.segmentMetaData.distanceScalingFactor;
   for (std::size_t i = 0; i < numberOfSamples; ++i)
   {
@@ -162,7 +162,7 @@ auto readScanData(ByteView data, MultiScan200Data& scanData) -> std::size_t
     std::vector<std::uint16_t> rawIntensities;
     readPosition += convertSubByteArray<std::uint16_t, kSizeOfIntensityInBits>(data.subview(readPosition), numberOfSamples, rawIntensities);
 
-    scanData.intensities.resize(numberOfSamples);
+    scanData.intensities = std::vector<float>(numberOfSamples);
     for (std::size_t i = 0; i < numberOfSamples; ++i)
     {
       scanData.intensities[i] = static_cast<float>(rawIntensities[i]) / maxIntensityValue;
@@ -176,7 +176,7 @@ auto readScanData(ByteView data, MultiScan200Data& scanData) -> std::size_t
     std::memcpy(rawPulseWidths.data(), data.data() + readPosition, numberOfSamples);
     readPosition += numberOfSamples;
 
-    scanData.pulseWidths.resize(numberOfSamples);
+    scanData.pulseWidths                     = std::vector<Duration>(numberOfSamples);
     constexpr double pulseWidthScalingFactor = 8.0;
     for (std::size_t i = 0; i < numberOfSamples; ++i)
     {
@@ -187,7 +187,7 @@ auto readScanData(ByteView data, MultiScan200Data& scanData) -> std::size_t
   // Echo properties - bulk read directly into target
   if ((scanData.segmentMetaData.echoDataContent.isSet(EchoDataContent::Properties)))
   {
-    scanData.echoProperties.resize(numberOfSamples);
+    scanData.echoProperties = std::vector<BitField<EchoProperties>>(numberOfSamples);
     std::memcpy(scanData.echoProperties.data(), data.data() + readPosition, numberOfSamples);
     readPosition += numberOfSamples;
   }
@@ -240,7 +240,7 @@ auto Parser::getSize(ByteView data) const -> std::optional<std::size_t>
   readValue(data, header);
   validateTelegramHeader(header, TelegramType::MultiScan200, kSupportedTelegramVersions);
 
-  return sizeof(TelegramHeader) + header.payloadLength + sizeof(std::uint32_t);
+  return sizeof(header) + header.payloadLength + sizeof(std::uint32_t);
 }
 
 } // namespace sick::compact::multiscan200

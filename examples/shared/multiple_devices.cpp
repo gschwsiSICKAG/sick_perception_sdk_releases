@@ -9,14 +9,14 @@ SPDX-License-Identifier: MIT
 #include <sick_perception_sdk/sensor_configuration/HttpClient/httplib_client/HttpClient.hpp>
 
 #if defined(USE_MULTISCAN100)
-#  include <sick_perception_sdk/drivers/multiScan100/Driver.hpp>
-#  include <sick_perception_sdk/sensor_configuration/multiScan100/Configurator.hpp>
-using ConfiguratorT = sick::multiScan100::v2_4_1::Configurator;
+#  include <sick_perception_sdk/drivers/multiScan100/MultiScan100Driver.hpp>
+#  include <sick_perception_sdk/sensor_configuration/multiScan100/MultiScan100Configurator.hpp>
+using ConfiguratorT = sick::multiScan100::v2_4_2_0R::Configurator;
 using DriverT       = sick::multiScan100::Driver;
 #else // Default to picoScan100
-#  include <sick_perception_sdk/drivers/picoScan100/Driver.hpp>
-#  include <sick_perception_sdk/sensor_configuration/picoScan150/Configurator.hpp>
-using ConfiguratorT = sick::picoScan150::v2_2_1::Configurator;
+#  include <sick_perception_sdk/drivers/picoScan100/PicoScan100Driver.hpp>
+#  include <sick_perception_sdk/sensor_configuration/picoScan150/PicoScan150Configurator.hpp>
+using ConfiguratorT = sick::picoScan150::v2_2_1_0R::Configurator;
 using DriverT       = sick::picoScan100::Driver;
 #endif
 
@@ -29,16 +29,16 @@ using namespace std::chrono_literals;
 
 std::mutex output_mutex;
 
-void onNewFrame1(sick::MultiEchoPointCloud const& pointCloud)
+void onNewFrame1(sick::point_cloud::UnorganizedPointCloud const& pointCloud)
 {
   std::lock_guard<std::mutex> lock(output_mutex);
-  std::cout << "Received frame from device 1.\n";
+  std::cout << "Received frame from device 1 containing " << pointCloud.numberOfPoints() << " points.\n";
 }
 
-void onNewFrame2(sick::MultiEchoPointCloud const& pointCloud)
+void onNewFrame2(sick::point_cloud::UnorganizedPointCloud const& pointCloud)
 {
   std::lock_guard<std::mutex> lock(output_mutex);
-  std::cout << "Received frame from device 2.\n";
+  std::cout << "Received frame from device 2 containing " << pointCloud.numberOfPoints() << " points.\n";
 }
 
 int main(int argc, char* argv[])
@@ -79,17 +79,20 @@ int main(int argc, char* argv[])
     sick::examples::printExceptionMessageWithPort(exception, 2116);
   });
 
-  driver1.scanDataReceiver().setup(2115);
-  driver2.scanDataReceiver().setup(2116);
-
-  sick::PointCloudConfiguration config;
+  sick::point_cloud::PointCloudConfiguration config;
   config.fields.enableCartesian = true;
   config.fields.enableIntensity = true;
 
-  driver1.scanDataReceiver().setOnNewFrameCallback(onNewFrame1, config);
+  driver1
+    .scanDataReceiver() //
+    .setup(2115)        //
+    .setOnNewFrameCallback(onNewFrame1, config);
   driver1.run();
 
-  driver2.scanDataReceiver().setOnNewFrameCallback(onNewFrame2, config);
+  driver2
+    .scanDataReceiver() //
+    .setup(2116)        //
+    .setOnNewFrameCallback(onNewFrame2, config);
   driver2.run();
 
   std::this_thread::sleep_for(10s);

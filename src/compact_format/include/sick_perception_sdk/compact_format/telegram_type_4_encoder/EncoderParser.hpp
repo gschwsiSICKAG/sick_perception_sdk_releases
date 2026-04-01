@@ -18,7 +18,9 @@ namespace sick::compact::encoder {
 class SDK_EXPORT Parser : public CompactParser
 {
 public:
-  static auto validateAndParse(ByteView data, bool validateChecksum) -> EncoderData;
+  using DataT = EncoderData;
+
+  static auto validateAndParse(ByteView data, bool validateChecksum) -> DataT;
 
   auto getSize(ByteView data) const -> std::optional<size_t> override;
 };

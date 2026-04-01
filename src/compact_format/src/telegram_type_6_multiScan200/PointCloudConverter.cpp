@@ -7,7 +7,7 @@ SPDX-License-Identifier: MIT
 
 #include <sick_perception_sdk/common/quantities/Angle.hpp>
 #include <sick_perception_sdk/common/quantities/Timestamp.hpp>
-#include <sick_perception_sdk/compact_format/PointCloud/MultiEchoPointCloud.hpp>
+#include <sick_perception_sdk/compact_format/PointCloud/OrganizedPointCloud.hpp>
 #include <sick_perception_sdk/compact_format/PointCloud/OrganizedPointCloudBuilder.hpp>
 #include <sick_perception_sdk/compact_format/PointCloud/PointCloudConfiguration.hpp>
 #include <sick_perception_sdk/compact_format/PointCloud/UnorganizedPointCloudBuilder.hpp>
@@ -56,7 +56,7 @@ struct AccessFunctions
   };
 };
 
-auto getAccessFunctions(PointCloudConfiguration const& configuration, MultiScan200Data const& data) -> AccessFunctions
+auto getAccessFunctions(point_cloud::PointCloudConfiguration const& configuration, MultiScan200Data const& data) -> AccessFunctions
 {
   AccessFunctions accessFunctions;
 
@@ -105,7 +105,7 @@ auto getAccessFunctions(PointCloudConfiguration const& configuration, MultiScan2
   return accessFunctions;
 }
 
-auto computeFilterIndices(PointCloudConfiguration const& configuration, MultiScan200Data const& data) -> FilterIndices
+auto computeFilterIndices(point_cloud::PointCloudConfiguration const& configuration, MultiScan200Data const& data) -> FilterIndices
 {
   FilterIndices indices;
   auto const numberOfEchoes = static_cast<std::size_t>(data.segmentMetaData.numberOfEchoes);
@@ -182,34 +182,83 @@ auto computeFilterIndices(PointCloudConfiguration const& configuration, MultiSca
   return indices;
 }
 
+auto getAvailableFields(MultiScan200Data const& data) -> std::set<point_cloud::PointField::FieldType>
+{
+  using FieldType = point_cloud::PointField::FieldType;
+
+  std::set<FieldType> availableFields = {
+    FieldType::X,
+    FieldType::Y,
+    FieldType::Z,
+    FieldType::Range,
+    FieldType::Azimuth,
+    FieldType::Elevation,
+    // Intensity is optional
+    FieldType::TimeOffsetNanoseconds,
+    FieldType::TimeOffsetSeconds,
+    FieldType::Ring,
+    FieldType::LayerId,
+    FieldType::EchoIndex,
+    // IsReflector and HasBlooming are optional and only available if echo properties are present
+  };
+
+  if (!data.intensities.empty())
+  {
+    availableFields.insert(FieldType::Intensity);
+  }
+  if (!data.pulseWidths.empty())
+  {
+    availableFields.insert(FieldType::PulseWidth);
+  }
+  if (!data.echoProperties.empty())
+  {
+    // If echo properties are available, we can provide IsReflector and HasBlooming fields based on the EchoProperties bits
+    availableFields.insert(FieldType::IsReflector);
+    availableFields.insert(FieldType::HasBlooming);
+  }
+
+  return availableFields;
+}
+
 template <typename BuilderT>
-auto createBuilder(PointCloudConfiguration const& configuration, Timestamp timestamp, MultiScan200Data const& data) -> BuilderT;
+auto createBuilder(typename BuilderT::FieldConfig const& fieldConfig, Timestamp timestamp, MultiScan200Data const& data) -> BuilderT;
 
 template <>
-auto createBuilder<OrganizedPointCloudBuilder>(PointCloudConfiguration const& configuration, Timestamp timestamp, MultiScan200Data const& data)
-  -> OrganizedPointCloudBuilder
+auto createBuilder<point_cloud::OrganizedPointCloudBuilder>(
+  point_cloud::OrganizedPointCloudBuilder::FieldConfig const& fieldConfig,
+  Timestamp timestamp,
+  MultiScan200Data const& data
+) -> point_cloud::OrganizedPointCloudBuilder
 {
   auto const numberOfEchoes = static_cast<std::size_t>(data.segmentMetaData.numberOfEchoes);
   auto const width          = static_cast<std::size_t>(data.segmentMetaData.numberOfColumnsInSegment);
   auto const height         = static_cast<std::size_t>(data.segmentMetaData.numberOfRows);
-  auto const layout         = OrganizedPointCloudBuilder::buildLayout(configuration, width, height, numberOfEchoes);
-  return OrganizedPointCloudBuilder(timestamp, layout);
+  return point_cloud::OrganizedPointCloudBuilder(fieldConfig, timestamp, width, height, numberOfEchoes);
 }
 
 template <>
-auto createBuilder<UnorganizedPointCloudBuilder>(PointCloudConfiguration const& configuration, Timestamp timestamp, MultiScan200Data const& data)
-  -> UnorganizedPointCloudBuilder
+auto createBuilder<point_cloud::UnorganizedPointCloudBuilder>(
+  point_cloud::UnorganizedPointCloudBuilder::FieldConfig const& fieldConfig,
+  Timestamp timestamp,
+  MultiScan200Data const& data
+) -> point_cloud::UnorganizedPointCloudBuilder
 {
   auto const numberOfEchoes    = static_cast<std::size_t>(data.segmentMetaData.numberOfEchoes);
   auto const width             = static_cast<std::size_t>(data.segmentMetaData.numberOfColumnsInSegment);
   auto const height            = static_cast<std::size_t>(data.segmentMetaData.numberOfRows);
   auto const maxNumberOfPoints = width * height * numberOfEchoes;
-  return UnorganizedPointCloudBuilder(timestamp, configuration, maxNumberOfPoints);
+  return point_cloud::UnorganizedPointCloudBuilder(fieldConfig, timestamp, maxNumberOfPoints);
 }
 
-template <typename BuilderT>
-auto convertSpecific(PointCloudConfiguration const& configuration, MultiScan200Data const& data) -> MultiEchoPointCloud
+template <typename BuilderT, typename PointCloudT>
+auto convertSpecific(
+  point_cloud::PointCloudConfiguration const& configuration,
+  std::set<point_cloud::PointField::FieldType> const& desiredFields,
+  MultiScan200Data const& data
+) -> PointCloudT
 {
+  using FieldType = point_cloud::PointField::FieldType;
+
   // Make sure the geometries in the input data are valid.
   if (data.geometry.azimuths.size() < static_cast<std::size_t>(data.segmentMetaData.numberOfColumnsInSegment) //
       || data.geometry.elevations.size() < static_cast<std::size_t>(data.segmentMetaData.numberOfRows)        //
@@ -218,6 +267,8 @@ auto convertSpecific(PointCloudConfiguration const& configuration, MultiScan200D
     throw std::runtime_error("Input data geometry size is smaller than expected based on segment metadata");
   }
 
+  typename BuilderT::FieldConfig fieldConfig {desiredFields, getAvailableFields(data)};
+
   // Handle empty point cloud case early (before accessing geometry)
   auto const pointCloudIsEmpty =
     data.segmentMetaData.numberOfColumnsInSegment == 0 //
@@ -225,7 +276,7 @@ auto convertSpecific(PointCloudConfiguration const& configuration, MultiScan200D
     || data.segmentMetaData.numberOfEchoes == 0;
   if (pointCloudIsEmpty)
   {
-    auto builder = createBuilder<BuilderT>(configuration, Timestamp::fromMicrosecondsSinceEpoch(0), data);
+    auto builder = createBuilder<BuilderT>(fieldConfig, Timestamp::fromMicrosecondsSinceEpoch(0), data);
     return builder.build();
   }
 
@@ -263,7 +314,7 @@ auto convertSpecific(PointCloudConfiguration const& configuration, MultiScan200D
   auto const firstDelta = data.geometry.relativeTimeStamps[0];
   auto const timestamp  = data.segmentMetaData.frameTimestamp + firstDelta;
 
-  auto builder = createBuilder<BuilderT>(configuration, timestamp, data);
+  auto builder = createBuilder<BuilderT>(fieldConfig, timestamp, data);
 
   // Compute the time offsets for each column relative to the start of the segment.
   std::vector<Duration> segmentColumnTimeOffsets;
@@ -308,7 +359,7 @@ auto convertSpecific(PointCloudConfiguration const& configuration, MultiScan200D
 
         if (isFilteredOut)
         {
-          if constexpr (std::is_same_v<BuilderT, OrganizedPointCloudBuilder>)
+          if constexpr (std::is_same_v<BuilderT, point_cloud::OrganizedPointCloudBuilder>)
           {
             builder.writeInvalidPoint();
           }
@@ -325,64 +376,64 @@ auto convertSpecific(PointCloudConfiguration const& configuration, MultiScan200D
           float const yDistance = cosElevation * sinAzimuth * distanceScaled;
           float const zDistance = -sinElevation * distanceScaled;
 
-          builder.write(xDistance);
-          builder.write(yDistance);
-          builder.write(zDistance);
+          builder.writeNextFieldValueOrIgnore(FieldType::X, xDistance);
+          builder.writeNextFieldValueOrIgnore(FieldType::Y, yDistance);
+          builder.writeNextFieldValueOrIgnore(FieldType::Z, zDistance);
         }
 
         if (configuration.fields.enableSpherical)
         {
-          builder.write(distanceScaled);
-          builder.write(azimuth.radians());
-          builder.write(elevation.radians());
+          builder.writeNextFieldValueOrIgnore(FieldType::Range, distanceScaled);
+          builder.writeNextFieldValueOrIgnore(FieldType::Azimuth, azimuth.radians());
+          builder.writeNextFieldValueOrIgnore(FieldType::Elevation, elevation.radians());
         }
 
         if (configuration.fields.enableIntensity)
         {
-          builder.write(intensity);
+          builder.writeNextFieldValueOrIgnore(FieldType::Intensity, intensity);
         }
 
         if (configuration.fields.enableTimeOffset)
         {
           auto const [seconds, nanoseconds] = columnTimeOffset.secondsAndNanoseconds();
-          builder.write(nanoseconds);
-          builder.write(seconds);
+          builder.writeNextFieldValueOrIgnore(FieldType::TimeOffsetNanoseconds, nanoseconds);
+          builder.writeNextFieldValueOrIgnore(FieldType::TimeOffsetSeconds, seconds);
         }
 
         if (configuration.fields.enableRing)
         {
-          builder.write(static_cast<std::uint8_t>(rowIndex));
+          builder.writeNextFieldValueOrIgnore(FieldType::Ring, static_cast<std::uint8_t>(rowIndex));
         }
 
         if (configuration.fields.enableLayer)
         {
-          builder.write(static_cast<std::uint8_t>(rowIndex));
+          builder.writeNextFieldValueOrIgnore(FieldType::LayerId, static_cast<std::uint8_t>(rowIndex));
         }
 
         if (configuration.fields.enableEcho)
         {
           auto const echoId = static_cast<std::uint8_t>(echoIndex);
-          builder.write(echoId);
+          builder.writeNextFieldValueOrIgnore(FieldType::EchoIndex, echoId);
         }
 
         if (configuration.fields.enableIsReflector)
         {
           auto const echoProperties      = accessFunctions.getEchoPropertiesOrReserved(data, dataIndex);
           std::uint8_t const isReflector = echoProperties.isSet(EchoProperties::IsReflector) ? 1 : 0;
-          builder.write(isReflector);
+          builder.writeNextFieldValueOrIgnore(FieldType::IsReflector, isReflector);
         }
 
         if (configuration.fields.enableHasBlooming)
         {
           auto const echoProperties      = accessFunctions.getEchoPropertiesOrReserved(data, dataIndex);
           std::uint8_t const hasBlooming = echoProperties.isSet(EchoProperties::IsBlooming) ? 1 : 0;
-          builder.write(hasBlooming);
+          builder.writeNextFieldValueOrIgnore(FieldType::HasBlooming, hasBlooming);
         }
 
         if (configuration.fields.enablePulseWidth)
         {
           auto const pulseWidth = accessFunctions.getPulseWidthOrNan(data, dataIndex);
-          builder.write(pulseWidth);
+          builder.writeNextFieldValueOrIgnore(FieldType::PulseWidth, pulseWidth);
         }
       }
     }
@@ -393,17 +444,19 @@ auto convertSpecific(PointCloudConfiguration const& configuration, MultiScan200D
 
 } // namespace
 
-PointCloudConverter::PointCloudConverter(PointCloudConfiguration configuration)
+PointCloudConverter::PointCloudConverter(point_cloud::PointCloudConfiguration configuration)
   : m_configuration(std::move(configuration))
+  , m_desiredFields(m_configuration.fields.toSet())
 { }
 
-auto PointCloudConverter::convert(MultiScan200Data const& data) const -> MultiEchoPointCloud
+auto PointCloudConverter::convertToOrganized(MultiScan200Data const& data) const -> point_cloud::OrganizedPointCloud
 {
-  if (m_configuration.organization == MultiEchoPointCloud::Organization::Organized)
-  {
-    return convertSpecific<OrganizedPointCloudBuilder>(m_configuration, data);
-  }
-  return convertSpecific<UnorganizedPointCloudBuilder>(m_configuration, data);
+  return convertSpecific<point_cloud::OrganizedPointCloudBuilder, point_cloud::OrganizedPointCloud>(m_configuration, m_desiredFields, data);
+}
+
+auto PointCloudConverter::convertToUnorganized(MultiScan200Data const& data) const -> point_cloud::UnorganizedPointCloud
+{
+  return convertSpecific<point_cloud::UnorganizedPointCloudBuilder, point_cloud::UnorganizedPointCloud>(m_configuration, m_desiredFields, data);
 }
 
 } // namespace sick::compact::multiscan200

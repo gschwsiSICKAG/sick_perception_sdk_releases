@@ -74,9 +74,11 @@ public:
     return numberOfLosses;
   }
 
+protected:
+  std::optional<SequenceNumberT> m_lastSequenceNumber;
+
 private:
   SequenceNumberT m_expectedIncrement;
-  std::optional<SequenceNumberT> m_lastSequenceNumber;
 };
 
 } // namespace sick::compact

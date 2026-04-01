@@ -7,9 +7,9 @@ SPDX-License-Identifier: MIT
 
 #include "../examples_helper.hpp"
 #include <sick_perception_sdk/compact_format/telegram_type_1_scan_data/DataLossMonitor.hpp>
-#include <sick_perception_sdk/drivers/multiScan100/Driver.hpp>
+#include <sick_perception_sdk/drivers/multiScan100/MultiScan100Driver.hpp>
 #include <sick_perception_sdk/sensor_configuration/HttpClient/httplib_client/HttpClient.hpp>
-#include <sick_perception_sdk/sensor_configuration/multiScan100/Configurator.hpp>
+#include <sick_perception_sdk/sensor_configuration/multiScan100/MultiScan100Configurator.hpp>
 
 #include <chrono>
 #include <iostream>
@@ -19,21 +19,21 @@ using namespace sick::literals;
 using namespace std::chrono_literals;
 using LossCounts = sick::compact::scan_data::DataLossMonitor::LossCounts;
 
-std::uint8_t newScanCounter = 0;
+std::uint8_t numberOfScans = 0;
 
-void onNewScanData(sick::compact::scan_data::ScanData const& compactScanData)
+void onNewScanData(sick::compact::scan_data::ScanData const& data)
 {
-  newScanCounter++;
-  if (newScanCounter == 100)
+  numberOfScans++;
+  if (numberOfScans == 100)
   {
-    std::cout << "Received scan data with telegram counter: " << compactScanData.telegramHeader.telegramCounter << '\n';
-    newScanCounter = 0;
+    std::cout << "Received scan data with telegram sequence number: " << data.telegramHeader.telegramSequenceNumber << '\n';
+    numberOfScans = 0;
   }
 }
 
 void onDataLoss(LossCounts const& lossCounts)
 {
-  std::cout << "Package losses detected: lost telegrams=" << lossCounts.numberOfLostTelegrams << ", lost frames=" << lossCounts.numberOfLostFrames
+  std::cout << "Data losses detected: lost telegrams=" << lossCounts.numberOfLostTelegrams << ", lost frames=" << lossCounts.numberOfLostFrames
             << ", lost segments=" << lossCounts.numberOfLostSegments << '\n';
 }
 
@@ -49,7 +49,7 @@ int main(int argc, char* argv[])
   // Change the default passwords during initial commissioning to secure your device.
   // Passwords can be updated via the web browser or API.
   // For production use, store passwords in a secure vault rather than in plain text.
-  sick::multiScan100::v2_4_1::Configurator configurator(httpClient, sick::UserLevel::Service, "servicelevel");
+  sick::multiScan100::v2_4_2_0R::Configurator configurator(httpClient, sick::UserLevel::Service, "servicelevel");
 
   try
   {
@@ -114,9 +114,11 @@ int main(int argc, char* argv[])
   sick::compact::scan_data::DataLossMonitor dataLossMonitor {expectedFrameSequenceNumberIncrement, expectedNumberOfSegments};
 
   sick::multiScan100::Driver driver(sick::examples::printExceptionMessage);
-  driver.scanDataReceiver().setup();
-  driver.scanDataReceiver().setDataLossMonitor(std::move(dataLossMonitor), onDataLoss);
-  driver.scanDataReceiver().setOnNewSegmentCallback(onNewScanData);
+  driver
+    .scanDataReceiver()                                         //
+    .setup()                                                    //
+    .setDataLossMonitor(std::move(dataLossMonitor), onDataLoss) //
+    .setOnNewSegmentCallback(onNewScanData);
   driver.run();
   std::this_thread::sleep_for(60s);
   deviceHealthThread.join();

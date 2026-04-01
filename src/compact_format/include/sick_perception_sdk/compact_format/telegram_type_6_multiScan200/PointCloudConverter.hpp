@@ -6,9 +6,13 @@ SPDX-License-Identifier: MIT
 #pragma once
 
 #include <sick_perception_sdk/common/export.hpp>
-#include <sick_perception_sdk/compact_format/PointCloud/MultiEchoPointCloud.hpp>
+#include <sick_perception_sdk/compact_format/PointCloud/OrganizedPointCloud.hpp>
+#include <sick_perception_sdk/compact_format/PointCloud/PointCloudAttributes.hpp>
 #include <sick_perception_sdk/compact_format/PointCloud/PointCloudConfiguration.hpp>
+#include <sick_perception_sdk/compact_format/PointCloud/UnorganizedPointCloud.hpp>
 #include <sick_perception_sdk/compact_format/telegram_type_6_multiScan200/MultiScan200Data.hpp>
+
+#include <set>
 
 namespace sick::compact::multiscan200 {
 
@@ -18,12 +22,14 @@ namespace sick::compact::multiscan200 {
 class SDK_EXPORT PointCloudConverter
 {
 public:
-  explicit PointCloudConverter(PointCloudConfiguration configuration);
+  explicit PointCloudConverter(point_cloud::PointCloudConfiguration configuration);
 
-  auto convert(MultiScan200Data const& data) const -> MultiEchoPointCloud;
+  auto convertToOrganized(MultiScan200Data const& data) const -> point_cloud::OrganizedPointCloud;
+  auto convertToUnorganized(MultiScan200Data const& data) const -> point_cloud::UnorganizedPointCloud;
 
 private:
-  PointCloudConfiguration m_configuration;
+  point_cloud::PointCloudConfiguration m_configuration;
+  std::set<point_cloud::PointField::FieldType> m_desiredFields; // Cached set of desired fields from m_configuration
 };
 
 } // namespace sick::compact::multiscan200

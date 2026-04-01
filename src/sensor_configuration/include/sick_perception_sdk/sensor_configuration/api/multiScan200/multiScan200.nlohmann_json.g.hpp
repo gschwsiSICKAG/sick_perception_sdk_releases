@@ -9,5 +9,5 @@ SPDX-License-Identifier: MIT
  */
 #pragma once
 
-#include <sick_perception_sdk/sensor_configuration/api/multiScan200/0_9_0.nlohmann_json.g.hpp>
+#include <sick_perception_sdk/sensor_configuration/api/multiScan200/0_9_0_2C.nlohmann_json.g.hpp>
 

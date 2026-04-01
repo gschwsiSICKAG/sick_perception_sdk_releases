@@ -9,14 +9,14 @@ SPDX-License-Identifier: MIT
 #include <sick_perception_sdk/sensor_configuration/HttpClient/httplib_client/HttpClient.hpp>
 
 #if defined(USE_MULTISCAN100)
-#  include <sick_perception_sdk/drivers/multiScan100/Driver.hpp>
-#  include <sick_perception_sdk/sensor_configuration/multiScan100/Configurator.hpp>
-using ConfiguratorT = sick::multiScan100::v2_4_1::Configurator;
+#  include <sick_perception_sdk/drivers/multiScan100/MultiScan100Driver.hpp>
+#  include <sick_perception_sdk/sensor_configuration/multiScan100/MultiScan100Configurator.hpp>
+using ConfiguratorT = sick::multiScan100::v2_4_2_0R::Configurator;
 using DriverT       = sick::multiScan100::Driver;
 #else // Default to picoScan100
-#  include <sick_perception_sdk/drivers/picoScan100/Driver.hpp>
-#  include <sick_perception_sdk/sensor_configuration/picoScan150/Configurator.hpp>
-using ConfiguratorT = sick::picoScan150::v2_2_1::Configurator;
+#  include <sick_perception_sdk/drivers/picoScan100/PicoScan100Driver.hpp>
+#  include <sick_perception_sdk/sensor_configuration/picoScan150/PicoScan150Configurator.hpp>
+using ConfiguratorT = sick::picoScan150::v2_2_1_0R::Configurator;
 using DriverT       = sick::picoScan100::Driver;
 #endif
 
@@ -31,10 +31,10 @@ using DriverT       = sick::picoScan100::Driver;
 
 using namespace std::chrono_literals;
 
-void onNewScanData(sick::compact::scan_data::ScanData const& compactScanData)
+void onNewScanData(sick::compact::scan_data::ScanData const& data)
 {
-  std::cout << "Received scan data with telegram counter: " << compactScanData.telegramHeader.telegramCounter << '\n';
-  for (auto const& module : compactScanData.modules)
+  std::cout << "Received scan data with telegram sequence number: " << data.telegramHeader.telegramSequenceNumber << '\n';
+  for (auto const& module : data.modules)
   {
     std::cout << "Segment index: " << module.metaData.segmentIndex << '\n';
     std::cout << "Frame sequence number: " << module.metaData.frameSequenceNumber << '\n';
@@ -65,8 +65,10 @@ int main(int argc, char* argv[])
   }
 
   DriverT driver(sick::examples::printExceptionMessage);
-  driver.scanDataReceiver().setup();
-  driver.scanDataReceiver().setOnNewSegmentCallback(onNewScanData);
+  driver
+    .scanDataReceiver() //
+    .setup()            //
+    .setOnNewSegmentCallback(onNewScanData);
   driver.run();
 
   std::this_thread::sleep_for(10s);

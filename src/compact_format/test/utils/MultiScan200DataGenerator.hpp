@@ -19,7 +19,7 @@ namespace sick::test {
  * This generator creates realistic MultiScan200Data structures for testing purposes.
  * It supports configurable parameters like number of rows, columns, echoes, and segments.
  * 
- * The generator is stateful, i.e. calling next() advances the segment index and frame number
+ * The generator is stateful, i.e. calling next() advances the segment index and frame sequence number,
  * similar to how a real sensor would stream data.
  */
 class MultiScan200DataGenerator

@@ -8,13 +8,13 @@
 
 A modern C++17 SDK for developing applications with various SICK LiDAR sensors and access to sensor configuration, scan data, and integration examples.
 
-![Release](https://img.shields.io/github/v/release/SICKAG/sick_perception_sdk?color=005aff&label=Release)
+![Release](https://img.shields.io/github/v/release/gschwsiSICKAG/sick_perception_sdk_releases?color=005aff&label=Release)
 ![OS](https://img.shields.io/badge/OS-Linux_|_Windows-005aff)
 ![CPU](https://img.shields.io/badge/CPU-x86__64_|_ARM64-005aff)
 ![Made-with](https://img.shields.io/badge/Language-C++17-005aff)
 [![License](https://img.shields.io/badge/License-MIT-005aff)](LICENSE)
 [![Maintenance](https://img.shields.io/badge/Maintained-yes-005aff)](https://github.com/SICKAG/sick_perception_sdk)
-[![Documentation](https://img.shields.io/badge/Documentation-complete-005aff)](https://github.com/SICKAG/sick_perception_sdk)
+[![Documentation](https://img.shields.io/badge/Documentation-complete-005aff)](https://github.com/gschwsiSICKAG/sick_perception_sdk_releases)
 [![Open Issues](https://img.shields.io/github/issues/SICKAG/sick_perception_sdk?label=Open%20Issues&color=005aff)](https://github.com/SICKAG/sick_perception_sdk/issues)
 
 [⚡️Getting started](#️-getting-started) • [🔄 Change Log](CHANGELOG.md)

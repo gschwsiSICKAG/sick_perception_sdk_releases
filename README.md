@@ -15,7 +15,7 @@ A modern C++17 SDK for developing applications with various SICK LiDAR sensors a
 [![License](https://img.shields.io/badge/License-MIT-005aff)](LICENSE)
 [![Maintenance](https://img.shields.io/badge/Maintained-yes-005aff)](https://github.com/SICKAG/sick_perception_sdk)
 [![Documentation](https://img.shields.io/badge/Documentation-complete-005aff)](https://github.com/SICKAG/sick_scan_xd)
-[![Open Issues](https://img.shields.io/github/issues/SICKAG/sick_perception_sdk?label=Open%20Issues&color=005aff)](https://github.com/SICKAG/sick_perception_sdk/issues)
+[![Open Issues](https://img.shields.io/github/issues/SICKAG/sick_scan_xd?label=Open%20Issues&color=005aff)](https://github.com/SICKAG/sick_perception_sdk/issues)
 
 [⚡️Getting started](#️-getting-started) • [🔄 Change Log](CHANGELOG.md)
 
